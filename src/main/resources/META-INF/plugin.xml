@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.calvincode.intellij-investor-dashboard</id>
-    <name>IntelliJ Investor Dashboard</name>
+    <name>Stocker</name>
     <vendor email="support@calvincode.com" url="http://www.calvincode.com">CalvinCode</vendor>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
