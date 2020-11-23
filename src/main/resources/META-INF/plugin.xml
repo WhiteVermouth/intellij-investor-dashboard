@@ -1,17 +1,15 @@
 <idea-plugin>
-    <id>com.calvincode.intellij-investor-dashboard</id>
+    <id>com.vermouthx.intellij-investor-dashboard</id>
     <name>Stocker</name>
-    <vendor email="support@calvincode.com" url="http://www.calvincode.com">CalvinCode</vendor>
-
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
+    <vendor email="vermouth7dante@gmail.com" url="https://vermouthx.com">Zihan Ma</vendor>
+    <idea-version since-build="202"/>
     <depends>com.intellij.modules.platform</depends>
-
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
+        <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerUpdateActivity"/>
+        <toolWindow id="Stocker" anchor="left" icon="/icons/logo.svg"
+                    factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
     </extensions>
-
     <actions>
-        <!-- Add your actions here -->
     </actions>
 </idea-plugin>
