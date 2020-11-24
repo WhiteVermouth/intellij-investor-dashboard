@@ -6,18 +6,24 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class StockerStockAddDialog extends DialogWrapper {
-    private JTextField tfStockCode;
-    private JLabel lbStockCode;
     private JPanel mPane;
+    private JLabel lbStockCode;
+    private JTextField tfStockCode;
+    private JLabel lbNote;
+    private JLabel lbStockCodeSample;
 
-    protected StockerStockAddDialog() {
+    public StockerStockAddDialog(String mkType) {
         super(true);
         init();
-        setTitle("Add Stock Code");
+        setTitle("Add " + mkType + " Stock Code");
     }
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
         return mPane;
+    }
+
+    public String getInput() {
+        return tfStockCode.getText();
     }
 }

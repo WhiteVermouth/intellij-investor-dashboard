@@ -6,8 +6,8 @@
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
-        <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerUpdateActivity"/>
-        <toolWindow id="Stocker" anchor="left" icon="/icons/logo.svg"
+        <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerStartupActivity"/>
+        <toolWindow id="Stocker" anchor="bottom" icon="/icons/logo.svg"
                     factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
     </extensions>
     <actions>

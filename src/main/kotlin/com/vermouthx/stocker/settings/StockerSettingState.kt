@@ -1,8 +1,11 @@
 package com.vermouthx.stocker.settings
 
+import com.vermouthx.stocker.enum.StockerQuoteProvider
+
 class StockerSettingState {
     var version: String = ""
-    var aShareList: List<String> = emptyList()
-    var hkStocksList: List<String> = emptyList()
-    var usStocksList: List<String> = emptyList()
+    var quoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
+    var aShareList: MutableList<String> = mutableListOf()
+    var hkStocksList: MutableList<String> = mutableListOf()
+    var usStocksList: MutableList<String> = mutableListOf()
 }
