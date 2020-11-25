@@ -1,5 +1,3 @@
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-
 plugins {
     java
     id("org.jetbrains.intellij") version "0.4.21"
@@ -32,11 +30,15 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
-}
-tasks.getByName<PatchPluginXmlTask>("patchPluginXml") {
-    changeNotes(
-        """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
-    )
+    patchPluginXml {
+        sinceBuild("202")
+        untilBuild("203.*")
+        pluginDescription("""
+            Stocker is a dashboard, which helps investor envision realtime market conditions in IntelliJ based IDEs.
+        """.trimIndent())
+        changeNotes("""
+            1.0.0 <br>
+                - Stocker: a stock quote dashboard
+        """.trimIndent())
+    }
 }
