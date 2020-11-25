@@ -45,7 +45,7 @@ object StockerQuoteHttpUtil {
                 .map { textArray ->
                     when (marketType) {
                         StockerMarketType.AShare -> {
-                            val code = textArray[0]
+                            val code = textArray[0].toUpperCase()
                             val name = textArray[1]
                             val opening = textArray[2].toDouble()
                             val close = textArray[3].toDouble()
@@ -71,7 +71,7 @@ object StockerQuoteHttpUtil {
                             )
                         }
                         StockerMarketType.HKStocks -> {
-                            val code = textArray[0]
+                            val code = textArray[0].toUpperCase()
                             val name = textArray[2]
                             val opening = textArray[3].toDouble()
                             val close = textArray[4].toDouble()
@@ -97,7 +97,7 @@ object StockerQuoteHttpUtil {
                             )
                         }
                         StockerMarketType.USStocks -> {
-                            val code = textArray[0]
+                            val code = textArray[0].toUpperCase()
                             val name = textArray[1]
                             val current = textArray[2].toDouble()
                             val percentage = if (textArray[3].startsWith("-")) {

@@ -79,6 +79,8 @@ class StockerToolWindow : ToolWindowFactory {
                             .forEach {
                                 setting.removeCode(k, it)
                             }
+                    v.tbModel.dataVector.clear()
+                    v.tbModel.fireTableDataChanged()
                 }
             }
             when (k) {

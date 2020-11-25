@@ -3,7 +3,6 @@ package com.vermouthx.stocker.activities
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.PluginId
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.vermouthx.stocker.enums.StockerMarketType
@@ -14,7 +13,7 @@ import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import com.vermouthx.stocker.views.StockerToolWindow
 import kotlin.concurrent.thread
 
-class StockerStartupActivity : StartupActivity, DumbAware {
+class StockerStartupActivity : StartupActivity {
 
     companion object {
         private const val pluginId = "com.vermouthx.intellij-investor-dashboard"
