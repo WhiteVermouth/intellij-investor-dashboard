@@ -15,6 +15,7 @@ public class StockerUIView {
     private JTable tbView;
     private JButton btnAdd;
     private JButton btnDelete;
+    private JButton btnRefresh;
     private JBColor upColor;
     private JBColor downColor;
     private final DefaultTableModel tbModel;
@@ -76,6 +77,10 @@ public class StockerUIView {
 
     public JButton getBtnDelete() {
         return btnDelete;
+    }
+
+    public JButton getBtnRefresh() {
+        return btnRefresh;
     }
 
     public DefaultTableModel getTbModel() {

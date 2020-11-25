@@ -6,20 +6,25 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.vermouthx.stocker.enums.StockerMarketType
+import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.listeners.StockerQuoteListener
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 import com.vermouthx.stocker.notifications.StockerNotification
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
+import kotlin.concurrent.thread
 
 class StockerToolWindow : ToolWindowFactory {
 
     companion object {
-        val setting = StockerSetting.instance
-        val messageBus = ApplicationManager.getApplication().messageBus
+        private val setting = StockerSetting.instance
+        private val messageBus = ApplicationManager.getApplication().messageBus
     }
 
     private lateinit var tabViewMap: Map<StockerMarketType, StockerUIView>
+    private lateinit var aShareThread: Thread
+    private lateinit var hkStocksThread: Thread
+    private lateinit var usStocksThread: Thread
 
     override fun init(toolWindow: ToolWindow) {
         super.init(toolWindow)
@@ -27,6 +32,21 @@ class StockerToolWindow : ToolWindowFactory {
                 StockerMarketType.AShare to StockerUIView(),
                 StockerMarketType.HKStocks to StockerUIView(),
                 StockerMarketType.USStocks to StockerUIView()
+        )
+        aShareThread = createQuoteUpdateThread(
+                StockerMarketType.AShare,
+                setting.quoteProvider,
+                setting.aShareList
+        )
+        hkStocksThread = createQuoteUpdateThread(
+                StockerMarketType.HKStocks,
+                setting.quoteProvider,
+                setting.hkStocksList
+        )
+        usStocksThread = createQuoteUpdateThread(
+                StockerMarketType.USStocks,
+                setting.quoteProvider,
+                setting.usStocksList
         )
     }
 
@@ -83,6 +103,17 @@ class StockerToolWindow : ToolWindowFactory {
                     v.tbModel.fireTableDataChanged()
                 }
             }
+            v.btnRefresh.addActionListener {
+                if (!aShareThread.isAlive) {
+                    aShareThread = createQuoteUpdateThread(StockerMarketType.AShare, setting.quoteProvider, setting.aShareList)
+                }
+                if (!hkStocksThread.isAlive) {
+                    hkStocksThread = createQuoteUpdateThread(StockerMarketType.HKStocks, setting.quoteProvider, setting.hkStocksList)
+                }
+                if (!usStocksThread.isAlive) {
+                    usStocksThread = createQuoteUpdateThread(StockerMarketType.USStocks, setting.quoteProvider, setting.usStocksList)
+                }
+            }
             when (k) {
                 StockerMarketType.AShare -> {
                     messageBus.connect()
@@ -108,6 +139,40 @@ class StockerToolWindow : ToolWindowFactory {
                 }
             }
         }
-
     }
+
+    private fun createQuoteUpdateThread(
+            marketType: StockerMarketType,
+            quoteProvider: StockerQuoteProvider,
+            stockCodeList: List<String>
+    ): Thread {
+        return thread(start = true) {
+            while (true) {
+                val quotes = if (stockCodeList.isNotEmpty()) {
+                    StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
+                } else {
+                    emptyList()
+                }
+                when (marketType) {
+                    StockerMarketType.AShare -> {
+                        val publisher =
+                                messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC)
+                        publisher.after(quotes)
+                    }
+                    StockerMarketType.HKStocks -> {
+                        val publisher =
+                                messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC)
+                        publisher.after(quotes)
+                    }
+                    StockerMarketType.USStocks -> {
+                        val publisher =
+                                messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC)
+                        publisher.after(quotes)
+                    }
+                }
+                Thread.sleep(1000)
+            }
+        }
+    }
+
 }

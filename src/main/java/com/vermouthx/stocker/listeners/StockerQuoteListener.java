@@ -17,12 +17,30 @@ public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
         quotes.forEach(quote -> {
             int rowIndex = existAt(quote.getCode());
             if (rowIndex != -1) {
-                tableModel.setValueAt(quote.getOpening(), rowIndex, 2);
-                tableModel.setValueAt(quote.getHigh(), rowIndex, 3);
-                tableModel.setValueAt(quote.getLow(), rowIndex, 4);
-                tableModel.setValueAt(quote.getCurrent(), rowIndex, 5);
-                tableModel.setValueAt(quote.getPercentage(), rowIndex, 6);
-                tableModel.setValueAt(quote.getUpdateAt(), rowIndex, 7);
+                if (!tableModel.getValueAt(rowIndex, 2).equals(quote.getOpening())) {
+                    tableModel.setValueAt(quote.getOpening(), rowIndex, 2);
+                    tableModel.fireTableCellUpdated(rowIndex, 2);
+                }
+                if (!tableModel.getValueAt(rowIndex, 3).equals(quote.getHigh())) {
+                    tableModel.setValueAt(quote.getHigh(), rowIndex, 3);
+                    tableModel.fireTableCellUpdated(rowIndex, 3);
+                }
+                if (!tableModel.getValueAt(rowIndex, 4).equals(quote.getLow())) {
+                    tableModel.setValueAt(quote.getLow(), rowIndex, 4);
+                    tableModel.fireTableCellUpdated(rowIndex, 4);
+                }
+                if (!tableModel.getValueAt(rowIndex, 5).equals(quote.getCurrent())) {
+                    tableModel.setValueAt(quote.getCurrent(), rowIndex, 5);
+                    tableModel.fireTableCellUpdated(rowIndex, 5);
+                }
+                if (!tableModel.getValueAt(rowIndex, 6).equals(quote.getPercentage())) {
+                    tableModel.setValueAt(quote.getPercentage(), rowIndex, 6);
+                    tableModel.fireTableCellUpdated(rowIndex, 6);
+                }
+                if (!tableModel.getValueAt(rowIndex, 7).equals(quote.getUpdateAt())) {
+                    tableModel.setValueAt(quote.getUpdateAt(), rowIndex, 7);
+                    tableModel.fireTableCellUpdated(rowIndex, 7);
+                }
             } else {
                 String[] row = {
                         quote.getCode().toUpperCase(),
@@ -36,7 +54,6 @@ public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
                 };
                 tableModel.addRow(row);
             }
-            tableModel.fireTableDataChanged();
         });
     }
 

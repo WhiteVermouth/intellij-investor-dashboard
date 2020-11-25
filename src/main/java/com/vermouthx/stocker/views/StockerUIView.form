@@ -32,6 +32,12 @@
               <text value="Delete"/>
             </properties>
           </component>
+          <component id="17ec3" class="javax.swing.JButton" binding="btnRefresh">
+            <constraints/>
+            <properties>
+              <text value="Refresh"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <scrollpane id="6765e" binding="sPane">
