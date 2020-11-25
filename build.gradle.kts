@@ -43,4 +43,7 @@ tasks {
                 - Stocker: a stock quote dashboard
         """.trimIndent())
     }
+    publishPlugin {
+        token(System.getProperty("jetbrains.token"))
+    }
 }

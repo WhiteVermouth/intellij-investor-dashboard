@@ -37,3 +37,10 @@ steps:
       tagSource: 'auto'
       target: '$(Build.SourceVersion)'
     displayName: 'Publish to GitHub Release'
+  - task: Gradle@2
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    inputs:
+      jdkVersionOption: '1.8'
+      options: '-Djetbrains.token=$(jetbrains.token)'
+      tasks: 'publishPlugin'
+    displayName: 'Publish to JetBrains Plugin Repository'
