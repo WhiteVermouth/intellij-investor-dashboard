@@ -80,15 +80,17 @@ class StockerToolWindow : ToolWindowFactory {
                 val dialog = StockerStockAddDialog(k.title)
                 if (dialog.showAndGet()) {
                     val input = dialog.input
-                    if (StockerQuoteHttpUtil.validateCode(k, setting.quoteProvider, input)) {
-                        val setting = StockerSetting.instance
-                        when (k) {
-                            StockerMarketType.AShare -> setting.aShareList.add(input.toUpperCase())
-                            StockerMarketType.HKStocks -> setting.hkStocksList.add(input.toUpperCase())
-                            StockerMarketType.USStocks -> setting.usStocksList.add(input.toUpperCase())
+                    input.split(",").forEach {
+                        if (StockerQuoteHttpUtil.validateCode(k, setting.quoteProvider, it)) {
+                            val setting = StockerSetting.instance
+                            when (k) {
+                                StockerMarketType.AShare -> setting.aShareList.add(it.toUpperCase())
+                                StockerMarketType.HKStocks -> setting.hkStocksList.add(it.toUpperCase())
+                                StockerMarketType.USStocks -> setting.usStocksList.add(it.toUpperCase())
+                            }
+                        } else {
+                            StockerNotification.notifyInvalidCode(project, it)
                         }
-                    } else {
-                        StockerNotification.notifyInvalidCode(project, input)
                     }
                 }
             }
