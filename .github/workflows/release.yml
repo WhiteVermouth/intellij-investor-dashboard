@@ -37,6 +37,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          body_path: 'build/distribution/*.zip'
+          body_path: 'build/distributions/*.zip'
           draft: false
           prerelease: false
