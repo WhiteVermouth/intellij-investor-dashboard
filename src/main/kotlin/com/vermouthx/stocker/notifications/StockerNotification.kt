@@ -9,9 +9,9 @@ import com.intellij.openapi.util.IconLoader
 
 object StockerNotification {
     private val notificationGroup = NotificationGroup(
-        displayId = "Stocker",
-        displayType = NotificationDisplayType.STICKY_BALLOON,
-        isLogByDefault = true
+            displayId = "Stocker",
+            displayType = NotificationDisplayType.STICKY_BALLOON,
+            isLogByDefault = true
     )
 
     @JvmField
@@ -19,12 +19,12 @@ object StockerNotification {
 
     fun notifyInvalidCode(project: Project, code: String) {
         notificationGroup.createNotification(
-            title = "Stocker",
-            content = "You entered an invalid stock code: ${code}.",
-            type = NotificationType.ERROR,
-            listener = NotificationListener.URL_OPENING_LISTENER
+                title = "Stocker",
+                content = "You entered an invalid stock code: ${code}.",
+                type = NotificationType.ERROR,
+                listener = NotificationListener.URL_OPENING_LISTENER
         )
-            .setIcon(icon)
-            .notify(project)
+                .setIcon(icon)
+                .notify(project)
     }
 }

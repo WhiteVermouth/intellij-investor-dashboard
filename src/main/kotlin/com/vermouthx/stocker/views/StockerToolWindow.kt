@@ -17,47 +17,23 @@ class StockerToolWindow : ToolWindowFactory {
     companion object {
         val setting = StockerSetting.instance
         val messageBus = ApplicationManager.getApplication().messageBus
-        val tabViewMap: Map<StockerMarketType, StockerUIView> = mapOf(
+    }
+
+    private lateinit var tabViewMap: Map<StockerMarketType, StockerUIView>
+
+    override fun init(toolWindow: ToolWindow) {
+        super.init(toolWindow)
+        tabViewMap = mapOf(
                 StockerMarketType.AShare to StockerUIView(),
                 StockerMarketType.HKStocks to StockerUIView(),
                 StockerMarketType.USStocks to StockerUIView()
         )
     }
 
-    override fun init(toolWindow: ToolWindow) {
-        super.init(toolWindow)
-        tabViewMap.forEach { (k, v) ->
-            when (k) {
-                StockerMarketType.AShare -> {
-                    messageBus.connect()
-                            .subscribe(
-                                    StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
-                                    StockerQuoteListener(v.tbModel)
-                            )
-                }
-                StockerMarketType.HKStocks -> {
-                    messageBus.connect()
-                            .subscribe(
-                                    StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
-                                    StockerQuoteListener(v.tbModel)
-                            )
-                }
-                StockerMarketType.USStocks -> {
-                    messageBus.connect()
-                            .subscribe(
-                                    StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
-                                    StockerQuoteListener(v.tbModel)
-                            )
-
-                }
-            }
-        }
-    }
-
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        setupButtonAction(project)
         val contentManager = toolWindow.contentManager
         val contentFactory = ContentFactory.SERVICE.getInstance()
+        setupActionListener(project)
         val aShareContent = contentFactory.createContent(
                 tabViewMap[StockerMarketType.AShare]?.content,
                 StockerMarketType.AShare.title,
@@ -78,7 +54,7 @@ class StockerToolWindow : ToolWindowFactory {
         contentManager.addContent(usStocksContent)
     }
 
-    private fun setupButtonAction(project: Project) {
+    private fun setupActionListener(project: Project) {
         tabViewMap.forEach { (k, v) ->
             v.btnAdd.addActionListener {
                 val dialog = StockerStockAddDialog(k.title)
@@ -105,6 +81,31 @@ class StockerToolWindow : ToolWindowFactory {
                             }
                 }
             }
+            when (k) {
+                StockerMarketType.AShare -> {
+                    messageBus.connect()
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
+                }
+                StockerMarketType.HKStocks -> {
+                    messageBus.connect()
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
+                }
+                StockerMarketType.USStocks -> {
+                    messageBus.connect()
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
+
+                }
+            }
         }
+
     }
 }
