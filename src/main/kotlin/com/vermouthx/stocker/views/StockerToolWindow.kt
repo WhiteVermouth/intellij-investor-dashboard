@@ -84,9 +84,21 @@ class StockerToolWindow : ToolWindowFactory {
                         if (StockerQuoteHttpUtil.validateCode(k, setting.quoteProvider, it)) {
                             val setting = StockerSetting.instance
                             when (k) {
-                                StockerMarketType.AShare -> setting.aShareList.add(it.toUpperCase())
-                                StockerMarketType.HKStocks -> setting.hkStocksList.add(it.toUpperCase())
-                                StockerMarketType.USStocks -> setting.usStocksList.add(it.toUpperCase())
+                                StockerMarketType.AShare -> {
+                                    if (!setting.aShareList.contains(it.toUpperCase())) {
+                                        setting.aShareList.add(it.toUpperCase())
+                                    }
+                                }
+                                StockerMarketType.HKStocks -> {
+                                    if (!setting.hkStocksList.contains(it.toUpperCase())) {
+                                        setting.hkStocksList.add(it.toUpperCase())
+                                    }
+                                }
+                                StockerMarketType.USStocks -> {
+                                    if (!setting.usStocksList.contains(it.toUpperCase())) {
+                                        setting.usStocksList.add(it.toUpperCase())
+                                    }
+                                }
                             }
                         } else {
                             StockerNotification.notifyInvalidCode(project, it)
