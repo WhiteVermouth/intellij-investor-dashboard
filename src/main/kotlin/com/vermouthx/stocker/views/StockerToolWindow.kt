@@ -5,8 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
-import com.vermouthx.stocker.enum.StockerMarketType
-import com.vermouthx.stocker.enum.StockerQuoteProvider
+import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteListener
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 import com.vermouthx.stocker.notifications.StockerNotification
@@ -19,9 +18,9 @@ class StockerToolWindow : ToolWindowFactory {
         val setting = StockerSetting.instance
         val messageBus = ApplicationManager.getApplication().messageBus
         val tabViewMap: Map<StockerMarketType, StockerUIView> = mapOf(
-            StockerMarketType.AShare to StockerUIView(),
-            StockerMarketType.HKStocks to StockerUIView(),
-            StockerMarketType.USStocks to StockerUIView()
+                StockerMarketType.AShare to StockerUIView(),
+                StockerMarketType.HKStocks to StockerUIView(),
+                StockerMarketType.USStocks to StockerUIView()
         )
     }
 
@@ -31,24 +30,24 @@ class StockerToolWindow : ToolWindowFactory {
             when (k) {
                 StockerMarketType.AShare -> {
                     messageBus.connect()
-                        .subscribe(
-                            StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tbModel)
-                        )
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
                 }
                 StockerMarketType.HKStocks -> {
                     messageBus.connect()
-                        .subscribe(
-                            StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tbModel)
-                        )
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
                 }
                 StockerMarketType.USStocks -> {
                     messageBus.connect()
-                        .subscribe(
-                            StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tbModel)
-                        )
+                            .subscribe(
+                                    StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
+                                    StockerQuoteListener(v.tbModel)
+                            )
 
                 }
             }
@@ -60,21 +59,21 @@ class StockerToolWindow : ToolWindowFactory {
         val contentManager = toolWindow.contentManager
         val contentFactory = ContentFactory.SERVICE.getInstance()
         val aShareContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.AShare]?.content,
-            StockerMarketType.AShare.title,
-            false
+                tabViewMap[StockerMarketType.AShare]?.content,
+                StockerMarketType.AShare.title,
+                false
         )
         contentManager.addContent(aShareContent)
         val hkStocksContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.HKStocks]?.content,
-            StockerMarketType.HKStocks.title,
-            false
+                tabViewMap[StockerMarketType.HKStocks]?.content,
+                StockerMarketType.HKStocks.title,
+                false
         )
         contentManager.addContent(hkStocksContent)
         val usStocksContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.USStocks]?.content,
-            StockerMarketType.USStocks.title,
-            false
+                tabViewMap[StockerMarketType.USStocks]?.content,
+                StockerMarketType.USStocks.title,
+                false
         )
         contentManager.addContent(usStocksContent)
     }
@@ -88,26 +87,22 @@ class StockerToolWindow : ToolWindowFactory {
                     if (StockerQuoteHttpUtil.validateCode(k, setting.quoteProvider, input)) {
                         val setting = StockerSetting.instance
                         when (k) {
-                            StockerMarketType.AShare -> setting.aShareList.add(input)
-                            StockerMarketType.HKStocks -> setting.hkStocksList.add(input)
-                            StockerMarketType.USStocks -> setting.usStocksList.add(input)
+                            StockerMarketType.AShare -> setting.aShareList.add(input.toUpperCase())
+                            StockerMarketType.HKStocks -> setting.hkStocksList.add(input.toUpperCase())
+                            StockerMarketType.USStocks -> setting.usStocksList.add(input.toUpperCase())
                         }
                     } else {
                         StockerNotification.notifyInvalidCode(project, input)
                     }
                 }
             }
-            v.btnRefresh.addActionListener {
-                when (k) {
-                    StockerMarketType.AShare -> {
-
-                    }
-                    StockerMarketType.HKStocks -> {
-
-                    }
-                    StockerMarketType.USStocks -> {
-
-                    }
+            v.btnDelete.addActionListener {
+                val dialog = StockerStockDeleteDialog(k.title)
+                if (dialog.showAndGet()) {
+                    dialog.input.map { it.toUpperCase() }
+                            .forEach {
+                                setting.removeCode(k, it)
+                            }
                 }
             }
         }

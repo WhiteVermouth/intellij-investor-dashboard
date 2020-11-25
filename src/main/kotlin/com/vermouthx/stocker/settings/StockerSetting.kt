@@ -4,7 +4,9 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.vermouthx.stocker.enum.StockerQuoteProvider
+import com.vermouthx.stocker.enums.StockerMarketType
+import com.vermouthx.stocker.enums.StockerQuoteColorPattern
+import com.vermouthx.stocker.enums.StockerQuoteProvider
 
 @State(name = "Stocker", storages = [Storage("stocker-config.xml")])
 class StockerSetting : PersistentStateComponent<StockerSettingState> {
@@ -27,6 +29,12 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             myState.quoteProvider = value
         }
 
+    var quoteColorPattern: StockerQuoteColorPattern
+        get() = myState.quoteColorPattern
+        set(value) {
+            myState.quoteColorPattern = value
+        }
+
     var aShareList: MutableList<String>
         get() = myState.aShareList
         set(value) {
@@ -44,6 +52,14 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
         set(value) {
             myState.usStocksList = value
         }
+
+    fun removeCode(marketType: StockerMarketType, code: String) {
+        when (marketType) {
+            StockerMarketType.AShare -> aShareList.remove(code)
+            StockerMarketType.HKStocks -> hkStocksList.remove(code)
+            StockerMarketType.USStocks -> usStocksList.remove(code)
+        }
+    }
 
     override fun getState(): StockerSettingState? {
         return myState

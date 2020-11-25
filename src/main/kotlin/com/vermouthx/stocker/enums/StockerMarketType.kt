@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.enum
+package com.vermouthx.stocker.enums
 
 enum class StockerMarketType(val title: String) {
     AShare("A Share"),

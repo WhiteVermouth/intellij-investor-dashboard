@@ -6,8 +6,8 @@ import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.vermouthx.stocker.enum.StockerMarketType
-import com.vermouthx.stocker.enum.StockerQuoteProvider
+import com.vermouthx.stocker.enums.StockerMarketType
+import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
@@ -28,47 +28,49 @@ class StockerStartupActivity : StartupActivity, DumbAware {
             setting.version = currentVersion
         }
         createQuoteUpdateThread(
-            StockerMarketType.AShare,
-            setting.quoteProvider,
-            StockerToolWindow.setting.aShareList
+                StockerMarketType.AShare,
+                setting.quoteProvider,
+                StockerToolWindow.setting.aShareList
         )
         createQuoteUpdateThread(
-            StockerMarketType.HKStocks,
-            setting.quoteProvider,
-            StockerToolWindow.setting.hkStocksList
+                StockerMarketType.HKStocks,
+                setting.quoteProvider,
+                StockerToolWindow.setting.hkStocksList
         )
         createQuoteUpdateThread(
-            StockerMarketType.USStocks,
-            setting.quoteProvider,
-            StockerToolWindow.setting.usStocksList
+                StockerMarketType.USStocks,
+                setting.quoteProvider,
+                StockerToolWindow.setting.usStocksList
         )
     }
 
     private fun createQuoteUpdateThread(
-        marketType: StockerMarketType,
-        quoteProvider: StockerQuoteProvider,
-        stockCodeList: List<String>
+            marketType: StockerMarketType,
+            quoteProvider: StockerQuoteProvider,
+            stockCodeList: List<String>
     ) {
         thread(start = true) {
             while (true) {
-                if (stockCodeList.isNotEmpty()) {
-                    val quotes = StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
-                    when (marketType) {
-                        StockerMarketType.AShare -> {
-                            val publisher =
+                val quotes = if (stockCodeList.isNotEmpty()) {
+                    StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
+                } else {
+                    emptyList()
+                }
+                when (marketType) {
+                    StockerMarketType.AShare -> {
+                        val publisher =
                                 messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC)
-                            publisher.after(quotes)
-                        }
-                        StockerMarketType.HKStocks -> {
-                            val publisher =
+                        publisher.after(quotes)
+                    }
+                    StockerMarketType.HKStocks -> {
+                        val publisher =
                                 messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC)
-                            publisher.after(quotes)
-                        }
-                        StockerMarketType.USStocks -> {
-                            val publisher =
+                        publisher.after(quotes)
+                    }
+                    StockerMarketType.USStocks -> {
+                        val publisher =
                                 messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC)
-                            publisher.after(quotes)
-                        }
+                        publisher.after(quotes)
                     }
                 }
                 Thread.sleep(1000)

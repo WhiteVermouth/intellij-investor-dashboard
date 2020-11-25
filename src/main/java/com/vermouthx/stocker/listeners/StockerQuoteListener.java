@@ -1,12 +1,12 @@
 package com.vermouthx.stocker.listeners;
 
-import com.vermouthx.stocker.entity.StockerStockQuote;
+import com.vermouthx.stocker.entities.StockerStockQuote;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
 public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
-    private DefaultTableModel tableModel;
+    private final DefaultTableModel tableModel;
 
     public StockerQuoteListener(DefaultTableModel tableModel) {
         this.tableModel = tableModel;
@@ -27,7 +27,6 @@ public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
                     quote.getUpdateAt()
             };
             tableModel.addRow(row);
-
         });
         tableModel.fireTableDataChanged();
     }

@@ -1,7 +1,7 @@
 package com.vermouthx.stocker.listeners;
 
 import com.intellij.util.messages.Topic;
-import com.vermouthx.stocker.entity.StockerStockQuote;
+import com.vermouthx.stocker.entities.StockerStockQuote;
 
 import java.util.List;
 

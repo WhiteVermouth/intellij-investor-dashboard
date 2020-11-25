@@ -26,10 +26,10 @@
               <text value="Add"/>
             </properties>
           </component>
-          <component id="e39b7" class="javax.swing.JButton" binding="btnRefresh">
+          <component id="e39b7" class="javax.swing.JButton" binding="btnDelete">
             <constraints/>
             <properties>
-              <text value="Refresh"/>
+              <text value="Delete"/>
             </properties>
           </component>
         </children>

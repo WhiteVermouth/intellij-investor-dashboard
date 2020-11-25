@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.entity
+package com.vermouthx.stocker.entities
 
 data class StockerStockQuote(
     var code: String,

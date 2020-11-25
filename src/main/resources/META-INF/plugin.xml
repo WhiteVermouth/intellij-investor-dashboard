@@ -9,6 +9,9 @@
         <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerStartupActivity"/>
         <toolWindow id="Stocker" anchor="bottom" icon="/icons/logo.svg"
                     factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
+        <applicationConfigurable parentId="tools" displayName="Stocker"
+                                 id="com.vermouthx.stocker.views.StockerSettingWindow"
+                                 instance="com.vermouthx.stocker.views.StockerSettingWindow"/>
     </extensions>
     <actions>
     </actions>
