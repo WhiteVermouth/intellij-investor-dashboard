@@ -6,6 +6,8 @@
 
 ## Screenshot
 
+![](./screenshots/dashboard.png)
+
 ## Installation
 
 Search **Stocker** in `Plugin Marketplace` and click `Install`.
