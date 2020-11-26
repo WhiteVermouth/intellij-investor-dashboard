@@ -1,11 +1,11 @@
 package com.vermouthx.stocker.utils
 
-import com.vermouthx.stocker.entities.StockerStockQuote
+import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 
 object StockerQuoteParser {
-    fun parse(provider: StockerQuoteProvider, marketType: StockerMarketType, responseText: String): List<StockerStockQuote> {
+    fun parse(provider: StockerQuoteProvider, marketType: StockerMarketType, responseText: String): List<StockerQuote> {
         return when (provider) {
             StockerQuoteProvider.SINA -> parseSinaResponseText(marketType, responseText)
             StockerQuoteProvider.TENCENT -> parseTencentResponseText(marketType, responseText)
@@ -16,7 +16,7 @@ object StockerQuoteParser {
         return String.format("%.2f", this)
     }
 
-    private fun parseSinaResponseText(marketType: StockerMarketType, responseText: String): List<StockerStockQuote> {
+    private fun parseSinaResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
         return responseText.split("\n")
                 .asSequence()
                 .filter { text -> text.isNotEmpty() }
@@ -43,7 +43,7 @@ object StockerQuoteParser {
                                 "${((current - close) / close * 100).round()}%"
                             }
                             val updateAt = textArray[31] + " " + textArray[32]
-                            StockerStockQuote(
+                            StockerQuote(
                                     code = code,
                                     name = name,
                                     current = current.round(),
@@ -69,7 +69,7 @@ object StockerQuoteParser {
                                 "+${textArray[9].toDouble().round()}%"
                             }
                             val updateAt = textArray[18] + " " + textArray[19]
-                            StockerStockQuote(
+                            StockerQuote(
                                     code = code,
                                     name = name,
                                     current = current.round(),
@@ -95,7 +95,7 @@ object StockerQuoteParser {
                             val high = textArray[7].toDouble()
                             val low = textArray[8].toDouble()
                             val close = textArray[27].toDouble()
-                            StockerStockQuote(
+                            StockerQuote(
                                     code = code,
                                     name = name,
                                     current = current.round(),
@@ -111,7 +111,7 @@ object StockerQuoteParser {
                 }.toList()
     }
 
-    private fun parseTencentResponseText(marketType: StockerMarketType, responseText: String): List<StockerStockQuote> {
+    private fun parseTencentResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
         return emptyList()
     }
 }

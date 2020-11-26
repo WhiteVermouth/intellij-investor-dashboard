@@ -1,6 +1,6 @@
 package com.vermouthx.stocker.utils
 
-import com.vermouthx.stocker.entities.StockerStockQuote
+import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 import org.apache.http.client.config.RequestConfig
@@ -22,7 +22,7 @@ object StockerQuoteHttpUtil {
         marketType: StockerMarketType,
         quoteProvider: StockerQuoteProvider,
         codes: List<String>
-    ): List<StockerStockQuote> {
+    ): List<StockerQuote> {
         val codesParam = codes.joinToString(",") { code ->
             "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
         }

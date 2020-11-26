@@ -1,6 +1,6 @@
 package com.vermouthx.stocker.entities
 
-data class StockerStockQuote(
+data class StockerQuote(
     var code: String,
     var name: String,
     var current: String,

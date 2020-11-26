@@ -1,6 +1,6 @@
 package com.vermouthx.stocker.listeners;
 
-import com.vermouthx.stocker.entities.StockerStockQuote;
+import com.vermouthx.stocker.entities.StockerQuote;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -13,7 +13,7 @@ public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
     }
 
     @Override
-    public void after(List<StockerStockQuote> quotes) {
+    public void after(List<StockerQuote> quotes) {
         quotes.forEach(quote -> {
             int rowIndex = existAt(quote.getCode());
             if (rowIndex != -1) {
