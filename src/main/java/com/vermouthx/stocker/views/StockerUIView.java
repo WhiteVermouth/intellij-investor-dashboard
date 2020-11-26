@@ -21,6 +21,7 @@ public class StockerUIView {
     private final DefaultTableModel tbModel;
 
     public StockerUIView() {
+        sPane.setBorder(BorderFactory.createEmptyBorder());
         tbModel = new StockerTableModel();
         String[] columnNames = {"Code", "Name", "Opening", "High", "Low", "Current", "Percentage", "Update At"};
         tbModel.setColumnIdentifiers(columnNames);
