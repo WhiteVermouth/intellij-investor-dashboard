@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.vermouthx"
-version = "1.0.1"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -37,8 +37,6 @@ tasks {
             Stocker is a dashboard, which helps investor envision realtime market conditions in IntelliJ based IDEs.
         """.trimIndent())
         changeNotes("""
-            1.0.1 <br>
-                - Bug fix
             1.0.0 <br>
                 - Stocker: a stock quote dashboard
         """.trimIndent())

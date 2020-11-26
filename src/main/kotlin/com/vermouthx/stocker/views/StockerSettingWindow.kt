@@ -6,22 +6,27 @@ import javax.swing.JComponent
 
 class StockerSettingWindow : Configurable {
 
+    private lateinit var view: StockerSettingView
+
     companion object {
-        val view = StockerSettingView()
         val setting = StockerSetting.instance
     }
 
     override fun createComponent(): JComponent? {
+        view = StockerSettingView()
+        view.resetQuoteProvider(setting.quoteProvider)
         return view.content
     }
 
     override fun isModified(): Boolean {
-        val colorPattern = view.colorPattern
-        return colorPattern != setting.quoteColorPattern
+        val quoteColorPattern = view.selectedQuoteColorPattern
+        val quoteProvider = view.selectedQuoteProvider
+        return quoteProvider != setting.quoteProvider || quoteColorPattern != setting.quoteColorPattern
     }
 
     override fun apply() {
-        setting.quoteColorPattern = view.colorPattern
+        setting.quoteProvider = view.selectedQuoteProvider
+        setting.quoteColorPattern = view.selectedQuoteColorPattern
     }
 
     override fun getDisplayName(): String {
@@ -29,6 +34,7 @@ class StockerSettingWindow : Configurable {
     }
 
     override fun reset() {
-        view.resetColorPattern(setting.quoteColorPattern)
+        view.resetQuoteProvider(setting.quoteProvider)
+        view.resetQuoteColorPattern(setting.quoteColorPattern)
     }
 }

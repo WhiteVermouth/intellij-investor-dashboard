@@ -7,7 +7,8 @@ class StockerSettingState {
     var version: String = ""
     var quoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
-    var aShareList: MutableList<String> = mutableListOf()
+    var refreshInterval: Long = 1000
+    var aShareList: MutableList<String> = mutableListOf("SZ000050", "SZ002475", "SZ002511")
     var hkStocksList: MutableList<String> = mutableListOf()
-    var usStocksList: MutableList<String> = mutableListOf()
+    var usStocksList: MutableList<String> = mutableListOf("AAPL", "GOOGL", "MSFT")
 }

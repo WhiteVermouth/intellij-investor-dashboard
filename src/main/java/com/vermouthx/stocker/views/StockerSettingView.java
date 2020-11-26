@@ -15,34 +15,37 @@ public class StockerSettingView {
     private JComboBox<String> cbProvider;
 
     public JPanel getContent() {
-        cbProvider.addItem(StockerQuoteProvider.SINA.getTitle());
-        cbProvider.setSelectedIndex(0);
+        for (StockerQuoteProvider value : StockerQuoteProvider.values()) {
+            cbProvider.addItem(value.getTitle());
+        }
         return mPane;
     }
 
-    public StockerQuoteProvider getSelectedProvider() {
+    public StockerQuoteProvider getSelectedQuoteProvider() {
         String title = Objects.requireNonNull(cbProvider.getSelectedItem()).toString();
-        switch (title) {
-            case "Sina":
-                return StockerQuoteProvider.SINA;
-            case "Tencent":
-                return StockerQuoteProvider.TENCENT;
+        if (StockerQuoteProvider.SINA.getTitle().equals(title)) {
+            return StockerQuoteProvider.SINA;
         }
-        return null;
+        return StockerQuoteProvider.TENCENT;
     }
 
-    public StockerQuoteColorPattern getColorPattern() {
+    public StockerQuoteColorPattern getSelectedQuoteColorPattern() {
         if (rbRedUpPattern.isSelected()) {
             return StockerQuoteColorPattern.RED_UP_GREEN_DOWN;
         }
         return StockerQuoteColorPattern.GREEN_UP_RED_DOWN;
     }
 
-    public void resetColorPattern(StockerQuoteColorPattern colorPattern) {
+    public void resetQuoteProvider(StockerQuoteProvider quoteProvider) {
+        cbProvider.setSelectedItem(quoteProvider.getTitle());
+    }
+
+    public void resetQuoteColorPattern(StockerQuoteColorPattern colorPattern) {
         if (colorPattern == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
             rbRedUpPattern.setSelected(true);
         } else {
             rbGreenUpPattern.setSelected(true);
         }
     }
+
 }
