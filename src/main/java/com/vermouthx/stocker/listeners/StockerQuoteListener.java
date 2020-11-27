@@ -18,6 +18,10 @@ public class StockerQuoteListener implements StockerQuoteUpdateNotifier {
     @Override
     public void after(List<StockerQuote> quotes) {
         DefaultTableModel tableModel = tableView.getTbModel();
+        if (tableModel.getRowCount() > quotes.size()) {
+            tableModel.getDataVector().clear();
+            tableModel.fireTableDataChanged();
+        }
         quotes.forEach(quote -> {
             int rowIndex = existAt(tableModel, quote.getCode());
             if (rowIndex != -1) {

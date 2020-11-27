@@ -15,14 +15,12 @@ public class StockerSettingView {
     private JComboBox<String> cbProvider;
 
     public JPanel getContent() {
-        for (StockerQuoteProvider value : StockerQuoteProvider.values()) {
-            cbProvider.addItem(value.getTitle());
-        }
+        cbProvider.addItem(StockerQuoteProvider.SINA.getTitle());
         return mPane;
     }
 
     public StockerQuoteProvider getSelectedQuoteProvider() {
-        String title = Objects.requireNonNull(cbProvider.getSelectedItem()).toString();
+        String title = (String) Objects.requireNonNull(cbProvider.getSelectedItem());
         if (StockerQuoteProvider.SINA.getTitle().equals(title)) {
             return StockerQuoteProvider.SINA;
         }

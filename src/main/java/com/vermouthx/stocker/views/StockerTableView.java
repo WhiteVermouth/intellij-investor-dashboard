@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class StockerTableView {
     private JPanel mPane;
@@ -39,6 +41,12 @@ public class StockerTableView {
     private void initTable() {
         tbModel = new StockerTableModel();
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
+        tbView.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                tbView.getSelectionModel().clearSelection();
+            }
+        });
         tbView.setModel(tbModel);
         tbView.getColumn(codeColumn).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
@@ -85,7 +93,7 @@ public class StockerTableView {
     }
 
     private void initDatetimeLabel() {
-        lbDatetimeContent.setForeground(JBColor.CYAN);
+        lbDatetimeContent.setForeground(JBColor.YELLOW);
     }
 
     private void updateColorPattern() {
@@ -99,7 +107,7 @@ public class StockerTableView {
         }
     }
 
-    public JPanel getContent() {
+    public JPanel getComponent() {
         return mPane;
     }
 

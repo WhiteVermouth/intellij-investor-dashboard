@@ -5,10 +5,10 @@ import com.vermouthx.stocker.enums.StockerQuoteProvider
 
 class StockerSettingState {
     var version: String = ""
+    var refreshInterval: Long = 1000
     var quoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
-    var refreshInterval: Long = 1000
-    var aShareList: MutableList<String> = mutableListOf("SZ000050", "SZ002475", "SZ002511")
+    var aShareList: MutableList<String> = mutableListOf()
     var hkStocksList: MutableList<String> = mutableListOf()
-    var usStocksList: MutableList<String> = mutableListOf("AAPL", "GOOGL", "MSFT")
+    var usStocksList: MutableList<String> = mutableListOf()
 }

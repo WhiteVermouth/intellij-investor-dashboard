@@ -14,6 +14,28 @@
                                  instance="com.vermouthx.stocker.views.StockerSettingWindow"/>
     </extensions>
     <actions>
-
+        <group id="com.vermouthx.stocker.actions.StockerActionGroup" text="Stocker" popup="true" icon="/icons/logo.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action class="com.vermouthx.stocker.actions.StockerReloadAction"
+                    id="com.vermouthx.stocker.actions.StockerReloadAction"
+                    text="Refresh" description="Refresh" icon="AllIcons.Actions.Refresh">
+                <override-text place="GoToAction" text="Stocker: Reload"/>
+            </action>
+            <action class="com.vermouthx.stocker.actions.StockerStockAddAction"
+                    id="com.vermouthx.stocker.actions.StockerStockAddAction"
+                    text="Add Stock Code" description="Add stock code" icon="AllIcons.General.Add">
+                <override-text place="GoToAction" text="Stocker: Add Stock Code"/>
+            </action>
+            <action class="com.vermouthx.stocker.actions.StockerStockDeleteAction"
+                    id="com.vermouthx.stocker.actions.StockerStockDeleteAction"
+                    text="Remove Stock Code" description="Remove stock code" icon="AllIcons.General.Remove">
+                <override-text place="GoToAction" text="Stocker: Remove Stock Code"/>
+            </action>
+            <action class="com.vermouthx.stocker.actions.StockerResetAction"
+                    id="com.vermouthx.stocker.actions.StockerResetAction"
+                    text="Remove All Stock Codes" description="Remove all stock codes" icon="AllIcons.General.Reset">
+                <override-text place="GoToAction" text="Stocker: Remove All Stock Codes"/>
+            </action>
+        </group>
     </actions>
 </idea-plugin>

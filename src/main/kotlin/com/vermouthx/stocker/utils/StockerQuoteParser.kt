@@ -112,6 +112,6 @@ object StockerQuoteParser {
     }
 
     private fun parseTencentResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
-        return emptyList()
+        TODO("Parse Tencent API Response")
     }
 }

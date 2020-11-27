@@ -9,19 +9,23 @@ import com.intellij.openapi.project.Project
 
 object StockerNotification {
     private val notificationGroup = NotificationGroup(
-            displayId = "Stocker",
-            displayType = NotificationDisplayType.BALLOON,
-            isLogByDefault = true
+        displayId = "Stocker",
+        displayType = NotificationDisplayType.BALLOON,
+        isLogByDefault = true
     )
 
-    fun notifyInvalidCode(project: Project, code: String) {
+    private val releaseNote: String = """
+        What's new?
+    """.trimIndent()
+
+    fun notifyReleaseNote(project: Project) {
         notificationGroup.createNotification(
-                title = "Stocker",
-                content = "You entered an invalid stock code: ${code}.",
-                type = NotificationType.ERROR,
-                listener = NotificationListener.URL_OPENING_LISTENER
+            title = "Stocker Updated",
+            content = releaseNote,
+            type = NotificationType.INFORMATION,
+            listener = NotificationListener.URL_OPENING_LISTENER
         )
-                .setIcon(AllIcons.General.NotificationError)
-                .notify(project)
+            .setIcon(AllIcons.General.NotificationInfo)
+            .notify(project)
     }
 }

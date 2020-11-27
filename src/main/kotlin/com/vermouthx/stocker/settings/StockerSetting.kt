@@ -5,7 +5,6 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
-import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 
@@ -65,14 +64,6 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
         set(value) {
             myState.usStocksList = value
         }
-
-    fun removeCode(marketType: StockerMarketType, code: String) {
-        when (marketType) {
-            StockerMarketType.AShare -> aShareList.remove(code)
-            StockerMarketType.HKStocks -> hkStocksList.remove(code)
-            StockerMarketType.USStocks -> usStocksList.remove(code)
-        }
-    }
 
     override fun getState(): StockerSettingState? {
         return myState
