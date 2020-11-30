@@ -1,8 +1,8 @@
 # Stocker
 
-## Introduction
+## Intro
 
-**Stocker** is a dashboard, which helps investor envision realtime market conditions in `IntelliJ` based IDEs.
+**Stocker** is a dashboard, which helps investor envision realtime market conditions in JetBrains IDEs.
 
 ## Screenshot
 
@@ -11,3 +11,9 @@
 ## Installation
 
 Search **Stocker** in `Plugin Marketplace` and click `Install`.
+
+![](./screenshots/install.png)
+
+## Licence
+
+Apache License
