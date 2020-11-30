@@ -2,17 +2,21 @@
 
 ## Intro
 
-**Stocker** is a dashboard, which helps investor envision realtime market conditions in JetBrains IDEs.
+**Stocker** is a dashboard, which helps investor track realtime market conditions in JetBrains IDEs.
 
 ## Screenshot
 
-![](./screenshots/dashboard.png)
+![dashboard](https://i.imgur.com/hP1TbCD.png)
 
 ## Installation
 
 Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
-![](./screenshots/install.png)
+![install](https://i.imgur.com/g3AODxd.png)
+
+## Caveat
+
+For A share stock code, `SH` or `SZ`(case-insensitive) prefix is needed.
 
 ## Licence
 

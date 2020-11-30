@@ -17,7 +17,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 .gradle
-/build/
+build
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache

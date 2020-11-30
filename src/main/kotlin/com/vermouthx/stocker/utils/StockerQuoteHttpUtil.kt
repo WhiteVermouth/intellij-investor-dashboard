@@ -25,7 +25,7 @@ object StockerQuoteHttpUtil {
         marketType: StockerMarketType,
         quoteProvider: StockerQuoteProvider,
         codes: List<String>
-    ): List<StockerQuote> {
+    ): List<StockerQuote>? {
         val codesParam = codes.joinToString(",") { code ->
             "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
         }
@@ -36,8 +36,8 @@ object StockerQuoteHttpUtil {
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
             StockerQuoteParser.parse(quoteProvider, marketType, responseText)
         } catch (e: Exception) {
-            log.error(e)
-            emptyList()
+            log.warn(e)
+            null
         }
     }
 

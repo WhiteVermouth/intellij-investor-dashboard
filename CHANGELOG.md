@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.1.0
+
+- Adopt more distinct colors
+- Improve Last Update At datetime
+- Add a new quote provider: Tencent
+
 ### 1.0.0
 
 - Stocker: a stock quote dashboard

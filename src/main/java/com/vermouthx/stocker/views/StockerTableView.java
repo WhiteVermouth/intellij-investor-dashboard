@@ -13,19 +13,13 @@ import java.awt.event.FocusEvent;
 
 public class StockerTableView {
     private JPanel mPane;
-    private JScrollPane sPane;
+    private JScrollPane tbPane;
+    private JPanel dtPane;
     private JTable tbView;
-    private JPanel tPane;
-    private JLabel lbDatetimeNote;
     private JLabel lbDatetimeContent;
-    private JBColor upColor;
-    private JBColor downColor;
+    private Color upColor;
+    private Color downColor;
     private DefaultTableModel tbModel;
-
-    private String codeColumn = "Code";
-    private String nameColumn = "Name";
-    private String currentColumn = "Current";
-    private String percentColumn = "Percentage";
 
     public StockerTableView() {
         initPane();
@@ -34,12 +28,16 @@ public class StockerTableView {
     }
 
     private void initPane() {
-        sPane.setBorder(BorderFactory.createEmptyBorder());
-        tPane.setBorder(BorderFactory.createEmptyBorder(1, 10, 10, 10));
+        tbPane.setBorder(BorderFactory.createEmptyBorder());
+        dtPane.setBorder(BorderFactory.createEmptyBorder(1, 10, 10, 10));
     }
 
     private void initTable() {
         tbModel = new StockerTableModel();
+        String codeColumn = "Code";
+        String nameColumn = "Name";
+        String currentColumn = "Current";
+        String percentColumn = "Percentage";
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
         tbView.addFocusListener(new FocusAdapter() {
             @Override
@@ -68,11 +66,7 @@ public class StockerTableView {
                 updateColorPattern();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
                 String v = table.getValueAt(row, column + 1).toString();
-                if (v.startsWith("+")) {
-                    setForeground(upColor);
-                } else {
-                    setForeground(downColor);
-                }
+                applyColorPattern(v, this);
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         });
@@ -82,32 +76,42 @@ public class StockerTableView {
                 updateColorPattern();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
                 String v = value.toString();
-                if (v.startsWith("+")) {
-                    setForeground(upColor);
-                } else {
-                    setForeground(downColor);
-                }
+                applyColorPattern(v, this);
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         });
     }
 
-    private void initDatetimeLabel() {
-        lbDatetimeContent.setForeground(JBColor.YELLOW);
-    }
-
-    private void updateColorPattern() {
-        StockerSetting setting = StockerSetting.Companion.getInstance();
-        if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
-            upColor = JBColor.RED;
-            downColor = JBColor.GREEN;
+    private void applyColorPattern(String value, DefaultTableCellRenderer renderer) {
+        String grayColorHex = "#888888";
+        if (value.startsWith("+")) {
+            renderer.setForeground(upColor);
+        } else if (value.startsWith("-")) {
+            renderer.setForeground(downColor);
         } else {
-            upColor = JBColor.GREEN;
-            downColor = JBColor.RED;
+            renderer.setForeground(JBColor.decode(grayColorHex));
         }
     }
 
-    public JPanel getComponent() {
+    private void initDatetimeLabel() {
+        String datetimeColorHex = "#6F84CA";
+        lbDatetimeContent.setForeground(JBColor.decode(datetimeColorHex));
+    }
+
+    private void updateColorPattern() {
+        String redColorHex = "#F44244";
+        String greenColorHex = "#0EBB70";
+        StockerSetting setting = StockerSetting.Companion.getInstance();
+        if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
+            upColor = JBColor.decode(redColorHex);
+            downColor = JBColor.decode(greenColorHex);
+        } else {
+            upColor = JBColor.decode(greenColorHex);
+            downColor = JBColor.decode(redColorHex);
+        }
+    }
+
+    public JComponent getComponent() {
         return mPane;
     }
 
