@@ -9,8 +9,8 @@ enum class StockerQuoteProvider(val title: String, val host: String, val provide
     ),
     TENCENT("Tencent", "http://qt.gtimg.cn/q=",
             mapOf(StockerMarketType.AShare to "",
-                    StockerMarketType.HKStocks to "r_hk",
-                    StockerMarketType.USStocks to "s_us"
+                    StockerMarketType.HKStocks to "hk",
+                    StockerMarketType.USStocks to "us"
             )
     )
 }

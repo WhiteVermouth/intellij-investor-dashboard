@@ -26,9 +26,16 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         codes: List<String>
     ): List<StockerQuote>? {
-        val codesParam = codes.joinToString(",") { code ->
-            "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
-        }
+        val codesParam =
+            if (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT) {
+                codes.joinToString(",") { code ->
+                    "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                }
+            } else {
+                codes.joinToString(",") { code ->
+                    "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                }
+            }
         val url = "${quoteProvider.host}${codesParam}"
         val httpGet = HttpGet(url)
         return try {
@@ -46,7 +53,11 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         code: String
     ): Boolean {
-        val url = "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+        val url = if (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT) {
+            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+        } else {
+            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+        }
         val httpGet = HttpGet(url)
         val response = httpClientPool.execute(httpGet)
         val responseText = EntityUtils.toString(response.entity, "UTF-8")
@@ -56,7 +67,10 @@ object StockerQuoteHttpUtil {
         if (start == end) {
             return false
         }
-        return firstLine.subSequence(start, end).contains(",")
+        return when (quoteProvider) {
+            StockerQuoteProvider.SINA -> firstLine.subSequence(start, end).contains(",")
+            StockerQuoteProvider.TENCENT -> firstLine.subSequence(start, end).contains("~")
+        }
     }
 
 }

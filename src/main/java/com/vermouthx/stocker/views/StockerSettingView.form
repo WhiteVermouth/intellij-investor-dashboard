@@ -8,7 +8,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="24464" class="javax.swing.JLabel" binding="lbColorPattern">
+      <component id="24464" class="javax.swing.JLabel">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -25,7 +25,7 @@
           <text value="Red Up, Green Down"/>
         </properties>
       </component>
-      <component id="67a42" class="javax.swing.JLabel" binding="lbProvider">
+      <component id="67a42" class="javax.swing.JLabel">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>

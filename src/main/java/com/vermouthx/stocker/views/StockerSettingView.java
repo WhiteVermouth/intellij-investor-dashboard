@@ -10,12 +10,12 @@ public class StockerSettingView {
     private JPanel mPane;
     private JRadioButton rbRedUpPattern;
     private JRadioButton rbGreenUpPattern;
-    private JLabel lbProvider;
-    private JLabel lbColorPattern;
     private JComboBox<String> cbProvider;
 
     public JPanel getContent() {
-        cbProvider.addItem(StockerQuoteProvider.SINA.getTitle());
+        for (StockerQuoteProvider value : StockerQuoteProvider.values()) {
+            cbProvider.addItem(value.getTitle());
+        }
         return mPane;
     }
 

@@ -2,20 +2,28 @@ package com.vermouthx.stocker.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.jsoup.Jsoup
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 
 open class StockerPatchHtmlTask : DefaultTask() {
     init {
         group = "documentation"
-        description = "Create markdown and html directories"
+        description = "Patch generated readme and changelog HTML"
     }
 
     @TaskAction
     fun run() {
-        val markdownPath = Paths.get(project.rootDir.absolutePath, "build", "markdown")
-        Files.createDirectories(markdownPath)
-        val htmlPath = Paths.get(project.rootDir.absolutePath, "build", "html")
-        Files.createDirectories(htmlPath)
+        val readmeHtmlPath = Paths.get(project.rootDir.absolutePath, "build", "html", "README.html")
+        val readmeHtml = Jsoup.parse(readmeHtmlPath.toFile(), Charsets.UTF_8.name())
+        readmeHtml.getElementsByTag("img")
+            .forEach {
+                it.attr("width", "700")
+            }
+        Files.newBufferedWriter(readmeHtmlPath, StandardOpenOption.TRUNCATE_EXISTING)
+            .use {
+                it.write(readmeHtml.html())
+            }
     }
 }

@@ -112,6 +112,43 @@ object StockerQuoteParser {
     }
 
     private fun parseTencentResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
-        TODO("Parse Tencent API Response")
+        return responseText.split("\n")
+                .asSequence()
+                .filter { text -> text.isNotEmpty() }
+                .map { text ->
+                    val code = when (marketType) {
+                        StockerMarketType.AShare -> text.subSequence(2, text.indexOfFirst { c -> c == '=' })
+                        StockerMarketType.HKStocks, StockerMarketType.USStocks -> text.subSequence(4, text.indexOfFirst { c -> c == '=' })
+                    }
+                    "$code~${text.subSequence(text.indexOfFirst { c -> c == '"' } + 1, text.indexOfLast { c -> c == '"' })}"
+                }
+                .map { text -> text.split("~") }
+                .map { textArray ->
+                    val code = textArray[0].toUpperCase()
+                    val name = textArray[2]
+                    val opening = textArray[6]
+                    val close = textArray[5]
+                    val current = textArray[4]
+                    val high = textArray[34]
+                    val low = textArray[35]
+                    val percentage = if (textArray[33].toDouble() > 0) {
+                        "+${textArray[33]}%"
+                    } else {
+                        "${textArray[33]}%"
+                    }
+                    val updateAt = textArray[31]
+                    StockerQuote(
+                            code = code,
+                            name = name,
+                            current = current,
+                            opening = opening,
+                            close = close,
+                            low = low,
+                            high = high,
+                            percentage = percentage,
+                            updateAt = updateAt
+                    )
+                }
+                .toList()
     }
 }

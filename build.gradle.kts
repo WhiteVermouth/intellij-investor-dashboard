@@ -1,5 +1,6 @@
 import com.vermouthx.stocker.gradle.StockerCopyChangelogTask
 import com.vermouthx.stocker.gradle.StockerCopyReadmeTask
+import com.vermouthx.stocker.gradle.StockerPatchHtmlTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.kordamp.gradle.plugin.markdown.tasks.MarkdownToHtmlTask
 
@@ -60,11 +61,11 @@ tasks {
 }
 
 tasks.withType<StockerCopyReadmeTask> {
-    dependsOn("patchHtml")
+    dependsOn("createDirectory")
 }
 
 tasks.withType<StockerCopyChangelogTask> {
-    dependsOn("patchHtml")
+    dependsOn("createDirectory")
 }
 
 tasks.withType<MarkdownToHtmlTask> {
@@ -72,6 +73,10 @@ tasks.withType<MarkdownToHtmlTask> {
     dependsOn("copyReadme")
 }
 
-tasks.withType<PatchPluginXmlTask> {
+tasks.withType<StockerPatchHtmlTask> {
     dependsOn("markdownToHtml")
+}
+
+tasks.withType<PatchPluginXmlTask> {
+    dependsOn("patchHtml")
 }
