@@ -18,12 +18,12 @@ open class StockerPatchHtmlTask : DefaultTask() {
         val readmeHtmlPath = Paths.get(project.rootDir.absolutePath, "build", "html", "README.html")
         val readmeHtml = Jsoup.parse(readmeHtmlPath.toFile(), Charsets.UTF_8.name())
         readmeHtml.getElementsByTag("img")
-            .forEach {
-                it.attr("width", "700")
-            }
+                .forEach {
+                    it.attr("width", "650")
+                }
         Files.newBufferedWriter(readmeHtmlPath, StandardOpenOption.TRUNCATE_EXISTING)
-            .use {
-                it.write(readmeHtml.html())
-            }
+                .use {
+                    it.write(readmeHtml.html())
+                }
     }
 }

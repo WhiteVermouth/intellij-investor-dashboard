@@ -3,6 +3,8 @@ package com.vermouthx.stocker.utils
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object StockerQuoteParser {
     fun parse(provider: StockerQuoteProvider, marketType: StockerMarketType, responseText: String): List<StockerQuote> {
@@ -68,7 +70,10 @@ object StockerQuoteParser {
                             } else {
                                 "+${textArray[9].toDouble().round()}%"
                             }
-                            val updateAt = textArray[18] + " " + textArray[19]
+                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
+                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                            val datetime = LocalDateTime.parse(textArray[18] + " " + textArray[19], sourceFormatter)
+                            val updateAt = targetFormatter.format(datetime)
                             StockerQuote(
                                     code = code,
                                     name = name,
@@ -136,7 +141,21 @@ object StockerQuoteParser {
                     } else {
                         "${textArray[33]}%"
                     }
-                    val updateAt = textArray[31]
+                    val updateAt = when (marketType) {
+                        StockerMarketType.AShare -> {
+                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                            val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
+                            targetFormatter.format(datetime)
+                        }
+                        StockerMarketType.HKStocks -> {
+                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                            val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
+                            targetFormatter.format(datetime)
+                        }
+                        StockerMarketType.USStocks -> textArray[31]
+                    }
                     StockerQuote(
                             code = code,
                             name = name,

@@ -16,7 +16,7 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ## Caveat
 
-For A share stock code, `SH` or `SZ`(case-insensitive) prefix is needed.
+For A-Share stock code, `SH` or `SZ`(case-insensitive) prefix is needed.
 
 ## Licence
 
