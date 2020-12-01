@@ -31,10 +31,10 @@ class StockerStockDeleteAction : AnAction() {
                             setting.aShareList.remove(it.toUpperCase())
                         } else {
                             Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent  stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg")
+                                    project,
+                                    "You entered an non-existent stock code: ${it}.",
+                                    "Invalid Stock Code",
+                                    IconLoader.getIcon("/icons/logo.svg")
                             )
                         }
                     }
@@ -43,10 +43,10 @@ class StockerStockDeleteAction : AnAction() {
                             setting.hkStocksList.remove(it.toUpperCase())
                         } else {
                             Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent  stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg")
+                                    project,
+                                    "You entered an non-existent stock code: ${it}.",
+                                    "Invalid Stock Code",
+                                    IconLoader.getIcon("/icons/logo.svg")
                             )
                         }
                     }
@@ -55,10 +55,10 @@ class StockerStockDeleteAction : AnAction() {
                             setting.usStocksList.remove(it.toUpperCase())
                         } else {
                             Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent  stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg")
+                                    project,
+                                    "You entered an non-existent stock code: ${it}.",
+                                    "Invalid Stock Code",
+                                    IconLoader.getIcon("/icons/logo.svg")
                             )
                         }
                     }
