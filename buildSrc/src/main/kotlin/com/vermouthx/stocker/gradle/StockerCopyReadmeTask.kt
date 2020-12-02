@@ -25,7 +25,7 @@ open class StockerCopyReadmeTask : DefaultTask() {
         )
         val content = Files.readAllLines(markdownPath)
             .stream()
-            .skip(4)
+            .skip(7)
             .toList()
             .joinToString("\n")
         Files.newBufferedWriter(
