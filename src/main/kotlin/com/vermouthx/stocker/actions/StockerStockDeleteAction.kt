@@ -34,7 +34,7 @@ class StockerStockDeleteAction : AnAction() {
                                     project,
                                     "You entered an non-existent stock code: ${it}.",
                                     "Invalid Stock Code",
-                                    IconLoader.getIcon("/icons/logo.svg")
+                                    IconLoader.getIcon("/icons/logo.svg", javaClass)
                             )
                         }
                     }
@@ -46,7 +46,7 @@ class StockerStockDeleteAction : AnAction() {
                                     project,
                                     "You entered an non-existent stock code: ${it}.",
                                     "Invalid Stock Code",
-                                    IconLoader.getIcon("/icons/logo.svg")
+                                    IconLoader.getIcon("/icons/logo.svg", javaClass)
                             )
                         }
                     }
@@ -58,7 +58,7 @@ class StockerStockDeleteAction : AnAction() {
                                     project,
                                     "You entered an non-existent stock code: ${it}.",
                                     "Invalid Stock Code",
-                                    IconLoader.getIcon("/icons/logo.svg")
+                                    IconLoader.getIcon("/icons/logo.svg", javaClass)
                             )
                         }
                     }

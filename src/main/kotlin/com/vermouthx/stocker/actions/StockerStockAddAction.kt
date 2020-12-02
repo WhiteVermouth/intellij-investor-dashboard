@@ -49,7 +49,7 @@ class StockerStockAddAction : AnAction() {
                         project,
                         "You entered an invalid stock code: ${it}.",
                         "Invalid Stock Code",
-                        IconLoader.getIcon("/icons/logo.svg")
+                        IconLoader.getIcon("/icons/logo.svg", javaClass)
                     )
                 }
             }
