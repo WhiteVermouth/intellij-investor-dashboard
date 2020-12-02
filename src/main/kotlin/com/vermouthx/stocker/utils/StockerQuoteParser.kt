@@ -58,7 +58,7 @@ object StockerQuoteParser {
                             )
                         }
                         StockerMarketType.HKStocks -> {
-                            val code = textArray[0].toUpperCase()
+                            val code = textArray[0].substring(2).toUpperCase()
                             val name = textArray[2]
                             val opening = textArray[3].toDouble()
                             val close = textArray[4].toDouble()

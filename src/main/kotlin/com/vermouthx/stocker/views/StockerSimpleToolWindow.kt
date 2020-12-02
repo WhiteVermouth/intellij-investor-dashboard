@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.vermouthx.stocker.actions.StockerReloadAction
+import com.vermouthx.stocker.actions.StockerRefreshAction
 import com.vermouthx.stocker.actions.StockerStockAddAction
 import com.vermouthx.stocker.actions.StockerStockDeleteAction
 
@@ -16,7 +16,7 @@ class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
         val actionGroup =
             DefaultActionGroup(
                 listOf(
-                    StockerReloadAction::class.qualifiedName?.let { actionManager.getAction(it) },
+                    StockerRefreshAction::class.qualifiedName?.let { actionManager.getAction(it) },
                     StockerStockAddAction::class.qualifiedName?.let { actionManager.getAction(it) },
                     StockerStockDeleteAction::class.qualifiedName?.let { actionManager.getAction(it) }
                 )

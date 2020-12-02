@@ -49,7 +49,7 @@ class StockerStockDeleteAction : AnAction() {
                             setting.removeCode(market, it.toUpperCase())
                             val publisher =
                                 messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC)
-                            publisher.after("HK${it.toUpperCase()}")
+                            publisher.after(it.toUpperCase())
                         } else {
                             Messages.showMessageDialog(
                                 project,

@@ -54,8 +54,8 @@ class StockerToolWindow : ToolWindowFactory {
             false
         )
         contentManager.addContent(usStocksContent)
-        StockerApp.reload()
         this.subscribeMessage()
+        StockerApp.refresh()
     }
 
     private fun subscribeMessage() {

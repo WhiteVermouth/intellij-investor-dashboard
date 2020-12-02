@@ -5,6 +5,9 @@ import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 object StockerApp {
@@ -14,54 +17,59 @@ object StockerApp {
     private val setting = StockerSetting.instance
     private val messageBus = ApplicationManager.getApplication().messageBus
 
-    private var aShareThread: Thread
-    private var hkStocksThread: Thread
-    private var usStocksThread: Thread
+    private val scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
 
     init {
-        aShareThread = createQuoteUpdateThread(StockerMarketType.AShare, setting.aShareList)
-        hkStocksThread = createQuoteUpdateThread(StockerMarketType.HKStocks, setting.hkStocksList)
-        usStocksThread = createQuoteUpdateThread(StockerMarketType.USStocks, setting.usStocksList)
+        scheduledExecutorService.scheduleAtFixedRate(
+            createQuoteUpdateThread(StockerMarketType.AShare, setting.aShareList),
+            0, 1, TimeUnit.SECONDS
+        )
+        scheduledExecutorService.scheduleAtFixedRate(
+            createQuoteUpdateThread(StockerMarketType.HKStocks, setting.hkStocksList),
+            0, 1, TimeUnit.SECONDS
+        )
+        scheduledExecutorService.scheduleAtFixedRate(
+            createQuoteUpdateThread(StockerMarketType.USStocks, setting.usStocksList),
+            0, 1, TimeUnit.SECONDS
+        )
     }
 
-    fun reload() {
-        if (!aShareThread.isAlive) {
-            aShareThread = createQuoteUpdateThread(StockerMarketType.AShare, setting.aShareList)
-        }
-        if (!hkStocksThread.isAlive) {
-            hkStocksThread = createQuoteUpdateThread(StockerMarketType.HKStocks, setting.hkStocksList)
-        }
-        if (!usStocksThread.isAlive) {
-            usStocksThread = createQuoteUpdateThread(StockerMarketType.USStocks, setting.usStocksList)
-        }
+    fun refresh() {
+        refresh(StockerMarketType.AShare, setting.aShareList)
+        refresh(StockerMarketType.HKStocks, setting.hkStocksList)
+        refresh(StockerMarketType.USStocks, setting.usStocksList)
     }
 
     private fun createQuoteUpdateThread(marketType: StockerMarketType, stockCodeList: List<String>): Thread {
-        return thread(start = true) {
-            while (true) {
-                val quotes = if (stockCodeList.isNotEmpty()) {
-                    StockerQuoteHttpUtil.get(marketType, setting.quoteProvider, stockCodeList)
-                } else {
-                    emptyList()
-                }
-                when (marketType) {
-                    StockerMarketType.AShare -> {
-                        val publisher =
-                            messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC)
-                        publisher.after(quotes)
-                    }
-                    StockerMarketType.HKStocks -> {
-                        val publisher =
-                            messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC)
-                        publisher.after(quotes)
-                    }
-                    StockerMarketType.USStocks -> {
-                        val publisher =
-                            messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC)
-                        publisher.after(quotes)
-                    }
-                }
-                Thread.sleep(setting.refreshInterval)
+        return thread {
+            refresh(marketType, stockCodeList)
+        }
+    }
+
+    private fun refresh(
+        marketType: StockerMarketType,
+        stockCodeList: List<String>
+    ) {
+        val quotes = if (stockCodeList.isNotEmpty()) {
+            StockerQuoteHttpUtil.get(marketType, setting.quoteProvider, stockCodeList)
+        } else {
+            emptyList()
+        }
+        when (marketType) {
+            StockerMarketType.AShare -> {
+                val publisher =
+                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC)
+                publisher.after(quotes)
+            }
+            StockerMarketType.HKStocks -> {
+                val publisher =
+                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC)
+                publisher.after(quotes)
+            }
+            StockerMarketType.USStocks -> {
+                val publisher =
+                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC)
+                publisher.after(quotes)
             }
         }
     }

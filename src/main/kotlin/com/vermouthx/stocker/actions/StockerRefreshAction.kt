@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.vermouthx.stocker.StockerApp
 
-class StockerReloadAction : AnAction() {
+class StockerRefreshAction : AnAction() {
     override fun update(e: AnActionEvent) {
         val project = e.project
         val presentation = e.presentation
@@ -14,6 +14,6 @@ class StockerReloadAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        StockerApp.reload()
+        StockerApp.refresh()
     }
 }
