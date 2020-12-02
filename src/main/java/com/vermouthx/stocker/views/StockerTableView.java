@@ -1,6 +1,5 @@
 package com.vermouthx.stocker.views;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -17,7 +16,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 public class StockerTableView {
-    private Logger log = Logger.getInstance(getClass());
 
     private JPanel mPane;
     private JScrollPane tbPane;

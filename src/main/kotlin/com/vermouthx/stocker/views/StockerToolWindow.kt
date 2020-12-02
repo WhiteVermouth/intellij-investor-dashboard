@@ -7,7 +7,9 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.enums.StockerMarketType
-import com.vermouthx.stocker.listeners.StockerQuoteListener
+import com.vermouthx.stocker.listeners.StockerQuoteDeleteListener
+import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier
+import com.vermouthx.stocker.listeners.StockerQuoteUpdateListener
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 
 class StockerToolWindow : ToolWindowFactory {
@@ -16,10 +18,12 @@ class StockerToolWindow : ToolWindowFactory {
         private val messageBus = ApplicationManager.getApplication().messageBus
     }
 
+    private lateinit var allView: StockerSimpleToolWindow
     private lateinit var tabViewMap: Map<StockerMarketType, StockerSimpleToolWindow>
 
     override fun init(toolWindow: ToolWindow) {
         super.init(toolWindow)
+        allView = StockerSimpleToolWindow()
         tabViewMap = mapOf(
             StockerMarketType.AShare to StockerSimpleToolWindow(),
             StockerMarketType.HKStocks to StockerSimpleToolWindow(),
@@ -30,6 +34,8 @@ class StockerToolWindow : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val contentManager = toolWindow.contentManager
         val contentFactory = ContentFactory.SERVICE.getInstance()
+        val allContent = contentFactory.createContent(allView.component, "ALL", false)
+        contentManager.addContent(allContent)
         val aShareContent = contentFactory.createContent(
             tabViewMap[StockerMarketType.AShare]?.component,
             StockerMarketType.AShare.title,
@@ -59,23 +65,55 @@ class StockerToolWindow : ToolWindowFactory {
                     messageBus.connect()
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tableView)
+                            StockerQuoteUpdateListener(
+                                allView.tableView,
+                                v.tableView
+                            )
+                        )
+                    messageBus.connect()
+                        .subscribe(
+                            StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC,
+                            StockerQuoteDeleteListener(
+                                allView.tableView,
+                                v.tableView
+                            )
                         )
                 }
                 StockerMarketType.HKStocks -> {
                     messageBus.connect()
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tableView)
+                            StockerQuoteUpdateListener(
+                                allView.tableView,
+                                v.tableView
+                            )
+                        )
+                    messageBus.connect()
+                        .subscribe(
+                            StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC,
+                            StockerQuoteDeleteListener(
+                                allView.tableView,
+                                v.tableView
+                            )
                         )
                 }
                 StockerMarketType.USStocks -> {
                     messageBus.connect()
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
-                            StockerQuoteListener(v.tableView)
+                            StockerQuoteUpdateListener(
+                                allView.tableView,
+                                v.tableView
+                            )
                         )
-
+                    messageBus.connect()
+                        .subscribe(
+                            StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC,
+                            StockerQuoteDeleteListener(
+                                allView.tableView,
+                                v.tableView
+                            )
+                        )
                 }
             }
         }
