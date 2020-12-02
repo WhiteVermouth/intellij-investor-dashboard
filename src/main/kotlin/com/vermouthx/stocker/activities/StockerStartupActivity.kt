@@ -6,6 +6,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.vermouthx.stocker.StockerApp
+import com.vermouthx.stocker.notifications.StockerNotification
 import com.vermouthx.stocker.settings.StockerSetting
 
 class StockerStartupActivity : StartupActivity, DumbAware {
@@ -18,6 +19,7 @@ class StockerStartupActivity : StartupActivity, DumbAware {
         val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(StockerApp.pluginId))?.version ?: ""
         if (setting.version != currentVersion) {
             setting.version = currentVersion
+            StockerNotification.notifyReleaseNote(project, currentVersion)
         }
     }
 }
