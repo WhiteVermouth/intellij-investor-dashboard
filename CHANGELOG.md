@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.2
+
+- Enhanced UI
+- Bug fix
+
 ### 1.2.0
 
 - Add a tab: ALL

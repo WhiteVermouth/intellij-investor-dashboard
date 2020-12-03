@@ -19,8 +19,8 @@ object StockerNotification {
 
     private val releaseNote: String = """
         What's new?<br>
-            - Add a tab: ALL<br>
             - Enhanced UI<br>
+            - Bug fix<br>
         Please visit the <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> for more details.<br>
         Thank you for choosing Stocker
     """.trimIndent()
