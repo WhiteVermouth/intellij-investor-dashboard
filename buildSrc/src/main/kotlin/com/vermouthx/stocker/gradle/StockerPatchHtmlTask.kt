@@ -19,8 +19,20 @@ open class StockerPatchHtmlTask : DefaultTask() {
         val readmeHtml = Jsoup.parse(readmeHtmlPath.toFile(), Charsets.UTF_8.name())
         readmeHtml.getElementsByTag("img")
             .forEach {
-                if (it.attr("alt") == "dashboard" || it.attr("alt") == "install") {
+                if (it.attr("alt") == "Dashboard" || it.attr("alt") == "Install") {
                     it.attr("width", "650")
+                }
+            }
+        readmeHtml.getElementsByTag("h1")
+            .forEach {
+                if (it.attr("align") == "center") {
+                    it.attr("align", "left")
+                }
+            }
+        readmeHtml.getElementsByTag("p")
+            .forEach {
+                if (it.attr("align") == "center") {
+                    it.attr("align", "left")
                 }
             }
         Files.newBufferedWriter(readmeHtmlPath, StandardOpenOption.TRUNCATE_EXISTING)

@@ -25,7 +25,10 @@ open class StockerCopyReadmeTask : DefaultTask() {
         )
         val content = Files.readAllLines(markdownPath)
             .stream()
-            .skip(7)
+            .skip(5)
+            .filter {
+                !it.contains("shields.io") && !it.contains("azure.com")
+            }
             .toList()
             .joinToString("\n")
         Files.newBufferedWriter(
