@@ -19,7 +19,7 @@ object StockerApp {
 
     private val scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
 
-    init {
+    fun schedule() {
         scheduledExecutorService.scheduleAtFixedRate(
             createQuoteUpdateThread(StockerMarketType.AShare, setting.aShareList),
             0, 1, TimeUnit.SECONDS

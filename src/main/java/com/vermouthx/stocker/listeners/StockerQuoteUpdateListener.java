@@ -14,6 +14,7 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     private final StockerTableView allTableView;
     private final StockerTableView myTableView;
 
+
     public StockerQuoteUpdateListener(StockerTableView allTableView, StockerTableView myTableView) {
         this.allTableView = allTableView;
         this.myTableView = myTableView;
@@ -22,34 +23,12 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     @Override
     public void after(List<StockerQuote> quotes) {
         if (quotes != null) {
-            DefaultTableModel myTableModel = myTableView.getTbModel();
-            DefaultTableModel allTableModel = allTableView.getTbModel();
             quotes.forEach(quote -> {
-                int myRowIndex = StockerTableModelUtil.existAt(myTableModel, quote.getCode());
-                int allRowIndex = StockerTableModelUtil.existAt(allTableModel, quote.getCode());
-                if (myRowIndex != -1) {
-                    if (!myTableModel.getValueAt(myRowIndex, 1).equals(quote.getName())) {
-                        myTableModel.setValueAt(quote.getName(), myRowIndex, 1);
-                        myTableModel.fireTableCellUpdated(myRowIndex, 1);
-                        allTableModel.setValueAt(quote.getName(), allRowIndex, 1);
-                        allTableModel.fireTableCellUpdated(allRowIndex, 1);
-                    }
-                    if (!myTableModel.getValueAt(myRowIndex, 2).equals(quote.getCurrent())) {
-                        myTableModel.setValueAt(quote.getCurrent(), myRowIndex, 2);
-                        myTableModel.fireTableCellUpdated(myRowIndex, 2);
-                        allTableModel.setValueAt(quote.getCurrent(), allRowIndex, 2);
-                        allTableModel.fireTableCellUpdated(allRowIndex, 2);
-                    }
-                    if (!myTableModel.getValueAt(myRowIndex, 3).equals(quote.getPercentage())) {
-                        myTableModel.setValueAt(quote.getPercentage(), myRowIndex, 3);
-                        myTableModel.fireTableCellUpdated(myRowIndex, 3);
-                        allTableModel.setValueAt(quote.getPercentage(), allRowIndex, 3);
-                        allTableModel.fireTableCellUpdated(allRowIndex, 3);
-                    }
-                } else {
-                    String[] row = {quote.getCode(), quote.getName(), quote.getCurrent(), quote.getPercentage()};
-                    myTableModel.addRow(row);
-                    allTableModel.addRow(row);
+                synchronized (myTableView.getTableModel()) {
+                    this.refreshTableModel(myTableView.getTableModel(), quote);
+                }
+                synchronized (allTableView.getTableModel()) {
+                    this.refreshTableModel(allTableView.getTableModel(), quote);
                 }
             });
             if (!quotes.isEmpty()) {
@@ -58,6 +37,26 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                 dtLabel.setText(updateAt);
                 allTableView.getLbDatetimeContent().setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             }
+        }
+    }
+
+    private void refreshTableModel(DefaultTableModel tableModel, StockerQuote quote) {
+        int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
+        if (rowIndex != -1) {
+            if (!tableModel.getValueAt(rowIndex, 1).equals(quote.getName())) {
+                tableModel.setValueAt(quote.getName(), rowIndex, 1);
+                tableModel.fireTableCellUpdated(rowIndex, 1);
+            }
+            if (!tableModel.getValueAt(rowIndex, 2).equals(quote.getCurrent())) {
+                tableModel.setValueAt(quote.getCurrent(), rowIndex, 2);
+                tableModel.fireTableCellUpdated(rowIndex, 2);
+            }
+            if (!tableModel.getValueAt(rowIndex, 3).equals(quote.getPercentage())) {
+                tableModel.setValueAt(quote.getPercentage(), rowIndex, 3);
+                tableModel.fireTableCellUpdated(rowIndex, 3);
+            }
+        } else {
+            tableModel.addRow(new String[]{quote.getCode(), quote.getName(), quote.getCurrent(), quote.getPercentage()});
         }
     }
 }

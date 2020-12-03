@@ -137,7 +137,7 @@ public class StockerTableView {
         return mPane;
     }
 
-    public DefaultTableModel getTbModel() {
+    public DefaultTableModel getTableModel() {
         return tbModel;
     }
 

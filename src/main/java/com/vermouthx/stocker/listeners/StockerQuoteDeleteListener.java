@@ -17,15 +17,19 @@ public class StockerQuoteDeleteListener implements StockerQuoteDeleteNotifier {
 
     @Override
     public void after(String code) {
-        DefaultTableModel myTableModel = myTableView.getTbModel();
-        DefaultTableModel allTableModel = allTableView.getTbModel();
-        int myRowIndex = StockerTableModelUtil.existAt(myTableModel, code);
-        int allRowIndex = StockerTableModelUtil.existAt(allTableModel, code);
-        if (myRowIndex != -1) {
-            myTableModel.removeRow(myRowIndex);
-            myTableModel.fireTableRowsDeleted(myRowIndex, myRowIndex);
-            allTableModel.removeRow(allRowIndex);
-            allTableModel.fireTableRowsDeleted(allRowIndex, allRowIndex);
+        synchronized (myTableView.getTableModel()) {
+            refreshTableModel(myTableView.getTableModel(), code);
+        }
+        synchronized (allTableView.getTableModel()) {
+            refreshTableModel(allTableView.getTableModel(), code);
+        }
+    }
+
+    private void refreshTableModel(DefaultTableModel tableModel, String code) {
+        int rowIndex = StockerTableModelUtil.existAt(tableModel, code);
+        if (rowIndex != -1) {
+            tableModel.removeRow(rowIndex);
+            tableModel.fireTableRowsDeleted(rowIndex, rowIndex);
         }
     }
 }
