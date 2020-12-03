@@ -1,15 +1,17 @@
-# Stocker
+<h1 align="center">
+<img src="https://i.imgur.com/3Xwh4D9.png" width="100" alt="icon"><br>
+Stocker
+</h1>
 
-[![Build Status](https://dev.azure.com/mvriddle/Stocker/_apis/build/status/WhiteVermouth.intellij-investor-dashboard?branchName=master)](https://dev.azure.com/mvriddle/Stocker/_build/latest?definitionId=1&branchName=master)
-![GitHub Release](https://img.shields.io/github/v/release/WhiteVermouth/intellij-investor-dashboard)
-![Marketplace Release](https://img.shields.io/jetbrains/plugin/v/com.vermouthx.intellij-investor-dashboard)
-![Marketplace Rating](https://img.shields.io/jetbrains/plugin/r/stars/com.vermouthx.intellij-investor-dashboard)
-
-## Intro
-
-**Stocker** is a dashboard, which helps investor track realtime market conditions in JetBrains IDEs.
-
-## Screenshot
+<p align="center">
+Stocker is a dashboard, which helps investor track realtime market conditions in JetBrains IDEs.
+</p>
+<p align="center">
+<img src="https://dev.azure.com/mvriddle/Stocker/_apis/build/status/WhiteVermouth.intellij-investor-dashboard?branchName=master" alt="Build Status" />
+<img src="https://img.shields.io/github/v/release/WhiteVermouth/intellij-investor-dashboard" alt="GitHub Release" />
+<img src="https://img.shields.io/jetbrains/plugin/v/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Release" />
+<img src="https://img.shields.io/jetbrains/plugin/r/stars/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Rating" />
+</p>
 
 ![dashboard](https://i.imgur.com/hP1TbCD.png)
 
