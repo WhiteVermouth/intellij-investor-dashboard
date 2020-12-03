@@ -51,6 +51,7 @@ public class StockerTableView {
         tbModel = new StockerTableModel();
         tbPane.add(tbView);
         tbPane.setViewportView(tbView);
+        tbView.setShowVerticalLines(false);
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
         tbView.addFocusListener(new FocusAdapter() {
             @Override
@@ -104,15 +105,13 @@ public class StockerTableView {
     }
 
     private void applyColorPattern(String value, DefaultTableCellRenderer renderer) {
-        String grayColorHex = "#888888";
         if (value.startsWith("+")) {
-            renderer.setBackground(upColor);
+            renderer.setForeground(upColor);
         } else if (value.startsWith("-")) {
-            renderer.setBackground(downColor);
+            renderer.setForeground(downColor);
         } else {
-            renderer.setBackground(JBColor.decode(grayColorHex));
+            renderer.setForeground(JBColor.GRAY);
         }
-        renderer.setForeground(JBColor.decode("#F8F8F2"));
     }
 
     private void initDatetimeLabel() {
@@ -124,15 +123,13 @@ public class StockerTableView {
     }
 
     private void updateColorPattern() {
-        String redColorHex = "#E93F41";
-        String greenColorHex = "#0DB06A";
         StockerSetting setting = StockerSetting.Companion.getInstance();
         if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
-            upColor = JBColor.decode(redColorHex);
-            downColor = JBColor.decode(greenColorHex);
+            upColor = JBColor.RED;
+            downColor = JBColor.GREEN;
         } else {
-            upColor = JBColor.decode(greenColorHex);
-            downColor = JBColor.decode(redColorHex);
+            upColor = JBColor.GREEN;
+            downColor = JBColor.RED;
         }
     }
 
