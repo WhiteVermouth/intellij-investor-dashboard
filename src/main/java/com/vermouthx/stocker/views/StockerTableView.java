@@ -33,7 +33,7 @@ public class StockerTableView {
     private List<StockerQuote> indices = new ArrayList<>();
 
     public StockerTableView() {
-        initColorPattern();
+        syncColorPatternSetting();
         initPane();
         initTable();
     }
@@ -44,7 +44,19 @@ public class StockerTableView {
             indices.forEach(i -> cbIndex.addItem(i.getName()));
             cbIndex.setSelectedIndex(0);
         }
+        syncColorPatternSetting();
         updateIndex();
+    }
+
+    private void syncColorPatternSetting() {
+        StockerSetting setting = StockerSetting.Companion.getInstance();
+        if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
+            upColor = JBColor.RED;
+            downColor = JBColor.GREEN;
+        } else {
+            upColor = JBColor.GREEN;
+            downColor = JBColor.RED;
+        }
     }
 
     private void updateIndex() {
@@ -130,6 +142,7 @@ public class StockerTableView {
         tbBody.getColumn(currentColumn).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                syncColorPatternSetting();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
                 String v = table.getValueAt(row, table.getColumn(percentColumn).getModelIndex()).toString();
                 applyColorPatternToTable(v, this);
@@ -139,6 +152,7 @@ public class StockerTableView {
         tbBody.getColumn(percentColumn).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                syncColorPatternSetting();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
                 String v = value.toString();
                 applyColorPatternToTable(v, this);
@@ -156,17 +170,6 @@ public class StockerTableView {
             renderer.setForeground(downColor);
         } else {
             renderer.setForeground(JBColor.GRAY);
-        }
-    }
-
-    private void initColorPattern() {
-        StockerSetting setting = StockerSetting.Companion.getInstance();
-        if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
-            upColor = JBColor.RED;
-            downColor = JBColor.GREEN;
-        } else {
-            upColor = JBColor.GREEN;
-            downColor = JBColor.RED;
         }
     }
 
