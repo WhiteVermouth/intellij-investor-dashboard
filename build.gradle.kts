@@ -2,12 +2,13 @@ import com.vermouthx.stocker.gradle.StockerCopyChangelogTask
 import com.vermouthx.stocker.gradle.StockerCopyReadmeTask
 import com.vermouthx.stocker.gradle.StockerPatchHtmlTask
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.kordamp.gradle.plugin.markdown.tasks.MarkdownToHtmlTask
 
 plugins {
-    java
-    kotlin("jvm") version "1.4.10"
-    id("org.jetbrains.intellij") version "0.4.21"
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "1.4.10"
+    id("org.jetbrains.intellij") version "0.6.3"
     id("stocker-gradle-helper")
     id("org.kordamp.gradle.markdown") version "2.2.0"
 }
@@ -25,20 +26,21 @@ dependencies {
 
 intellij {
     version = "2020.2"
+    type = "IU"
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}
+
+listOf("compileKotlin", "compileTestKotlin").forEach {
+    tasks.getByName<KotlinCompile>(it) {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
     markdownToHtml {
         sourceDir = file("$projectDir/build/markdown")
         outputDir = file("$projectDir/build/html")
