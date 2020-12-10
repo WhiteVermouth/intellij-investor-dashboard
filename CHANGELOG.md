@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.0
+
+- Add index view
+
 ### 1.2.1
 
 - Enhanced UI

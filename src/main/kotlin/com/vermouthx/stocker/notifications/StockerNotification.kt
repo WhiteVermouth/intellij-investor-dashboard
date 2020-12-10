@@ -19,10 +19,9 @@ object StockerNotification {
 
     private val releaseNote: String = """
         What's new?<br>
-            - Enhanced UI<br>
-            - Bug fix<br>
+            - Add index view<br>
         Please visit the <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> for more details.<br>
-        Thank you for choosing Stocker
+        Thank you for choosing Stocker.
     """.trimIndent()
 
     fun notifyReleaseNote(project: Project, version: String) {
