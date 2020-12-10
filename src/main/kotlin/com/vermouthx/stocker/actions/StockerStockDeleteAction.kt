@@ -28,6 +28,9 @@ class StockerStockDeleteAction : AnAction() {
             val market = dialog.market
             val codes = dialog.input
             codes.split(",").forEach {
+                val publisherToAll =
+                    messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_ALL_QUOTE_DELETE_TOPIC)
+                publisherToAll.after(it.toUpperCase())
                 when (market) {
                     StockerMarketType.AShare -> {
                         if (setting.aShareList.contains(it.toUpperCase())) {
