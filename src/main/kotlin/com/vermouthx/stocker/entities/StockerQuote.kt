@@ -8,6 +8,7 @@ data class StockerQuote(
     var close: String,
     var low: String,
     var high: String,
+    var change: String,
     var percentage: String,
     var updateAt: String
 )

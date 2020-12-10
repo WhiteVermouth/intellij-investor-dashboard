@@ -19,155 +19,176 @@ object StockerQuoteParser {
     }
 
     private fun parseSinaResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
+        fun evalChange(current: Double, close: Double): String {
+            return if (current > close) {
+                "+${(current - close).round()}"
+            } else {
+                (current - close).round()
+            }
+        }
         return responseText.split("\n")
-                .asSequence()
-                .filter { text -> text.isNotEmpty() }
-                .map { text ->
-                    val code = text.subSequence(text.indexOfLast { c -> c == '_' } + 1, text.indexOfFirst { c -> c == '=' })
-                    val start = text.indexOfFirst { c -> c == '"' } + 1
-                    val end = text.indexOfLast { c -> c == '"' }
-                    "${code},${text.subSequence(start, end)}"
-                }
-                .map { text -> text.split(",") }
-                .map { textArray ->
-                    when (marketType) {
-                        StockerMarketType.AShare -> {
-                            val code = textArray[0].toUpperCase()
-                            val name = textArray[1]
-                            val opening = textArray[2].toDouble()
-                            val close = textArray[3].toDouble()
-                            val current = textArray[4].toDouble()
-                            val high = textArray[5].toDouble()
-                            val low = textArray[6].toDouble()
-                            val percentage = if (current > close) {
-                                "+${((current - close) / close * 100).round()}%"
-                            } else {
-                                "${((current - close) / close * 100).round()}%"
-                            }
-                            val updateAt = textArray[31] + " " + textArray[32]
-                            StockerQuote(
-                                    code = code,
-                                    name = name,
-                                    current = current.round(),
-                                    opening = opening.round(),
-                                    close = close.round(),
-                                    low = low.round(),
-                                    high = high.round(),
-                                    percentage = percentage,
-                                    updateAt = updateAt
-                            )
+            .asSequence()
+            .filter { text -> text.isNotEmpty() }
+            .map { text ->
+                val code = text.subSequence(text.indexOfLast { c -> c == '_' } + 1, text.indexOfFirst { c -> c == '=' })
+                val start = text.indexOfFirst { c -> c == '"' } + 1
+                val end = text.indexOfLast { c -> c == '"' }
+                "${code},${text.subSequence(start, end)}"
+            }
+            .map { text -> text.split(",") }
+            .map { textArray ->
+                when (marketType) {
+                    StockerMarketType.AShare -> {
+                        val code = textArray[0].toUpperCase()
+                        val name = textArray[1]
+                        val opening = textArray[2].toDouble()
+                        val close = textArray[3].toDouble()
+                        val current = textArray[4].toDouble()
+                        val high = textArray[5].toDouble()
+                        val low = textArray[6].toDouble()
+                        val change = evalChange(current, close)
+                        val percentage = if (current > close) {
+                            "+${((current - close) / close * 100).round()}%"
+                        } else {
+                            "${((current - close) / close * 100).round()}%"
                         }
-                        StockerMarketType.HKStocks -> {
-                            val code = textArray[0].substring(2).toUpperCase()
-                            val name = textArray[2]
-                            val opening = textArray[3].toDouble()
-                            val close = textArray[4].toDouble()
-                            val high = textArray[5].toDouble()
-                            val low = textArray[6].toDouble()
-                            val current = textArray[7].toDouble()
-                            val percentage = if (textArray[9].startsWith("-")) {
-                                "${textArray[9].toDouble().round()}%"
-                            } else {
-                                "+${textArray[9].toDouble().round()}%"
-                            }
-                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
-                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val datetime = LocalDateTime.parse(textArray[18] + " " + textArray[19], sourceFormatter)
-                            val updateAt = targetFormatter.format(datetime)
-                            StockerQuote(
-                                    code = code,
-                                    name = name,
-                                    current = current.round(),
-                                    opening = opening.round(),
-                                    close = close.round(),
-                                    low = low.round(),
-                                    high = high.round(),
-                                    percentage = percentage,
-                                    updateAt = updateAt
-                            )
-                        }
-                        StockerMarketType.USStocks -> {
-                            val code = textArray[0].toUpperCase()
-                            val name = textArray[1]
-                            val current = textArray[2].toDouble()
-                            val percentage = if (textArray[3].startsWith("-")) {
-                                "${textArray[3]}%"
-                            } else {
-                                "+${textArray[3]}%"
-                            }
-                            val updateAt = textArray[4]
-                            val opening = textArray[6].toDouble()
-                            val high = textArray[7].toDouble()
-                            val low = textArray[8].toDouble()
-                            val close = textArray[27].toDouble()
-                            StockerQuote(
-                                    code = code,
-                                    name = name,
-                                    current = current.round(),
-                                    opening = opening.round(),
-                                    close = close.round(),
-                                    low = low.round(),
-                                    high = high.round(),
-                                    percentage = percentage,
-                                    updateAt = updateAt
-                            )
-                        }
+                        val updateAt = textArray[31] + " " + textArray[32]
+                        StockerQuote(
+                            code = code,
+                            name = name,
+                            current = current.round(),
+                            opening = opening.round(),
+                            close = close.round(),
+                            low = low.round(),
+                            high = high.round(),
+                            change = change,
+                            percentage = percentage,
+                            updateAt = updateAt
+                        )
                     }
-                }.toList()
+                    StockerMarketType.HKStocks -> {
+                        val code = textArray[0].substring(2).toUpperCase()
+                        val name = textArray[2]
+                        val opening = textArray[3].toDouble()
+                        val close = textArray[4].toDouble()
+                        val high = textArray[5].toDouble()
+                        val low = textArray[6].toDouble()
+                        val current = textArray[7].toDouble()
+                        val change = evalChange(current, close)
+                        val percentage = if (current > close) {
+                            "+${textArray[9].toDouble().round()}%"
+                        } else {
+                            "${textArray[9].toDouble().round()}%"
+                        }
+                        val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
+                        val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val datetime = LocalDateTime.parse(textArray[18] + " " + textArray[19], sourceFormatter)
+                        val updateAt = targetFormatter.format(datetime)
+                        StockerQuote(
+                            code = code,
+                            name = name,
+                            current = current.round(),
+                            opening = opening.round(),
+                            close = close.round(),
+                            low = low.round(),
+                            high = high.round(),
+                            change = change,
+                            percentage = percentage,
+                            updateAt = updateAt
+                        )
+                    }
+                    StockerMarketType.USStocks -> {
+                        val code = textArray[0].toUpperCase()
+                        val name = textArray[1]
+                        val current = textArray[2].toDouble()
+                        val updateAt = textArray[4]
+                        val opening = textArray[6].toDouble()
+                        val high = textArray[7].toDouble()
+                        val low = textArray[8].toDouble()
+                        val close = textArray[27].toDouble()
+                        val change = evalChange(current, close)
+                        val percentage = if (current > close) {
+                            "+${textArray[3]}%"
+                        } else {
+                            "${textArray[3]}%"
+                        }
+                        StockerQuote(
+                            code = code,
+                            name = name,
+                            current = current.round(),
+                            opening = opening.round(),
+                            close = close.round(),
+                            low = low.round(),
+                            high = high.round(),
+                            change = change,
+                            percentage = percentage,
+                            updateAt = updateAt
+                        )
+                    }
+                }
+            }.toList()
     }
 
     private fun parseTencentResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
         return responseText.split("\n")
-                .asSequence()
-                .filter { text -> text.isNotEmpty() }
-                .map { text ->
-                    val code = when (marketType) {
-                        StockerMarketType.AShare -> text.subSequence(2, text.indexOfFirst { c -> c == '=' })
-                        StockerMarketType.HKStocks, StockerMarketType.USStocks -> text.subSequence(4, text.indexOfFirst { c -> c == '=' })
-                    }
-                    "$code~${text.subSequence(text.indexOfFirst { c -> c == '"' } + 1, text.indexOfLast { c -> c == '"' })}"
+            .asSequence()
+            .filter { text -> text.isNotEmpty() }
+            .map { text ->
+                val code = when (marketType) {
+                    StockerMarketType.AShare -> text.subSequence(2, text.indexOfFirst { c -> c == '=' })
+                    StockerMarketType.HKStocks, StockerMarketType.USStocks -> text.subSequence(
+                        4,
+                        text.indexOfFirst { c -> c == '=' })
                 }
-                .map { text -> text.split("~") }
-                .map { textArray ->
-                    val code = textArray[0].toUpperCase()
-                    val name = textArray[2]
-                    val opening = textArray[6]
-                    val close = textArray[5]
-                    val current = textArray[4]
-                    val high = textArray[34]
-                    val low = textArray[35]
-                    val percentage = if (textArray[33].toDouble() > 0) {
-                        "+${textArray[33]}%"
-                    } else {
-                        "${textArray[33]}%"
-                    }
-                    val updateAt = when (marketType) {
-                        StockerMarketType.AShare -> {
-                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
-                            targetFormatter.format(datetime)
-                        }
-                        StockerMarketType.HKStocks -> {
-                            val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-                            val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                            val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
-                            targetFormatter.format(datetime)
-                        }
-                        StockerMarketType.USStocks -> textArray[31]
-                    }
-                    StockerQuote(
-                            code = code,
-                            name = name,
-                            current = current,
-                            opening = opening,
-                            close = close,
-                            low = low,
-                            high = high,
-                            percentage = percentage,
-                            updateAt = updateAt
-                    )
+                "$code~${text.subSequence(text.indexOfFirst { c -> c == '"' } + 1, text.indexOfLast { c -> c == '"' })}"
+            }
+            .map { text -> text.split("~") }
+            .map { textArray ->
+                val code = textArray[0].toUpperCase()
+                val name = textArray[2]
+                val opening = textArray[6].toDouble()
+                val close = textArray[5].toDouble()
+                val current = textArray[4].toDouble()
+                val high = textArray[34].toDouble()
+                val low = textArray[35].toDouble()
+                val change = if (current > close) {
+                    "+${(current - close).round()}"
+                } else {
+                    (current - close).round()
                 }
-                .toList()
+                val percentage = if (textArray[33].toDouble() > 0) {
+                    "+${textArray[33]}%"
+                } else {
+                    "${textArray[33]}%"
+                }
+                val updateAt = when (marketType) {
+                    StockerMarketType.AShare -> {
+                        val sourceFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                        val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
+                        targetFormatter.format(datetime)
+                    }
+                    StockerMarketType.HKStocks -> {
+                        val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+                        val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val datetime = LocalDateTime.parse(textArray[31], sourceFormatter)
+                        targetFormatter.format(datetime)
+                    }
+                    StockerMarketType.USStocks -> textArray[31]
+                }
+                StockerQuote(
+                    code = code,
+                    name = name,
+                    current = current.round(),
+                    opening = opening.round(),
+                    close = close.round(),
+                    low = low.round(),
+                    high = high.round(),
+                    change = change,
+                    percentage = percentage,
+                    updateAt = updateAt
+                )
+            }
+            .toList()
     }
 }

@@ -59,6 +59,16 @@ class StockerToolWindow : ToolWindowFactory {
     }
 
     private fun subscribeMessage() {
+        messageBus.connect()
+            .subscribe(
+                StockerQuoteUpdateNotifier.STOCK_ALL_QUOTE_UPDATE_TOPIC,
+                StockerQuoteUpdateListener(allView.tableView)
+            )
+        messageBus.connect()
+            .subscribe(
+                StockerQuoteDeleteNotifier.STOCK_ALL_QUOTE_DELETE_TOPIC,
+                StockerQuoteDeleteListener(allView.tableView)
+            )
         tabViewMap.forEach { (market, myTableView) ->
             when (market) {
                 StockerMarketType.AShare -> {
@@ -66,7 +76,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC,
                             StockerQuoteUpdateListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )
@@ -74,7 +83,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC,
                             StockerQuoteDeleteListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )
@@ -84,7 +92,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC,
                             StockerQuoteUpdateListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )
@@ -92,7 +99,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC,
                             StockerQuoteDeleteListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )
@@ -102,7 +108,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC,
                             StockerQuoteUpdateListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )
@@ -110,7 +115,6 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC,
                             StockerQuoteDeleteListener(
-                                allView.tableView,
                                 myTableView.tableView
                             )
                         )

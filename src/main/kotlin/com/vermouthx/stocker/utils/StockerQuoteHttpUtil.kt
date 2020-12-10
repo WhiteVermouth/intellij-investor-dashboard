@@ -17,7 +17,7 @@ object StockerQuoteHttpUtil {
     private val httpClientPool = run {
         val connectionManager = PoolingHttpClientConnectionManager()
         connectionManager.maxTotal = 20
-        val requestConfig = RequestConfig.custom().setConnectionRequestTimeout(1000).setSocketTimeout(1000).build()
+        val requestConfig = RequestConfig.custom().build()
         HttpClients.custom().setConnectionManager(connectionManager).setDefaultRequestConfig(requestConfig).build()
     }
 
@@ -25,9 +25,12 @@ object StockerQuoteHttpUtil {
         marketType: StockerMarketType,
         quoteProvider: StockerQuoteProvider,
         codes: List<String>
-    ): List<StockerQuote>? {
+    ): List<StockerQuote> {
+        if (codes.isEmpty()) {
+            return emptyList()
+        }
         val codesParam =
-            if (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT) {
+            if (isUpperCase(marketType, quoteProvider)) {
                 codes.joinToString(",") { code ->
                     "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
                 }
@@ -44,7 +47,7 @@ object StockerQuoteHttpUtil {
             StockerQuoteParser.parse(quoteProvider, marketType, responseText)
         } catch (e: Exception) {
             log.warn(e)
-            null
+            emptyList()
         }
     }
 
@@ -53,7 +56,7 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         code: String
     ): Boolean {
-        val url = if (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT) {
+        val url = if (isUpperCase(marketType, quoteProvider)) {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
         } else {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
@@ -71,6 +74,10 @@ object StockerQuoteHttpUtil {
             StockerQuoteProvider.SINA -> firstLine.subSequence(start, end).contains(",")
             StockerQuoteProvider.TENCENT -> firstLine.subSequence(start, end).contains("~")
         }
+    }
+
+    private fun isUpperCase(marketType: StockerMarketType, quoteProvider: StockerQuoteProvider): Boolean {
+        return marketType == StockerMarketType.HKStocks || (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT)
     }
 
 }
