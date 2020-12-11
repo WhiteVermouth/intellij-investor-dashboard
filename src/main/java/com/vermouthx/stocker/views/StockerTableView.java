@@ -95,7 +95,6 @@ public class StockerTableView {
         tbPane.setBorder(BorderFactory.createEmptyBorder());
         JPanel iPane = new JBPanel<>(new GridLayout(1, 4));
         iPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()));
-        cbIndex.setBorder(BorderFactory.createEmptyBorder());
         iPane.add(cbIndex);
         iPane.add(lbIndexValue);
         iPane.add(lbIndexExtent);
