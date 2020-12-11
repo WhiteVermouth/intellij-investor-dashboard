@@ -3,7 +3,7 @@ package com.vermouthx.stocker
 import com.intellij.openapi.application.ApplicationManager
 import com.vermouthx.stocker.enums.StockerMarketIndex
 import com.vermouthx.stocker.enums.StockerMarketType
-import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
+import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier.*
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import java.util.concurrent.Executors
@@ -60,7 +60,7 @@ object StockerApp {
                 StockerQuoteHttpUtil.get(StockerMarketType.HKStocks, quoteProvider, StockerMarketIndex.HK.codes),
                 StockerQuoteHttpUtil.get(StockerMarketType.USStocks, quoteProvider, StockerMarketIndex.US.codes)
             ).flatten()
-            val publisher = messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_ALL_QUOTE_UPDATE_TOPIC)
+            val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_UPDATE_TOPIC)
             publisher.syncQuotes(allStockQuotes)
             publisher.syncIndices(allStockIndices)
         }
@@ -81,25 +81,28 @@ object StockerApp {
             StockerMarketType.AShare -> {
                 val quotes = StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
                 val indices = StockerQuoteHttpUtil.get(marketType, quoteProvider, StockerMarketIndex.CN.codes)
-                val publisher =
-                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_CN_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(quotes)
+                val publisher = messageBus.syncPublisher(STOCK_CN_QUOTE_UPDATE_TOPIC)
+                if (quotes.size == setting.aShareList.size) {
+                    publisher.syncQuotes(quotes)
+                }
                 publisher.syncIndices(indices)
             }
             StockerMarketType.HKStocks -> {
                 val quotes = StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
                 val indices = StockerQuoteHttpUtil.get(marketType, quoteProvider, StockerMarketIndex.HK.codes)
-                val publisher =
-                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_HK_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(quotes)
+                val publisher = messageBus.syncPublisher(STOCK_HK_QUOTE_UPDATE_TOPIC)
+                if (quotes.size == setting.hkStocksList.size) {
+                    publisher.syncQuotes(quotes)
+                }
                 publisher.syncIndices(indices)
             }
             StockerMarketType.USStocks -> {
                 val quotes = StockerQuoteHttpUtil.get(marketType, quoteProvider, stockCodeList)
                 val indices = StockerQuoteHttpUtil.get(marketType, quoteProvider, StockerMarketIndex.US.codes)
-                val publisher =
-                    messageBus.syncPublisher(StockerQuoteUpdateNotifier.STOCK_US_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(quotes)
+                val publisher = messageBus.syncPublisher(STOCK_US_QUOTE_UPDATE_TOPIC)
+                if (quotes.size == setting.usStocksList.size) {
+                    publisher.syncQuotes(quotes)
+                }
                 publisher.syncIndices(indices)
             }
         }

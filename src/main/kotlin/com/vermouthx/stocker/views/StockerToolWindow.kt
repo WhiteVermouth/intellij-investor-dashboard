@@ -36,8 +36,8 @@ class StockerToolWindow : ToolWindowFactory {
                 val code = tbModel.getValueAt(selectedRow, 0).toString()
                 val market = setting.marketOf(code)
                 if (market != null) {
-                    synchronized(tbBody) {
-                        setting.removeCode(market, code)
+                    setting.removeCode(market, code)
+                    synchronized(tbModel) {
                         tbModel.removeRow(selectedRow)
                         tbModel.fireTableRowsDeleted(selectedRow, selectedRow)
                     }

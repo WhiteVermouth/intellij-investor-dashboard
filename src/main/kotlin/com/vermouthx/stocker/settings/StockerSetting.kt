@@ -82,13 +82,19 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
     fun removeCode(market: StockerMarketType, code: String) {
         when (market) {
             StockerMarketType.AShare -> {
-                aShareList.remove(code)
+                synchronized(aShareList) {
+                    aShareList.remove(code)
+                }
             }
             StockerMarketType.HKStocks -> {
-                hkStocksList.remove(code)
+                synchronized(hkStocksList) {
+                    hkStocksList.remove(code)
+                }
             }
             StockerMarketType.USStocks -> {
-                usStocksList.remove(code)
+                synchronized(usStocksList) {
+                    usStocksList.remove(code)
+                }
             }
         }
     }
