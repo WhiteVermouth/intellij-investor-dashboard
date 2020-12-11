@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.1
+
+- Add right-click popup menu to delete code(s)
+
 ### 1.3.0
 
 - Add index view
