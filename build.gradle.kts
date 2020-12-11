@@ -1,10 +1,3 @@
-import com.vermouthx.stocker.gradle.StockerCopyChangelogTask
-import com.vermouthx.stocker.gradle.StockerCopyReadmeTask
-import com.vermouthx.stocker.gradle.StockerPatchHtmlTask
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.kordamp.gradle.plugin.markdown.tasks.MarkdownToHtmlTask
-
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
@@ -29,21 +22,35 @@ intellij {
     type = "IU"
 }
 
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-}
-
-listOf("compileKotlin", "compileTestKotlin").forEach {
-    tasks.getByName<KotlinCompile>(it) {
+tasks {
+    compileJava {
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
+    }
+    compileTestJava {
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
+    }
+    compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
-}
-
-tasks {
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    copyReadme {
+        dependsOn("createDirectory")
+    }
+    copyChangelog {
+        dependsOn("createDirectory")
+    }
     markdownToHtml {
         sourceDir = file("$projectDir/build/markdown")
         outputDir = file("$projectDir/build/html")
+
+        dependsOn("copyReadme", "copyChangelog")
+    }
+    patchHtml {
+        dependsOn("markdownToHtml")
     }
     patchPluginXml {
         sinceBuild("202")
@@ -56,29 +63,10 @@ tasks {
         if (file(readmePath).exists()) {
             pluginDescription(file(readmePath).readText())
         }
+
+        dependsOn("patchHtml")
     }
     publishPlugin {
         token(System.getProperty("jetbrains.token"))
     }
-}
-
-tasks.withType<StockerCopyReadmeTask> {
-    dependsOn("createDirectory")
-}
-
-tasks.withType<StockerCopyChangelogTask> {
-    dependsOn("createDirectory")
-}
-
-tasks.withType<MarkdownToHtmlTask> {
-    dependsOn("copyChangelog")
-    dependsOn("copyReadme")
-}
-
-tasks.withType<StockerPatchHtmlTask> {
-    dependsOn("markdownToHtml")
-}
-
-tasks.withType<PatchPluginXmlTask> {
-    dependsOn("patchHtml")
 }
