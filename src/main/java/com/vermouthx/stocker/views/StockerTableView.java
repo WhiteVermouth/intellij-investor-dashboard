@@ -121,7 +121,9 @@ public class StockerTableView {
             public void mouseReleased(MouseEvent e) {
                 int row = tbBody.rowAtPoint(e.getPoint());
                 if (tbBody.getSelectedRows().length == 0 || Arrays.stream(tbBody.getSelectedRows()).noneMatch(p -> p == row)) {
-                    tbBody.setRowSelectionInterval(row, row);
+                    if (row >= 0 && row < tbBody.getRowCount()) {
+                        tbBody.setRowSelectionInterval(row, row);
+                    }
                 }
             }
         });
