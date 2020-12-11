@@ -14,7 +14,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +27,7 @@ public class StockerTableView {
     private JScrollPane tbPane;
     private Color upColor;
     private Color downColor;
+    private JTable tbBody;
     private DefaultTableModel tbModel;
 
     private final ComboBox<String> cbIndex = new ComboBox<>();
@@ -111,7 +115,16 @@ public class StockerTableView {
     private static final String percentColumn = "Percentage";
 
     private void initTable() {
-        JTable tbBody = new JBTable();
+        tbBody = new JBTable();
+        tbBody.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int row = tbBody.rowAtPoint(e.getPoint());
+                if (tbBody.getSelectedRows().length == 0 || Arrays.stream(tbBody.getSelectedRows()).noneMatch(p -> p == row)) {
+                    tbBody.setRowSelectionInterval(row, row);
+                }
+            }
+        });
         tbModel = new StockerTableModel();
         tbBody.setShowVerticalLines(false);
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
@@ -174,6 +187,10 @@ public class StockerTableView {
 
     public JComponent getComponent() {
         return mPane;
+    }
+
+    public JTable getTableBody() {
+        return tbBody;
     }
 
     public DefaultTableModel getTableModel() {

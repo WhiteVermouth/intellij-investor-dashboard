@@ -15,7 +15,7 @@ public class StockerQuoteDeleteListener implements StockerQuoteDeleteNotifier {
 
     @Override
     public void after(String code) {
-        synchronized (myTableView.getTableModel()) {
+        synchronized (myTableView) {
             DefaultTableModel tableModel = myTableView.getTableModel();
             int rowIndex = StockerTableModelUtil.existAt(tableModel, code);
             if (rowIndex != -1) {

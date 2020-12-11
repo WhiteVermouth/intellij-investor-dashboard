@@ -66,6 +66,19 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             myState.usStocksList = value
         }
 
+    fun marketOf(code: String): StockerMarketType? {
+        if (aShareList.contains(code)) {
+            return StockerMarketType.AShare
+        }
+        if (hkStocksList.contains(code)) {
+            return StockerMarketType.HKStocks
+        }
+        if (usStocksList.contains(code)) {
+            return StockerMarketType.USStocks
+        }
+        return null
+    }
+
     fun removeCode(market: StockerMarketType, code: String) {
         when (market) {
             StockerMarketType.AShare -> {
