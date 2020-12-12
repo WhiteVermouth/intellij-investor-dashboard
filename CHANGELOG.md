@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.2
+
+- Bug fix
+
 ### 1.3.1
 
 - Add right-click popup menu to delete code(s)
