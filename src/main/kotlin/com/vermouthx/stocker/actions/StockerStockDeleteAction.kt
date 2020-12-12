@@ -3,8 +3,8 @@ package com.vermouthx.stocker.actions
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.IconLoader
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier
 import com.vermouthx.stocker.settings.StockerSetting
@@ -39,12 +39,7 @@ class StockerStockDeleteAction : AnAction() {
                                 messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC)
                             publisher.after(it.toUpperCase())
                         } else {
-                            Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg", javaClass)
-                            )
+                            showErrorMessage(project, it)
                         }
                     }
                     StockerMarketType.HKStocks -> {
@@ -54,12 +49,7 @@ class StockerStockDeleteAction : AnAction() {
                                 messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC)
                             publisher.after(it.toUpperCase())
                         } else {
-                            Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg", javaClass)
-                            )
+                            showErrorMessage(project, it)
                         }
                     }
                     StockerMarketType.USStocks -> {
@@ -69,16 +59,17 @@ class StockerStockDeleteAction : AnAction() {
                                 messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC)
                             publisher.after(it.toUpperCase())
                         } else {
-                            Messages.showMessageDialog(
-                                project,
-                                "You entered an non-existent stock code: ${it}.",
-                                "Invalid Stock Code",
-                                IconLoader.getIcon("/icons/logo.svg", javaClass)
-                            )
+                            showErrorMessage(project, it)
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun showErrorMessage(project: Project?, code: String) {
+        val message = "$code does not exist in your self-chosen stock list."
+        val title = "Invalid Stock Code"
+        Messages.showErrorDialog(project, message, title)
     }
 }

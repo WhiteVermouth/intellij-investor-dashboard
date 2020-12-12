@@ -3,7 +3,6 @@ package com.vermouthx.stocker.actions
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.IconLoader
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
@@ -45,11 +44,10 @@ class StockerStockAddAction : AnAction() {
                         }
                     }
                 } else {
-                    Messages.showMessageDialog(
+                    Messages.showErrorDialog(
                         project,
-                        "You entered an invalid stock code: ${it}.",
-                        "Invalid Stock Code",
-                        IconLoader.getIcon("/icons/logo.svg", javaClass)
+                        "$it is an invalid stock code.",
+                        "Invalid Stock Code"
                     )
                 }
             }

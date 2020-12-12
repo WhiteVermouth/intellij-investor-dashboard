@@ -15,10 +15,10 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     }
 
     @Override
-    public void syncQuotes(List<StockerQuote> quotes) {
-        synchronized (myTableView) {
-            DefaultTableModel tableModel = myTableView.getTableModel();
-            quotes.forEach(quote -> {
+    public void syncQuotes(List<StockerQuote> quotes, int size) {
+        DefaultTableModel tableModel = myTableView.getTableModel();
+        quotes.forEach(quote -> {
+            synchronized (myTableView.getTableModel()) {
                 int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
                 if (rowIndex != -1) {
                     if (!tableModel.getValueAt(rowIndex, 1).equals(quote.getName())) {
@@ -34,10 +34,12 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                         tableModel.fireTableCellUpdated(rowIndex, 3);
                     }
                 } else {
-                    tableModel.addRow(new String[]{quote.getCode(), quote.getName(), quote.getCurrent(), quote.getPercentage()});
+                    if (quotes.size() == size) {
+                        tableModel.addRow(new String[]{quote.getCode(), quote.getName(), quote.getCurrent(), quote.getPercentage()});
+                    }
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override

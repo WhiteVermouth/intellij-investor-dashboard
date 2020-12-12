@@ -66,6 +66,9 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             myState.usStocksList = value
         }
 
+    val allStockListSize: Int
+        get() = aShareList.size + hkStocksList.size + usStocksList.size
+
     fun marketOf(code: String): StockerMarketType? {
         if (aShareList.contains(code)) {
             return StockerMarketType.AShare

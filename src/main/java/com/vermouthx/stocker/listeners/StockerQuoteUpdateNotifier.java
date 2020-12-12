@@ -11,7 +11,7 @@ public interface StockerQuoteUpdateNotifier {
     Topic<StockerQuoteUpdateNotifier> STOCK_HK_QUOTE_UPDATE_TOPIC = Topic.create("StockHKQuoteUpdateTopic", StockerQuoteUpdateNotifier.class);
     Topic<StockerQuoteUpdateNotifier> STOCK_US_QUOTE_UPDATE_TOPIC = Topic.create("StockUSQuoteUpdateTopic", StockerQuoteUpdateNotifier.class);
 
-    void syncQuotes(List<StockerQuote> quotes);
+    void syncQuotes(List<StockerQuote> quotes, int size);
 
     void syncIndices(List<StockerQuote> indices);
 }
