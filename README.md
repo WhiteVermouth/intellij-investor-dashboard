@@ -13,7 +13,7 @@ Stocker is a dashboard, which helps investor track realtime market conditions in
 <img src="https://img.shields.io/jetbrains/plugin/r/stars/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Rating" />
 </p>
 <p align="center">
-<img src="https://i.imgur.com/hP1TbCD.png" alt="Dashboard"/>
+<img src="https://i.imgur.com/mdX1Sk8.png" alt="Dashboard"/>
 </p>
 
 ## Installation
