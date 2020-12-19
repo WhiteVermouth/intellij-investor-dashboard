@@ -109,7 +109,7 @@ public class StockerTableView {
         mPane.add(iPane, BorderLayout.SOUTH);
     }
 
-    private static final String codeColumn = "Code";
+    private static final String codeColumn = "Symbol";
     private static final String nameColumn = "Name";
     private static final String currentColumn = "Current";
     private static final String percentColumn = "Percentage";
