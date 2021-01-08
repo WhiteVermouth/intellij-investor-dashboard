@@ -10,7 +10,7 @@ Stocker is a dashboard, which helps investor track realtime market conditions in
 <img src="https://dev.azure.com/mvriddle/Stocker/_apis/build/status/WhiteVermouth.intellij-investor-dashboard?branchName=master" alt="Build Status" />
 <img src="https://img.shields.io/github/v/release/WhiteVermouth/intellij-investor-dashboard" alt="GitHub Release" />
 <img src="https://img.shields.io/jetbrains/plugin/v/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Release" />
-<img src="https://img.shields.io/jetbrains/plugin/r/stars/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Rating" />
+<img src="https://img.shields.io/jetbrains/plugin/d/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Downloads" />
 </p>
 <p align="center">
 <img src="https://i.imgur.com/mdX1Sk8.png" alt="Dashboard"/>
