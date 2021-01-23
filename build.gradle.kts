@@ -18,24 +18,27 @@ dependencies {
 }
 
 intellij {
-    version = "2020.2"
-    type = "IU"
+    version = "LATEST-EAP-SNAPSHOT"
+    type = "IC"
 }
 
 tasks {
     compileJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     compileTestJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
+    }
+    buildSearchableOptions {
+        enabled = false
     }
     copyReadme {
         dependsOn("createDirectory")
@@ -53,8 +56,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("202")
-        untilBuild("203.*")
+        sinceBuild("203.3645.34")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
         if (file(changelogPath).exists()) {
