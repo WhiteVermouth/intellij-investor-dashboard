@@ -116,14 +116,17 @@ public class StockerTableView {
 
     private void initTable() {
         tbBody = new JBTable();
+        tbBody.setFocusable(false);
         tbBody.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 int row = tbBody.rowAtPoint(e.getPoint());
-                if (tbBody.getSelectedRows().length == 0 || Arrays.stream(tbBody.getSelectedRows()).noneMatch(p -> p == row)) {
-                    if (row >= 0 && row < tbBody.getRowCount()) {
+                if (row >= 0 && row < tbBody.getRowCount()) {
+                    if (tbBody.getSelectedRows().length == 0 || Arrays.stream(tbBody.getSelectedRows()).noneMatch(p -> p == row)) {
                         tbBody.setRowSelectionInterval(row, row);
                     }
+                } else {
+                    tbBody.clearSelection();
                 }
             }
         });
