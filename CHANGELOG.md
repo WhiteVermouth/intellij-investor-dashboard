@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.3
+
+- Bug fix
+
 ### 1.3.2
 
 - Bug fix
