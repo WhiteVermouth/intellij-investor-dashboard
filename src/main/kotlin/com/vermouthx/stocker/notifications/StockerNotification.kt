@@ -8,15 +8,15 @@ import org.intellij.lang.annotations.Language
 object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
-        <li>Bug fix</li>
+        <ul>
+            <li>Support disable Red/Green color pattern. Go to <em>Preferences/Settings -> Tools -> Stocker</em>, pick <em>Color Pattern</em> option <em>None</em>, then apply.</li>
+        </ul>
     """.trimIndent()
 
     @Language("HTML")
     private val releaseNote: String = """
         <h3>What's new</h3>
-        <ul>
-            $whatsNew
-        </ul>
+        $whatsNew
         <p>Please visit the <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> for more details.</p>
         <p>Enjoy this plugin? Consider <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>STAR</a> this project.</p>
         <p>Thank you for choosing Stocker.</p>

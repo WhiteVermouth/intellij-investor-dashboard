@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.4
+
+- Support disable Red/Green color pattern
+
 ### 1.3.3
 
 - Bug fix
