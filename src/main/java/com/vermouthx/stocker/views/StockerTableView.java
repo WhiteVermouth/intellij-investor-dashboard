@@ -27,6 +27,7 @@ public class StockerTableView {
     private JScrollPane tbPane;
     private Color upColor;
     private Color downColor;
+    private Color zeroColor;
     private JTable tbBody;
     private DefaultTableModel tbModel;
 
@@ -54,12 +55,22 @@ public class StockerTableView {
 
     private void syncColorPatternSetting() {
         StockerSetting setting = StockerSetting.Companion.getInstance();
-        if (setting.getQuoteColorPattern() == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
-            upColor = JBColor.RED;
-            downColor = JBColor.GREEN;
-        } else {
-            upColor = JBColor.GREEN;
-            downColor = JBColor.RED;
+        switch (setting.getQuoteColorPattern()) {
+            case RED_UP_GREEN_DOWN:
+                upColor = JBColor.RED;
+                downColor = JBColor.GREEN;
+                zeroColor = JBColor.GRAY;
+                break;
+            case GREEN_UP_RED_DOWN:
+                upColor = JBColor.GREEN;
+                downColor = JBColor.RED;
+                zeroColor = JBColor.GRAY;
+                break;
+            default:
+                upColor = JBColor.foreground();
+                downColor = JBColor.foreground();
+                zeroColor = JBColor.foreground();
+                break;
         }
     }
 
@@ -88,9 +99,9 @@ public class StockerTableView {
             lbIndexExtent.setForeground(downColor);
             lbIndexPercent.setForeground(downColor);
         } else {
-            lbIndexValue.setForeground(JBColor.GRAY);
-            lbIndexExtent.setForeground(JBColor.GRAY);
-            lbIndexPercent.setForeground(JBColor.GRAY);
+            lbIndexValue.setForeground(zeroColor);
+            lbIndexExtent.setForeground(zeroColor);
+            lbIndexPercent.setForeground(zeroColor);
         }
     }
 
@@ -186,7 +197,7 @@ public class StockerTableView {
         } else if (value.startsWith("-")) {
             renderer.setForeground(downColor);
         } else {
-            renderer.setForeground(JBColor.GRAY);
+            renderer.setForeground(zeroColor);
         }
     }
 

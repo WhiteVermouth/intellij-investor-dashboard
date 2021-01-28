@@ -10,6 +10,7 @@ public class StockerSettingView {
     private JPanel mPane;
     private JRadioButton rbRedUpPattern;
     private JRadioButton rbGreenUpPattern;
+    private JRadioButton rbNonePattern;
     private JComboBox<String> cbProvider;
 
     public JPanel getContent() {
@@ -31,7 +32,10 @@ public class StockerSettingView {
         if (rbRedUpPattern.isSelected()) {
             return StockerQuoteColorPattern.RED_UP_GREEN_DOWN;
         }
-        return StockerQuoteColorPattern.GREEN_UP_RED_DOWN;
+        if (rbGreenUpPattern.isSelected()) {
+            return StockerQuoteColorPattern.GREEN_UP_RED_DOWN;
+        }
+        return StockerQuoteColorPattern.NONE;
     }
 
     public void resetQuoteProvider(StockerQuoteProvider quoteProvider) {
@@ -39,10 +43,15 @@ public class StockerSettingView {
     }
 
     public void resetQuoteColorPattern(StockerQuoteColorPattern colorPattern) {
-        if (colorPattern == StockerQuoteColorPattern.RED_UP_GREEN_DOWN) {
-            rbRedUpPattern.setSelected(true);
-        } else {
-            rbGreenUpPattern.setSelected(true);
+        switch (colorPattern) {
+            case RED_UP_GREEN_DOWN:
+                rbRedUpPattern.setSelected(true);
+                break;
+            case GREEN_UP_RED_DOWN:
+                rbGreenUpPattern.setSelected(true);
+                break;
+            default:
+                rbNonePattern.setSelected(true);
         }
     }
 
