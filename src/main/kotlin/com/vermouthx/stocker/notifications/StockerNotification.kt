@@ -10,6 +10,7 @@ object StockerNotification {
     private val whatsNew: String = """
         <ul>
             <li>Support disable Red/Green color pattern. Go to <em>Preferences/Settings -> Tools -> Stocker</em>, pick <em>Color Pattern</em> option <em>None</em>, then apply.</li>
+            <li>Fixed compatibility issue</li>
         </ul>
     """.trimIndent()
 
