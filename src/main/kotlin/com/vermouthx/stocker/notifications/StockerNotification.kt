@@ -26,16 +26,15 @@ object StockerNotification {
     @JvmField
     var logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
+    private val NOTIFICATION_GROUP = NotificationGroup("Stocker", NotificationDisplayType.STICKY_BALLOON, true)
+
     fun notifyReleaseNote(project: Project, version: String) {
-        NotificationGroupManager
-            .getInstance()
-            .getNotificationGroup("Stocker")
-            .createNotification(
-                title = "Stocker Updated to v$version",
-                content = releaseNote,
-                type = NotificationType.INFORMATION,
-                listener = NotificationListener.URL_OPENING_LISTENER
-            )
+        NOTIFICATION_GROUP.createNotification(
+            title = "Stocker Updated to v$version",
+            content = releaseNote,
+            type = NotificationType.INFORMATION,
+            listener = NotificationListener.URL_OPENING_LISTENER
+        )
             .setIcon(logoIcon)
             .notify(project)
     }

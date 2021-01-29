@@ -2,12 +2,11 @@
     <id>com.vermouthx.intellij-investor-dashboard</id>
     <name>Stocker</name>
     <vendor email="vermouth7dante@gmail.com" url="https://vermouthx.com">Zihan Ma</vendor>
-    <idea-version since-build="203.3645.34"/>
+    <idea-version since-build="191"/>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
         <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerStartupActivity"/>
-        <notificationGroup displayType="STICKY_BALLOON" id="Stocker" isLogByDefault="true"/>
         <toolWindow id="Stocker" anchor="left" icon="/icons/logo.svg" secondary="true"
                     factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
         <applicationConfigurable parentId="tools" displayName="Stocker"
