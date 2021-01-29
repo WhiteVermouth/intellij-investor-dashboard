@@ -56,6 +56,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
+        sinceBuild("203.3645.34")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
         if (file(changelogPath).exists()) {
