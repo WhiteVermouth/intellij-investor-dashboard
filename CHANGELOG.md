@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.6
+
+- Add backward compatibility until 2019.1
+
 ### 1.3.5
 
 - Fixed compatibility issue

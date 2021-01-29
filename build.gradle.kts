@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.vermouthx"
-version = "1.3.5"
+version = "1.3.6"
 
 repositories {
     mavenCentral()
@@ -56,7 +56,8 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("203.3645.34")
+        sinceBuild("191")
+        untilBuild("211.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
         if (file(changelogPath).exists()) {
