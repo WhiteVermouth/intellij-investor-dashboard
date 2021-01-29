@@ -1,6 +1,9 @@
 package com.vermouthx.stocker.notifications
 
-import com.intellij.notification.*
+import com.intellij.notification.NotificationDisplayType
+import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationListener
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import org.intellij.lang.annotations.Language
