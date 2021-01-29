@@ -29,7 +29,7 @@ object StockerNotification {
     fun notifyReleaseNote(project: Project, version: String) {
         NotificationGroupManager
             .getInstance()
-            .getNotificationGroup("stocker-notification-group")
+            .getNotificationGroup("Stocker")
             .createNotification(
                 title = "Stocker Updated to v$version",
                 content = releaseNote,
