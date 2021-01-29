@@ -2,7 +2,7 @@
 
 ### 1.3.6
 
-- Add backward compatibility until 2019.1
+- Add backward compatibility until 2020.1
 
 ### 1.3.5
 

@@ -56,7 +56,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("191")
+        sinceBuild("201")
         untilBuild("211.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
