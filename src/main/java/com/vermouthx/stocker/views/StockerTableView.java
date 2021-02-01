@@ -7,7 +7,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.vermouthx.stocker.entities.StockerQuote;
-import com.vermouthx.stocker.enums.StockerQuoteColorPattern;
 import com.vermouthx.stocker.settings.StockerSetting;
 
 import javax.swing.*;

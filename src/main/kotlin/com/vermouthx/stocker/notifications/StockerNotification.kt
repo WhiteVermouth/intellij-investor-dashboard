@@ -9,6 +9,8 @@ import com.intellij.openapi.util.IconLoader
 import org.intellij.lang.annotations.Language
 
 object StockerNotification {
+    private val NOTIFICATION_GROUP = NotificationGroup("Stocker", NotificationDisplayType.STICKY_BALLOON, true)
+
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
@@ -27,9 +29,7 @@ object StockerNotification {
     """.trimIndent()
 
     @JvmField
-    var logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
-
-    private val NOTIFICATION_GROUP = NotificationGroup("Stocker", NotificationDisplayType.STICKY_BALLOON, true)
+    val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
     fun notifyReleaseNote(project: Project, version: String) {
         NOTIFICATION_GROUP.createNotification(
