@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
@@ -56,7 +58,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("201")
+        sinceBuild("201.6668.113")
         untilBuild("211.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
@@ -68,6 +70,10 @@ tasks {
         }
 
         dependsOn("patchHtml")
+    }
+    runPluginVerifier {
+        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57"))
+        setFailureLevel(FailureLevel.COMPATIBILITY_PROBLEMS)
     }
     publishPlugin {
         token(System.getProperty("jetbrains.token"))
