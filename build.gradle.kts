@@ -2,7 +2,7 @@ import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.4.10"
+    id("org.jetbrains.kotlin.jvm") version "1.3.72"
     id("org.jetbrains.intellij") version "0.6.3"
     id("stocker-gradle-helper")
     id("org.kordamp.gradle.markdown") version "2.2.0"
@@ -20,7 +20,7 @@ dependencies {
 }
 
 intellij {
-    version = "LATEST-EAP-SNAPSHOT"
+    version = "2019.2"
     type = "IC"
 }
 
@@ -58,7 +58,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("201.6668.113")
+        sinceBuild("192")
         untilBuild("211.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
@@ -72,7 +72,7 @@ tasks {
         dependsOn("patchHtml")
     }
     runPluginVerifier {
-        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57"))
+        ideVersions(listOf("192.7142.36", "193.7288.26", "201.8743.12", "202.8194.7", "203.7148.57"))
         setFailureLevel(FailureLevel.COMPATIBILITY_PROBLEMS)
     }
     publishPlugin {

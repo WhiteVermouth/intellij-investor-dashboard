@@ -33,10 +33,10 @@ object StockerNotification {
 
     fun notifyReleaseNote(project: Project, version: String) {
         NOTIFICATION_GROUP.createNotification(
-            title = "Stocker Updated to v$version",
-            content = releaseNote,
-            type = NotificationType.INFORMATION,
-            listener = NotificationListener.URL_OPENING_LISTENER
+            "Stocker Updated to v$version",
+            releaseNote,
+            NotificationType.INFORMATION,
+            NotificationListener.URL_OPENING_LISTENER
         )
             .setIcon(logoIcon)
             .notify(project)

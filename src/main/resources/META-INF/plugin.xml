@@ -2,7 +2,7 @@
     <id>com.vermouthx.intellij-investor-dashboard</id>
     <name>Stocker</name>
     <vendor email="vermouth7dante@gmail.com" url="https://vermouthx.com">Zihan Ma</vendor>
-    <idea-version since-build="201.6668.113"/>
+    <idea-version since-build="192"/>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
@@ -19,22 +19,18 @@
             <action class="com.vermouthx.stocker.actions.StockerRefreshAction"
                     id="com.vermouthx.stocker.actions.StockerRefreshAction"
                     text="Refresh" description="Refresh" icon="AllIcons.Actions.Refresh">
-                <override-text place="GoToAction" text="Stocker: Refresh"/>
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockAddAction"
                     id="com.vermouthx.stocker.actions.StockerStockAddAction"
                     text="Add Stock Code" description="Add stock code" icon="AllIcons.General.Add">
-                <override-text place="GoToAction" text="Stocker: Add Stock Code"/>
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockDeleteAction"
                     id="com.vermouthx.stocker.actions.StockerStockDeleteAction"
                     text="Remove Stock Code" description="Remove stock code" icon="AllIcons.General.Remove">
-                <override-text place="GoToAction" text="Stocker: Remove Stock Code"/>
             </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"
                     text="Remove All Stock Codes" description="Remove all stock codes" icon="AllIcons.General.Reset">
-                <override-text place="GoToAction" text="Stocker: Remove All Stock Codes"/>
             </action>
         </group>
     </actions>
