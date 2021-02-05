@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.7
+
+- Support JetBrains 2019 series (2019.2 at least)
+
 ### 1.3.6
 
 - Add backward compatibility until 2020.1
