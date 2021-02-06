@@ -2,7 +2,7 @@
 
 ### 1.3.7
 
-- Support JetBrains 2019 series (2019.2 at least)
+- Support JetBrains 2019 series
 
 ### 1.3.6
 

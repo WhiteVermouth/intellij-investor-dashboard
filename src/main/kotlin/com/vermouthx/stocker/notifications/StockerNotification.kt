@@ -14,7 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>Support JetBrains 2019 series (2019.2 at least)</li>
+            <li>Support JetBrains 2019 series</li>
         </ul>
     """.trimIndent()
 
