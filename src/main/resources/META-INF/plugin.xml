@@ -2,7 +2,7 @@
     <id>com.vermouthx.intellij-investor-dashboard</id>
     <name>Stocker</name>
     <vendor email="vermouth7dante@gmail.com" url="https://vermouthx.com">Zihan Ma</vendor>
-    <idea-version since-build="191"/>
+    <idea-version since-build="201.6668.113"/>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>

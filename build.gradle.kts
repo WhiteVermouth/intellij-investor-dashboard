@@ -20,24 +20,24 @@ dependencies {
 }
 
 intellij {
-    version = "2019.1"
+    version = "2020.1"
     type = "IC"
 }
 
 tasks {
     compileJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     compileTestJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     buildSearchableOptions {
         enabled = false
@@ -58,7 +58,7 @@ tasks {
         dependsOn("markdownToHtml")
     }
     patchPluginXml {
-        sinceBuild("191")
+        sinceBuild("201.6668.113")
         untilBuild("211.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
@@ -72,7 +72,7 @@ tasks {
         dependsOn("patchHtml")
     }
     runPluginVerifier {
-        ideVersions(listOf("191.8026.42", "192.7142.36", "193.7288.26", "201.8743.12", "202.8194.7", "203.7148.57"))
+        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57"))
         setFailureLevel(FailureLevel.COMPATIBILITY_PROBLEMS)
     }
     publishPlugin {

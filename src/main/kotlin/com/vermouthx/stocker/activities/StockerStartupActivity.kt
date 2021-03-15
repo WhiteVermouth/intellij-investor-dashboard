@@ -1,6 +1,6 @@
 package com.vermouthx.stocker.activities
 
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -16,7 +16,7 @@ class StockerStartupActivity : StartupActivity, DumbAware {
     }
 
     override fun runActivity(project: Project) {
-        val currentVersion = PluginManager.getPlugin(PluginId.getId(StockerApp.pluginId))?.version ?: ""
+        val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(StockerApp.pluginId))?.version ?: ""
         if (setting.version != currentVersion) {
             setting.version = currentVersion
             StockerNotification.notifyReleaseNote(project, currentVersion)
