@@ -27,7 +27,11 @@ class StockerStockDeleteAction : AnAction() {
         dialog.setupStockSymbols(quotes)
         if (dialog.showAndGet()) {
             val deletedSymbols = dialog.deleteSymbols()
-            val publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC)
+            val publisher = when (dialog.currentMarketSelection) {
+                StockerMarketType.AShare, null -> messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC)
+                StockerMarketType.HKStocks -> messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC)
+                StockerMarketType.USStocks -> messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC)
+            }
             val publisherToAll = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_ALL_QUOTE_DELETE_TOPIC)
             deletedSymbols.forEach {
                 publisherToAll.after(it.toUpperCase())
