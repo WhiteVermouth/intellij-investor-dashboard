@@ -3,9 +3,9 @@ import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.3.72"
-    id("org.jetbrains.intellij") version "0.6.3"
-    id("stocker-gradle-helper")
+    id("org.jetbrains.intellij") version "0.7.2"
     id("org.kordamp.gradle.markdown") version "2.2.0"
+    id("stocker-gradle-helper")
 }
 
 group = "com.vermouthx"
