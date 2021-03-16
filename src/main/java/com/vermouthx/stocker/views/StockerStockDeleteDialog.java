@@ -56,9 +56,10 @@ public class StockerStockDeleteDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         mPane.setLayout(new BorderLayout());
-        initMenu();
         initTable();
+        initMenu();
         initMenuListener();
+        mPane.setPreferredSize(new Dimension(400, 300));
         return mPane;
     }
 
@@ -82,9 +83,9 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             mTable.getColumn(tableColumnIdentifiers[i]).setCellRenderer(tableCellRenderer);
         }
         mTable.setShowVerticalLines(false);
+        mTable.setShowHorizontalLines(false);
         tbPane.add(mTable);
         tbPane.setViewportView(mTable);
-        tbPane.setPreferredSize(new Dimension(250, 300));
         mPane.add(tbPane, BorderLayout.CENTER);
     }
 

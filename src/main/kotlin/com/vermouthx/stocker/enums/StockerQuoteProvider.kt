@@ -8,7 +8,7 @@ enum class StockerQuoteProvider(
 ) {
     SINA(
         title = "Sina", host = "http://hq.sinajs.cn/list=",
-        suggestHost = "http://suggest3.sinajs.cn/suggest/type=2&key=",
+        suggestHost = "http://suggest3.sinajs.cn/suggest/key=",
         providerPrefixMap = mapOf(
             StockerMarketType.AShare to "",
             StockerMarketType.HKStocks to "hk",

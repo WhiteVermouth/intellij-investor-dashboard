@@ -1,7 +1,7 @@
 package com.vermouthx.stocker.utils
 
 import com.intellij.openapi.diagnostic.Logger
-import com.vermouthx.stocker.entities.StockerQuote
+import com.vermouthx.stocker.entities.StockerSuggest
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 import org.apache.http.client.config.RequestConfig
@@ -10,7 +10,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
 
-object StockerQuoteHttpUtil {
+object StockerSuggestHttpUtil {
 
     private val log = Logger.getInstance(javaClass)
 
@@ -20,40 +20,35 @@ object StockerQuoteHttpUtil {
         val requestConfig = RequestConfig.custom().build()
         HttpClients.custom().setConnectionManager(connectionManager).setDefaultRequestConfig(requestConfig)
             .useSystemProperties().build()
+
     }
 
-    fun get(
-        marketType: StockerMarketType,
-        quoteProvider: StockerQuoteProvider,
-        codes: List<String>
-    ): List<StockerQuote> {
-        if (codes.isEmpty()) {
-            return emptyList()
-        }
-        val codesParam =
-            if (isUpperCase(marketType, quoteProvider)) {
-                codes.joinToString(",") { code ->
-                    "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
-                }
-            } else {
-                codes.joinToString(",") { code ->
-                    "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
-                }
-            }
-        val url = "${quoteProvider.host}${codesParam}"
+    fun suggest(key: String): List<StockerSuggest> {
+        val url = "${StockerQuoteProvider.SINA.suggestHost}$key"
         val httpGet = HttpGet(url)
         return try {
             val response = httpClientPool.execute(httpGet)
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
-            StockerQuoteParser.parse(quoteProvider, marketType, responseText)
+            parse(responseText)
         } catch (e: Exception) {
             log.warn(e)
             emptyList()
         }
     }
 
-    private fun isUpperCase(marketType: StockerMarketType, quoteProvider: StockerQuoteProvider): Boolean {
-        return marketType == StockerMarketType.HKStocks || (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT)
+    private fun parse(responseText: String): List<StockerSuggest> {
+        val startLoc = responseText.indexOfFirst { c -> c == '"' } + 1
+        val endLoc = responseText.indexOfLast { c -> c == '"' }
+        val snippets = responseText.subSequence(startLoc, endLoc).split(";")
+        val result = mutableListOf<StockerSuggest>()
+        snippets.forEach { snippet ->
+            val columns = snippet.split(",")
+            when (columns[1]) {
+                "11" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.AShare))
+                "31" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.HKStocks))
+                "41" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.USStocks))
+            }
+        }
+        return result
     }
-
 }

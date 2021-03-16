@@ -14,10 +14,6 @@ class StockerStockAddAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val project = e.project
-        val dialog = StockerStockAddDialog(project)
-        if (dialog.showAndGet()) {
-
-        }
+        StockerStockAddDialog(e.project).show()
     }
 }
