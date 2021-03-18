@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.4.0
+
+- New Stock Add Dialog
+- New Stock Delete Dialog
+- Some enhancement and bug fix
+
 ### 1.3.7
 
 - Support JetBrains 2019 series
