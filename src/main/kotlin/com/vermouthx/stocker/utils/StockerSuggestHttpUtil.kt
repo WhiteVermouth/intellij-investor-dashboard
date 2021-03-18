@@ -24,6 +24,9 @@ object StockerSuggestHttpUtil {
     }
 
     fun suggest(key: String): List<StockerSuggest> {
+        if (key.contains(" ")) {
+            return emptyList()
+        }
         val url = "${StockerQuoteProvider.SINA.suggestHost}$key"
         val httpGet = HttpGet(url)
         return try {
@@ -37,10 +40,13 @@ object StockerSuggestHttpUtil {
     }
 
     private fun parse(responseText: String): List<StockerSuggest> {
+        val result = mutableListOf<StockerSuggest>()
         val startLoc = responseText.indexOfFirst { c -> c == '"' } + 1
         val endLoc = responseText.indexOfLast { c -> c == '"' }
+        if (startLoc == endLoc) {
+            return result
+        }
         val snippets = responseText.subSequence(startLoc, endLoc).split(";")
-        val result = mutableListOf<StockerSuggest>()
         snippets.forEach { snippet ->
             val columns = snippet.split(",")
             when (columns[1]) {

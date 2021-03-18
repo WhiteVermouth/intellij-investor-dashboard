@@ -52,6 +52,31 @@ object StockerQuoteHttpUtil {
         }
     }
 
+    fun validateCode(
+        marketType: StockerMarketType,
+        quoteProvider: StockerQuoteProvider,
+        code: String
+    ): Boolean {
+        val url = if (isUpperCase(marketType, quoteProvider)) {
+            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+        } else {
+            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+        }
+        val httpGet = HttpGet(url)
+        val response = httpClientPool.execute(httpGet)
+        val responseText = EntityUtils.toString(response.entity, "UTF-8")
+        val firstLine = responseText.split("\n")[0]
+        val start = firstLine.indexOfFirst { c -> c == '"' } + 1
+        val end = firstLine.indexOfLast { c -> c == '"' }
+        if (start == end) {
+            return false
+        }
+        return when (quoteProvider) {
+            StockerQuoteProvider.SINA -> firstLine.subSequence(start, end).contains(",")
+            StockerQuoteProvider.TENCENT -> firstLine.subSequence(start, end).contains("~")
+        }
+    }
+
     private fun isUpperCase(marketType: StockerMarketType, quoteProvider: StockerQuoteProvider): Boolean {
         return marketType == StockerMarketType.HKStocks || (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT)
     }

@@ -2,15 +2,18 @@ package com.vermouthx.stocker.views;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.settings.StockerSetting;
+import com.vermouthx.stocker.utils.StockerQuoteHttpUtil;
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,8 +28,11 @@ public class StockerStockAddDialog extends DialogWrapper {
     private final JScrollPane container = new JBScrollPane();
     private final SearchTextField searchTextField = new SearchTextField(true);
 
+    private Project project;
+
     public StockerStockAddDialog(Project project) {
         super(project);
+        this.project = project;
         init();
         setTitle("Search Stocks");
     }
@@ -38,6 +44,7 @@ public class StockerStockAddDialog extends DialogWrapper {
         mPane.add(container, BorderLayout.CENTER);
         mPane.setMaximumSize(new Dimension(300, 400));
         mPane.setPreferredSize(new Dimension(300, 400));
+        setupStockSymbols(StockerSuggestHttpUtil.INSTANCE.suggest("SH600"));
         return mPane;
     }
 
@@ -59,8 +66,10 @@ public class StockerStockAddDialog extends DialogWrapper {
             protected void textChanged(@NotNull DocumentEvent e) {
                 new Thread(() -> {
                     String text = searchTextField.getText();
-                    List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
-                    setupStockSymbols(suggests);
+                    if (text != null && !text.equals("")) {
+                        List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
+                        setupStockSymbols(suggests);
+                    }
                 }).start();
             }
         });
@@ -68,7 +77,7 @@ public class StockerStockAddDialog extends DialogWrapper {
 
     public synchronized void setupStockSymbols(List<StockerSuggest> suggests) {
         JPanel inner = new JBPanel<>();
-        inner.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+        inner.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         StockerSetting setting = StockerSetting.Companion.getInstance();
         for (StockerSuggest suggest : suggests) {
@@ -77,9 +86,10 @@ public class StockerStockAddDialog extends DialogWrapper {
             row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, JBColor.border()));
             row.setMaximumSize(new Dimension(400, 30));
             String code = suggest.getCode().toUpperCase();
+            String fullName = suggest.getName();
             String name = suggest.getName();
             if (name.length() > 6) {
-                name = name.substring(0, 6) + "...";
+                name = fullName.substring(0, 6) + "...";
             }
             StockerMarketType market = suggest.getMarket();
             JLabel lbCode = new JBLabel(code);
@@ -93,20 +103,28 @@ public class StockerStockAddDialog extends DialogWrapper {
                 operation.setEnabled(false);
             }
             operation.addActionListener(e -> {
+                StockerApp.INSTANCE.shutdown();
                 if (!setting.containsCode(code)) {
-                    switch (market) {
-                        case AShare:
-                            setting.getAShareList().add(code);
-                            break;
-                        case HKStocks:
-                            setting.getHkStocksList().add(code);
-                            break;
-                        case USStocks:
-                            setting.getUsStocksList().add(code);
-                            break;
+                    if (StockerQuoteHttpUtil.INSTANCE.validateCode(market, setting.getQuoteProvider(), code)) {
+                        switch (market) {
+                            case AShare:
+                                setting.getAShareList().add(code);
+                                break;
+                            case HKStocks:
+                                setting.getHkStocksList().add(code);
+                                break;
+                            case USStocks:
+                                setting.getUsStocksList().add(code);
+                                break;
+                        }
+                        operation.setEnabled(false);
+                    } else {
+                        String errMessage = fullName + " is not supported.";
+                        String errTitle = "Not Supported Stock";
+                        Messages.showErrorDialog(project, errMessage, errTitle);
                     }
                 }
-                operation.setEnabled(false);
+                StockerApp.INSTANCE.schedule();
             });
             row.add(operation);
             inner.add(row);

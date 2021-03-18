@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.util.messages.MessageBus;
+import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerQuote;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier;
@@ -91,7 +92,7 @@ public class StockerStockDeleteDialog extends DialogWrapper {
     public void setupStockSymbols(List<StockerQuote> symbols) {
         JScrollPane container = tabMap.get(tabbedPane.getSelectedIndex());
         JPanel inner = new JBPanel<>();
-        inner.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+        inner.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         for (StockerQuote symbol : symbols) {
             JPanel row = new JBPanel<>(new GridLayout(1, 3));
@@ -105,6 +106,7 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             JLabel lbName = new JBLabel(name);
             JButton operation = new JButton("Delete");
             operation.addActionListener(e -> {
+                StockerApp.INSTANCE.shutdown();
                 StockerSetting setting = StockerSetting.Companion.getInstance();
                 setting.removeCode(currentMarketSelection, symbol.getCode());
                 MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
@@ -125,6 +127,7 @@ public class StockerStockDeleteDialog extends DialogWrapper {
                     publisherToAll.after(symbol.getCode().toUpperCase());
                     publisher.after(symbol.getCode().toUpperCase());
                 }
+                StockerApp.INSTANCE.schedule();
             });
             row.add(lbCode);
             row.add(lbName);

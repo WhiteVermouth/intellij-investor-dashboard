@@ -12,17 +12,21 @@ import java.util.concurrent.TimeUnit
 
 object StockerApp {
 
-    const val pluginId = "com.vermouthx.intellij-investor-dashboard"
+    const val PLUGIN_ID = "com.vermouthx.intellij-investor-dashboard"
 
     private val setting = StockerSetting.instance
     private val messageBus = ApplicationManager.getApplication().messageBus
 
-    private val scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
+    private var scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
 
-    private const val scheduleInitialDelay: Long = 3
-    private const val schedulePeriod: Long = 2
+    private var scheduleInitialDelay: Long = 3
+    private val schedulePeriod: Long = StockerSetting.instance.refreshInterval
 
     fun schedule() {
+        if (scheduledExecutorService.isShutdown) {
+            scheduledExecutorService = Executors.newScheduledThreadPool(3)
+            scheduleInitialDelay = 0
+        }
         scheduledExecutorService.scheduleAtFixedRate(
             createAllQuoteUpdateThread(StockerMarketType.AShare, setting.aShareList),
             scheduleInitialDelay, schedulePeriod, TimeUnit.SECONDS
@@ -41,10 +45,8 @@ object StockerApp {
         )
     }
 
-    fun refresh() {
-        refresh(StockerMarketType.AShare, setting.aShareList)
-        refresh(StockerMarketType.HKStocks, setting.hkStocksList)
-        refresh(StockerMarketType.USStocks, setting.usStocksList)
+    fun shutdown() {
+        scheduledExecutorService.shutdown()
     }
 
     private fun createAllQuoteUpdateThread(): Runnable {

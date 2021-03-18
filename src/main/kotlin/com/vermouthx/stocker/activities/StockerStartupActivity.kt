@@ -16,7 +16,7 @@ class StockerStartupActivity : StartupActivity, DumbAware {
     }
 
     override fun runActivity(project: Project) {
-        val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(StockerApp.pluginId))?.version ?: ""
+        val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(StockerApp.PLUGIN_ID))?.version ?: ""
         if (setting.version != currentVersion) {
             setting.version = currentVersion
             StockerNotification.notifyReleaseNote(project, currentVersion)

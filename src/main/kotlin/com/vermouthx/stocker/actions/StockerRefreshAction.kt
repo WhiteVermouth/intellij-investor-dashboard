@@ -14,6 +14,7 @@ class StockerRefreshAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        StockerApp.refresh()
+        StockerApp.shutdown()
+        StockerApp.schedule()
     }
 }
