@@ -22,10 +22,6 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ![Install](https://i.imgur.com/g3AODxd.png)
 
-## Caveat
-
-For A-Share stock code, `SH` or `SZ`(case-insensitive) prefix is needed.
-
 ## TODO
 
 - Add CN mutual fund dashboard
