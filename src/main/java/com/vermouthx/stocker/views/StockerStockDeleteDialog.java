@@ -1,6 +1,5 @@
 package com.vermouthx.stocker.views;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBColor;
@@ -8,12 +7,12 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.util.messages.MessageBus;
 import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerQuote;
+import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
-import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier;
 import com.vermouthx.stocker.settings.StockerSetting;
+import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,8 +29,11 @@ public class StockerStockDeleteDialog extends DialogWrapper {
     private final Map<Integer, JScrollPane> tabMap = new HashMap<>();
     private StockerMarketType currentMarketSelection = StockerMarketType.AShare;
 
+    private final Project project;
+
     public StockerStockDeleteDialog(Project project) {
         super(project);
+        this.project = project;
         init();
         setTitle("Manage Stocks");
     }
@@ -104,34 +106,26 @@ public class StockerStockDeleteDialog extends DialogWrapper {
                 name = name.substring(0, 6) + "...";
             }
             JLabel lbName = new JBLabel(name);
-            JButton operation = new JButton("Delete");
-            operation.addActionListener(e -> {
+            JButton btnOperation = new JButton("Delete");
+            btnOperation.addActionListener(e -> {
                 StockerApp.INSTANCE.shutdown();
-                StockerSetting setting = StockerSetting.Companion.getInstance();
-                setting.removeCode(currentMarketSelection, symbol.getCode());
-                MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
-                StockerQuoteDeleteNotifier publisher = null;
-                switch (currentMarketSelection) {
-                    case AShare:
-                        publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_CN_QUOTE_DELETE_TOPIC);
+                String operation = btnOperation.getText();
+                switch (operation) {
+                    case "Add":
+                        if (StockerActionUtil.addStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection), project)) {
+                            btnOperation.setText("Delete");
+                        }
                         break;
-                    case HKStocks:
-                        publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_HK_QUOTE_DELETE_TOPIC);
-                        break;
-                    case USStocks:
-                        publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC);
-                }
-                StockerQuoteDeleteNotifier publisherToAll = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_ALL_QUOTE_DELETE_TOPIC);
-                if (publisher != null) {
-                    operation.setEnabled(false);
-                    publisherToAll.after(symbol.getCode().toUpperCase());
-                    publisher.after(symbol.getCode().toUpperCase());
+                    case "Delete":
+                        if (StockerActionUtil.removeStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection))) {
+                            btnOperation.setText("Add");
+                        }
                 }
                 StockerApp.INSTANCE.schedule();
             });
             row.add(lbCode);
             row.add(lbName);
-            row.add(operation);
+            row.add(btnOperation);
             inner.add(row);
         }
         container.setViewportView(inner);

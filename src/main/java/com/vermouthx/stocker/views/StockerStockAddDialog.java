@@ -2,7 +2,6 @@ package com.vermouthx.stocker.views;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
@@ -13,7 +12,7 @@ import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.settings.StockerSetting;
-import com.vermouthx.stocker.utils.StockerQuoteHttpUtil;
+import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +27,7 @@ public class StockerStockAddDialog extends DialogWrapper {
     private final JScrollPane container = new JBScrollPane();
     private final SearchTextField searchTextField = new SearchTextField(true);
 
-    private Project project;
+    private final Project project;
 
     public StockerStockAddDialog(Project project) {
         super(project);
@@ -85,7 +84,7 @@ public class StockerStockAddDialog extends DialogWrapper {
             JPanel row = new JBPanel<>(layout);
             row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, JBColor.border()));
             row.setMaximumSize(new Dimension(400, 30));
-            String code = suggest.getCode().toUpperCase();
+            String code = suggest.getCode();
             String fullName = suggest.getName();
             String name = suggest.getName();
             if (name.length() > 6) {
@@ -98,35 +97,30 @@ public class StockerStockAddDialog extends DialogWrapper {
             row.add(lbName);
             JLabel lbMarket = new JBLabel(market.getTitle());
             row.add(lbMarket);
-            JButton operation = new JButton("Add");
+            JButton btnOperation = new JButton();
             if (setting.containsCode(code)) {
-                operation.setEnabled(false);
+                btnOperation.setText("Delete");
+            } else {
+                btnOperation.setText("Add");
             }
-            operation.addActionListener(e -> {
+            btnOperation.addActionListener(e -> {
                 StockerApp.INSTANCE.shutdown();
-                if (!setting.containsCode(code)) {
-                    if (StockerQuoteHttpUtil.INSTANCE.validateCode(market, setting.getQuoteProvider(), code)) {
-                        switch (market) {
-                            case AShare:
-                                setting.getAShareList().add(code);
-                                break;
-                            case HKStocks:
-                                setting.getHkStocksList().add(code);
-                                break;
-                            case USStocks:
-                                setting.getUsStocksList().add(code);
-                                break;
+                String operation = btnOperation.getText();
+                switch (operation) {
+                    case "Add":
+                        if (StockerActionUtil.addStock(market, suggest, project)) {
+                            btnOperation.setText("Delete");
                         }
-                        operation.setEnabled(false);
-                    } else {
-                        String errMessage = fullName + " is not supported.";
-                        String errTitle = "Not Supported Stock";
-                        Messages.showErrorDialog(project, errMessage, errTitle);
-                    }
+                        break;
+                    case "Delete":
+                        if (StockerActionUtil.removeStock(market, suggest)) {
+                            btnOperation.setText("Add");
+                        }
+
                 }
                 StockerApp.INSTANCE.schedule();
             });
-            row.add(operation);
+            row.add(btnOperation);
             inner.add(row);
         }
         container.setViewportView(inner);

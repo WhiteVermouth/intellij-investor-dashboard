@@ -50,9 +50,9 @@ object StockerSuggestHttpUtil {
         snippets.forEach { snippet ->
             val columns = snippet.split(",")
             when (columns[1]) {
-                "11" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.AShare))
-                "31" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.HKStocks))
-                "41" -> result.add(StockerSuggest(columns[3], columns[4], StockerMarketType.USStocks))
+                "11" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                "31" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
+                "41" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
             }
         }
         return result
