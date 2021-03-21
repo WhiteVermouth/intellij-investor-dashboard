@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.4.1
+
+- Enhanced stock management dialogs
+
 ### 1.4.0
 
 - New Stock Add Dialog

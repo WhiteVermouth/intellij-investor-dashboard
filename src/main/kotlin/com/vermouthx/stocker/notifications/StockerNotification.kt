@@ -14,9 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>Feature: search with keyword when adding stocks</li>
-            <li>Enhancement: more friendly dialog when deleting stocks</li>
-            <li>Bug fix</li>
+            <li>Enhanced stock management dialogs</li>
         </ul>
     """.trimIndent()
 
@@ -24,9 +22,9 @@ object StockerNotification {
     private val releaseNote: String = """
         <h3>What's new</h3>
         $whatsNew
+        <p>Visit the <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> for more details.</p>
+        <p>Enjoy this plugin? Consider <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>STAR</a> this project.</p>
         <p>Thank you for choosing Stocker.</p>
-        <p><a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | 
-        <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Repository</a></p>
     """.trimIndent()
 
     @JvmField
