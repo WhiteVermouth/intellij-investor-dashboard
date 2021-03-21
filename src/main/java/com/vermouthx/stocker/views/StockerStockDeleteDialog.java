@@ -11,6 +11,7 @@ import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerQuote;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
+import com.vermouthx.stocker.enums.StockerStockOperation;
 import com.vermouthx.stocker.settings.StockerSetting;
 import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil;
@@ -106,19 +107,20 @@ public class StockerStockDeleteDialog extends DialogWrapper {
                 name = name.substring(0, 6) + "...";
             }
             JLabel lbName = new JBLabel(name);
-            JButton btnOperation = new JButton("Delete");
+            JButton btnOperation = new JButton(StockerStockOperation.STOCK_DELETE.getOperation());
             btnOperation.addActionListener(e -> {
                 StockerApp.INSTANCE.shutdown();
-                String operation = btnOperation.getText();
+                String txt = btnOperation.getText();
+                StockerStockOperation operation = StockerStockOperation.mapOf(txt);
                 switch (operation) {
-                    case "Add":
+                    case STOCK_ADD:
                         if (StockerActionUtil.addStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection), project)) {
-                            btnOperation.setText("Delete");
+                            btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
                         }
                         break;
-                    case "Delete":
+                    case STOCK_DELETE:
                         if (StockerActionUtil.removeStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection))) {
-                            btnOperation.setText("Add");
+                            btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
                         }
                 }
                 StockerApp.INSTANCE.schedule();

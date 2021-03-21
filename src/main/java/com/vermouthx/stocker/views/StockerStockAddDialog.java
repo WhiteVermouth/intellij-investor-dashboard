@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
+import com.vermouthx.stocker.enums.StockerStockOperation;
 import com.vermouthx.stocker.settings.StockerSetting;
 import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil;
@@ -99,22 +100,23 @@ public class StockerStockAddDialog extends DialogWrapper {
             row.add(lbMarket);
             JButton btnOperation = new JButton();
             if (setting.containsCode(code)) {
-                btnOperation.setText("Delete");
+                btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
             } else {
-                btnOperation.setText("Add");
+                btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
             }
             btnOperation.addActionListener(e -> {
                 StockerApp.INSTANCE.shutdown();
-                String operation = btnOperation.getText();
+                String txt = btnOperation.getText();
+                StockerStockOperation operation = StockerStockOperation.mapOf(txt);
                 switch (operation) {
-                    case "Add":
+                    case STOCK_ADD:
                         if (StockerActionUtil.addStock(market, suggest, project)) {
-                            btnOperation.setText("Delete");
+                            btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
                         }
                         break;
-                    case "Delete":
+                    case STOCK_DELETE:
                         if (StockerActionUtil.removeStock(market, suggest)) {
-                            btnOperation.setText("Add");
+                            btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
                         }
 
                 }
