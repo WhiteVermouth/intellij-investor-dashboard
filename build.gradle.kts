@@ -16,7 +16,7 @@ repositories {
 }
 
 intellij {
-    version = "2020.3.3"
+    version = "2020.1"
     type = "IC"
 }
 
