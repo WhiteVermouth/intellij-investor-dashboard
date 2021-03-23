@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.4.2
+
+- Fix compatibility issue
+
 ### 1.4.1
 
 - Enhanced stock management dialogs
