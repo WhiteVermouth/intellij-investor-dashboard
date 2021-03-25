@@ -41,16 +41,26 @@ object StockerSuggestHttpUtil {
 
     private fun parse(responseText: String): List<StockerSuggest> {
         val result = mutableListOf<StockerSuggest>()
-        val startLoc = responseText.indexOfFirst { c -> c == '"' } + 1
-        val endLoc = responseText.indexOfLast { c -> c == '"' }
-        if (startLoc == endLoc) {
+        val snippets = responseText
+            .replace("var suggestvalue=\"", "")
+            .replace("\";", "")
+            .split(";")
+        if (snippets.isEmpty()) {
             return result
         }
-        val snippets = responseText.subSequence(startLoc, endLoc).split(";")
         snippets.forEach { snippet ->
             val columns = snippet.split(",")
             when (columns[1]) {
                 "11" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                "22" -> {
+                    val code = columns[3].replace("of", "")
+                    when {
+                        code.startsWith("15") || code.startsWith("16") || code.startsWith("18") ->
+                            result.add(StockerSuggest("SZ$code", columns[4], StockerMarketType.AShare))
+                        code.startsWith("50") || code.startsWith("51") ->
+                            result.add(StockerSuggest("SH$code", columns[4], StockerMarketType.AShare))
+                    }
+                }
                 "31" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
                 "41" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
             }

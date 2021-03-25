@@ -3,7 +3,6 @@ package com.vermouthx.stocker.views;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.vermouthx.stocker.entities.StockerQuote;
@@ -27,13 +26,13 @@ public class StockerTableView {
     private Color upColor;
     private Color downColor;
     private Color zeroColor;
-    private JTable tbBody;
+    private JBTable tbBody;
     private DefaultTableModel tbModel;
 
     private final ComboBox<String> cbIndex = new ComboBox<>();
-    private final JLabel lbIndexValue = new JBLabel("", SwingConstants.CENTER);
-    private final JLabel lbIndexExtent = new JBLabel("", SwingConstants.CENTER);
-    private final JLabel lbIndexPercent = new JBLabel("", SwingConstants.CENTER);
+    private final JBLabel lbIndexValue = new JBLabel("", SwingConstants.CENTER);
+    private final JBLabel lbIndexExtent = new JBLabel("", SwingConstants.CENTER);
+    private final JBLabel lbIndexPercent = new JBLabel("", SwingConstants.CENTER);
     private List<StockerQuote> indices = new ArrayList<>();
 
     public StockerTableView() {
@@ -107,14 +106,14 @@ public class StockerTableView {
     private void initPane() {
         tbPane = new JBScrollPane();
         tbPane.setBorder(BorderFactory.createEmptyBorder());
-        JPanel iPane = new JBPanel<>(new GridLayout(1, 4));
+        JPanel iPane = new JPanel(new GridLayout(1, 4));
         iPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()));
         iPane.add(cbIndex);
         iPane.add(lbIndexValue);
         iPane.add(lbIndexExtent);
         iPane.add(lbIndexPercent);
         cbIndex.addItemListener(i -> updateIndex());
-        mPane = new JBPanel<>(new BorderLayout());
+        mPane = new JPanel(new BorderLayout());
         mPane.add(tbPane, BorderLayout.CENTER);
         mPane.add(iPane, BorderLayout.SOUTH);
     }
@@ -126,7 +125,6 @@ public class StockerTableView {
 
     private void initTable() {
         tbBody = new JBTable();
-        tbBody.setFocusable(false);
         tbBody.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -204,7 +202,7 @@ public class StockerTableView {
         return mPane;
     }
 
-    public JTable getTableBody() {
+    public JBTable getTableBody() {
         return tbBody;
     }
 
