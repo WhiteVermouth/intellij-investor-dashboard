@@ -41,7 +41,6 @@ public class StockerStockAddDialog extends DialogWrapper {
         initSearchBar();
         initSearchBarListener();
         mPane.add(container, BorderLayout.CENTER);
-//        mPane.setMaximumSize(new Dimension(400, 400));
         mPane.setPreferredSize(new Dimension(400, 400));
         setupStockSymbols(StockerSuggestHttpUtil.INSTANCE.suggest("SH600"));
         return mPane;
