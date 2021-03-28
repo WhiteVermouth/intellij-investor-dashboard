@@ -41,7 +41,7 @@ public class StockerStockAddDialog extends DialogWrapper {
         initSearchBar();
         initSearchBarListener();
         mPane.add(container, BorderLayout.CENTER);
-        mPane.setPreferredSize(new Dimension(400, 400));
+        mPane.setPreferredSize(new Dimension(400, 500));
         setupStockSymbols(StockerSuggestHttpUtil.INSTANCE.suggest("SH600"));
         return mPane;
     }
@@ -76,12 +76,13 @@ public class StockerStockAddDialog extends DialogWrapper {
     public synchronized void setupStockSymbols(List<StockerSuggest> suggests) {
         JPanel inner = new JPanel();
         inner.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
-        inner.setLayout(new GridLayout(0, 1));
+        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         StockerSetting setting = StockerSetting.Companion.getInstance();
         for (StockerSuggest suggest : suggests) {
             GridBagLayout layout = new GridBagLayout();
             JPanel rowPane = new JPanel(layout);
             rowPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, JBColor.border()));
+            rowPane.setMaximumSize(new Dimension(400, 30));
             String code = suggest.getCode();
             String name = suggest.getName();
             JBLabel lbCode = new JBLabel(code);

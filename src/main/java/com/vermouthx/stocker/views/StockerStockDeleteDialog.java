@@ -76,8 +76,8 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             }
         });
         mPane.add(tabbedPane, BorderLayout.CENTER);
-        mPane.setMaximumSize(new Dimension(300, 400));
-        mPane.setPreferredSize(new Dimension(300, 400));
+        mPane.setMaximumSize(new Dimension(400, 500));
+        mPane.setPreferredSize(new Dimension(400, 500));
         return mPane;
     }
 
@@ -103,9 +103,6 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             row.setMaximumSize(new Dimension(400, 30));
             JLabel lbCode = new JBLabel(symbol.getCode());
             String name = symbol.getName();
-            if (name.length() > 6) {
-                name = name.substring(0, 6) + "...";
-            }
             JLabel lbName = new JBLabel(name);
             JButton btnOperation = new JButton(StockerStockOperation.STOCK_DELETE.getOperation());
             btnOperation.addActionListener(e -> {
