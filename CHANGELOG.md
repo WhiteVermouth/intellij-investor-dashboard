@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.4.3
+
+- Fixed Android Studio compatibility
+- Fixed missed ETF in search results
+
 ### 1.4.2
 
 - Fix compatibility issue
