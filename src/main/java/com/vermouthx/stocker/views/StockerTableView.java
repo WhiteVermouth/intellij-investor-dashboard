@@ -77,29 +77,26 @@ public class StockerTableView {
             String name = Objects.requireNonNull(cbIndex.getSelectedItem()).toString();
             for (StockerQuote index : indices) {
                 if (index.getName().equals(name)) {
-                    lbIndexValue.setText(index.getCurrent());
-                    lbIndexExtent.setText(index.getChange());
-                    lbIndexPercent.setText(index.getPercentage());
-                    applyColorPatternToIndex(index.getPercentage());
+                    lbIndexValue.setText(Double.toString(index.getCurrent()));
+                    lbIndexExtent.setText(Double.toString(index.getChange()));
+                    lbIndexPercent.setText(index.getPercentage() + "%");
+                    double value = index.getPercentage();
+                    if (value > 0) {
+                        lbIndexValue.setForeground(upColor);
+                        lbIndexExtent.setForeground(upColor);
+                        lbIndexPercent.setForeground(upColor);
+                    } else if (value < 0) {
+                        lbIndexValue.setForeground(downColor);
+                        lbIndexExtent.setForeground(downColor);
+                        lbIndexPercent.setForeground(downColor);
+                    } else {
+                        lbIndexValue.setForeground(zeroColor);
+                        lbIndexExtent.setForeground(zeroColor);
+                        lbIndexPercent.setForeground(zeroColor);
+                    }
                     break;
                 }
             }
-        }
-    }
-
-    private void applyColorPatternToIndex(String value) {
-        if (value.startsWith("+")) {
-            lbIndexValue.setForeground(upColor);
-            lbIndexExtent.setForeground(upColor);
-            lbIndexPercent.setForeground(upColor);
-        } else if (value.startsWith("-")) {
-            lbIndexValue.setForeground(downColor);
-            lbIndexExtent.setForeground(downColor);
-            lbIndexPercent.setForeground(downColor);
-        } else {
-            lbIndexValue.setForeground(zeroColor);
-            lbIndexExtent.setForeground(zeroColor);
-            lbIndexPercent.setForeground(zeroColor);
         }
     }
 
@@ -169,7 +166,8 @@ public class StockerTableView {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 syncColorPatternSetting();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                String v = table.getValueAt(row, table.getColumn(percentColumn).getModelIndex()).toString();
+                String percent = table.getValueAt(row, table.getColumn(percentColumn).getModelIndex()).toString();
+                Double v = Double.parseDouble(percent.substring(0, percent.indexOf("%")));
                 applyColorPatternToTable(v, this);
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
@@ -179,7 +177,8 @@ public class StockerTableView {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 syncColorPatternSetting();
                 setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                String v = value.toString();
+                String percent = value.toString();
+                Double v = Double.parseDouble(percent.substring(0, percent.indexOf("%")));
                 applyColorPatternToTable(v, this);
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
@@ -188,10 +187,10 @@ public class StockerTableView {
         tbPane.setViewportView(tbBody);
     }
 
-    private void applyColorPatternToTable(String value, DefaultTableCellRenderer renderer) {
-        if (value.startsWith("+")) {
+    private void applyColorPatternToTable(Double value, DefaultTableCellRenderer renderer) {
+        if (value > 0) {
             renderer.setForeground(upColor);
-        } else if (value.startsWith("-")) {
+        } else if (value < 0) {
             renderer.setForeground(downColor);
         } else {
             renderer.setForeground(zeroColor);
