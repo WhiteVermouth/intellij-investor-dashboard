@@ -22,13 +22,6 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ![Install](https://i.imgur.com/g3AODxd.png)
 
-## TODO
-
-- Add CN mutual fund dashboard
-- Add stock detail info: high price, low price, candlestick chart etc.
-- Add notification when the price or percentage reach to a specified value
-- ...
-
 ## Licence
 
 Apache License
