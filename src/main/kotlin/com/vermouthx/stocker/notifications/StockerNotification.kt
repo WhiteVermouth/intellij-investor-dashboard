@@ -14,8 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>Fixed Android Studio compatibility</li>
-            <li>Fixed missed ETF in search results</li>
+            <li>Some bug fix</li>
         </ul>
     """.trimIndent()
 

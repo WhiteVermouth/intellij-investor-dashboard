@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.4.4
+
+- Fix Long stock name wrapping
+- Fix search bar text change event
+
 ### 1.4.3
 
 - Fixed Android Studio compatibility
