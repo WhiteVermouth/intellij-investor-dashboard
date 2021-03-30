@@ -21,6 +21,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class StockerStockAddDialog extends DialogWrapper {
     private final JPanel mPane = new JPanel(new BorderLayout());
@@ -28,6 +30,8 @@ public class StockerStockAddDialog extends DialogWrapper {
     private final SearchTextField searchTextField = new SearchTextField(true);
 
     private final Project project;
+
+    private final ExecutorService service = Executors.newFixedThreadPool(1);
 
     public StockerStockAddDialog(Project project) {
         super(project);
@@ -62,11 +66,13 @@ public class StockerStockAddDialog extends DialogWrapper {
         searchTextField.addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                String text = searchTextField.getText();
-                if (text != null && !text.equals("")) {
-                    List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
-                    setupStockSymbols(suggests);
-                }
+                service.submit(() -> {
+                    String text = searchTextField.getText();
+                    if (text != null && !text.equals("")) {
+                        List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
+                        setupStockSymbols(suggests);
+                    }
+                });
             }
         });
     }
