@@ -41,13 +41,13 @@ object StockerSuggestHttpUtil {
 
     private fun parse(responseText: String): List<StockerSuggest> {
         val result = mutableListOf<StockerSuggest>()
-        val snippets = responseText
+        val snippetsText = responseText
             .replace("var suggestvalue=\"", "")
             .replace("\";", "")
-            .split(";")
-        if (snippets.isEmpty()) {
+        if (snippetsText.isEmpty()) {
             return result
         }
+        val snippets = snippetsText.split(";")
         snippets.forEach { snippet ->
             val columns = snippet.split(",")
             when (columns[1]) {

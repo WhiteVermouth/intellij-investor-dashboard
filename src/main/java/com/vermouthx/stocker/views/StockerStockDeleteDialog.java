@@ -103,7 +103,11 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             row.setMaximumSize(new Dimension(400, 30));
             JLabel lbCode = new JBLabel(symbol.getCode());
             String name = symbol.getName();
-            JLabel lbName = new JBLabel(name);
+            String lbNameText = name;
+            if (name.length() > 7) {
+                lbNameText = name.substring(0, 7) + "...";
+            }
+            JLabel lbName = new JBLabel(lbNameText);
             JButton btnOperation = new JButton(StockerStockOperation.STOCK_DELETE.getOperation());
             btnOperation.addActionListener(e -> {
                 StockerApp.INSTANCE.shutdown();

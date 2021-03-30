@@ -62,13 +62,11 @@ public class StockerStockAddDialog extends DialogWrapper {
         searchTextField.addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                new Thread(() -> {
-                    String text = searchTextField.getText();
-                    if (text != null && !text.equals("")) {
-                        List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
-                        setupStockSymbols(suggests);
-                    }
-                }).start();
+                String text = searchTextField.getText();
+                if (text != null && !text.equals("")) {
+                    List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
+                    setupStockSymbols(suggests);
+                }
             }
         });
     }
@@ -86,7 +84,11 @@ public class StockerStockAddDialog extends DialogWrapper {
             String code = suggest.getCode();
             String name = suggest.getName();
             JBLabel lbCode = new JBLabel(code);
-            JBLabel lbName = new JBLabel(name);
+            String lbNameText = name;
+            if (name.length() > 25) {
+                lbNameText = name.substring(0, 25) + "...";
+            }
+            JBLabel lbName = new JBLabel(lbNameText);
             JButton btnOperation = new JButton();
             if (setting.containsCode(code)) {
                 btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
