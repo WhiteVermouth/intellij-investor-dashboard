@@ -14,14 +14,5 @@ enum class StockerQuoteProvider(
             StockerMarketType.HKStocks to "hk",
             StockerMarketType.USStocks to "gb_"
         )
-    ),
-    TENCENT(
-        title = "Tencent", host = "http://qt.gtimg.cn/q=",
-        suggestHost = "https://smartbox.gtimg.cn/s3/?v=2&t=all&c=1&q=",
-        providerPrefixMap = mapOf(
-            StockerMarketType.AShare to "",
-            StockerMarketType.HKStocks to "hk",
-            StockerMarketType.USStocks to "us"
-        )
     )
 }

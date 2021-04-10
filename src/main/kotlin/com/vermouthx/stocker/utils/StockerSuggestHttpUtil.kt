@@ -20,26 +20,25 @@ object StockerSuggestHttpUtil {
         val requestConfig = RequestConfig.custom().build()
         HttpClients.custom().setConnectionManager(connectionManager).setDefaultRequestConfig(requestConfig)
             .useSystemProperties().build()
-
     }
 
-    fun suggest(key: String): List<StockerSuggest> {
+    fun suggest(key: String, provider: StockerQuoteProvider): List<StockerSuggest> {
         if (key.contains(" ")) {
             return emptyList()
         }
-        val url = "${StockerQuoteProvider.SINA.suggestHost}$key"
+        val url = "${provider.suggestHost}$key"
         val httpGet = HttpGet(url)
         return try {
             val response = httpClientPool.execute(httpGet)
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
-            parse(responseText)
+            parseSinaResponse(responseText)
         } catch (e: Exception) {
             log.warn(e)
             emptyList()
         }
     }
 
-    private fun parse(responseText: String): List<StockerSuggest> {
+    private fun parseSinaResponse(responseText: String): List<StockerSuggest> {
         val result = mutableListOf<StockerSuggest>()
         val snippetsText = responseText
             .replace("var suggestvalue=\"", "")

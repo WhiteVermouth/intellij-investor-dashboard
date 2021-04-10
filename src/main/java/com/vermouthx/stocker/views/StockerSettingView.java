@@ -4,7 +4,6 @@ import com.vermouthx.stocker.enums.StockerQuoteColorPattern;
 import com.vermouthx.stocker.enums.StockerQuoteProvider;
 
 import javax.swing.*;
-import java.util.Objects;
 
 public class StockerSettingView {
     private JPanel mPane;
@@ -21,11 +20,7 @@ public class StockerSettingView {
     }
 
     public StockerQuoteProvider getSelectedQuoteProvider() {
-        String title = (String) Objects.requireNonNull(cbProvider.getSelectedItem());
-        if (StockerQuoteProvider.SINA.getTitle().equals(title)) {
-            return StockerQuoteProvider.SINA;
-        }
-        return StockerQuoteProvider.TENCENT;
+        return StockerQuoteProvider.SINA;
     }
 
     public StockerQuoteColorPattern getSelectedQuoteColorPattern() {

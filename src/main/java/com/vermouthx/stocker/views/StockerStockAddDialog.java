@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.vermouthx.stocker.StockerApp;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
+import com.vermouthx.stocker.enums.StockerQuoteProvider;
 import com.vermouthx.stocker.enums.StockerStockOperation;
 import com.vermouthx.stocker.settings.StockerSetting;
 import com.vermouthx.stocker.utils.StockerActionUtil;
@@ -46,7 +47,7 @@ public class StockerStockAddDialog extends DialogWrapper {
         initSearchBarListener();
         mPane.add(container, BorderLayout.CENTER);
         mPane.setPreferredSize(new Dimension(400, 500));
-        setupStockSymbols(StockerSuggestHttpUtil.INSTANCE.suggest("SH600"));
+        setupStockSymbols(StockerSuggestHttpUtil.INSTANCE.suggest("SH600", StockerQuoteProvider.SINA));
         return mPane;
     }
 
@@ -69,7 +70,7 @@ public class StockerStockAddDialog extends DialogWrapper {
                 service.submit(() -> {
                     String text = searchTextField.getText();
                     if (text != null && !text.equals("")) {
-                        List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text);
+                        List<StockerSuggest> suggests = StockerSuggestHttpUtil.INSTANCE.suggest(text, StockerQuoteProvider.SINA);
                         setupStockSymbols(suggests);
                     }
                 });

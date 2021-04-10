@@ -3,6 +3,7 @@ package com.vermouthx.stocker
 import com.intellij.openapi.application.ApplicationManager
 import com.vermouthx.stocker.enums.StockerMarketIndex
 import com.vermouthx.stocker.enums.StockerMarketType
+import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier.*
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
@@ -23,6 +24,9 @@ object StockerApp {
     private val schedulePeriod: Long = StockerSetting.instance.refreshInterval
 
     fun schedule() {
+        if (setting.quoteProvider != StockerQuoteProvider.SINA) {
+            setting.quoteProvider = StockerQuoteProvider.SINA
+        }
         if (scheduledExecutorService.isShutdown) {
             scheduledExecutorService = Executors.newScheduledThreadPool(3)
             scheduleInitialDelay = 0

@@ -31,7 +31,7 @@ object StockerQuoteHttpUtil {
             return emptyList()
         }
         val codesParam =
-            if (isUpperCase(marketType, quoteProvider)) {
+            if (isUpperCase(marketType)) {
                 codes.joinToString(",") { code ->
                     "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
                 }
@@ -45,7 +45,7 @@ object StockerQuoteHttpUtil {
         return try {
             val response = httpClientPool.execute(httpGet)
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
-            StockerQuoteParser.parse(quoteProvider, marketType, responseText)
+            StockerQuoteParser.parseSinaResponseText(marketType, responseText)
         } catch (e: Exception) {
             log.warn(e)
             emptyList()
@@ -57,7 +57,7 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         code: String
     ): Boolean {
-        val url = if (isUpperCase(marketType, quoteProvider)) {
+        val url = if (isUpperCase(marketType)) {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
         } else {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
@@ -71,14 +71,11 @@ object StockerQuoteHttpUtil {
         if (start == end) {
             return false
         }
-        return when (quoteProvider) {
-            StockerQuoteProvider.SINA -> firstLine.subSequence(start, end).contains(",")
-            StockerQuoteProvider.TENCENT -> firstLine.subSequence(start, end).contains("~")
-        }
+        return firstLine.subSequence(start, end).contains(",")
     }
 
-    private fun isUpperCase(marketType: StockerMarketType, quoteProvider: StockerQuoteProvider): Boolean {
-        return marketType == StockerMarketType.HKStocks || (marketType == StockerMarketType.USStocks && quoteProvider == StockerQuoteProvider.TENCENT)
+    private fun isUpperCase(marketType: StockerMarketType): Boolean {
+        return marketType == StockerMarketType.HKStocks
     }
 
 }
