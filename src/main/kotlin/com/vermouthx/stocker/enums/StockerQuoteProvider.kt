@@ -12,7 +12,8 @@ enum class StockerQuoteProvider(
         providerPrefixMap = mapOf(
             StockerMarketType.AShare to "",
             StockerMarketType.HKStocks to "hk",
-            StockerMarketType.USStocks to "gb_"
+            StockerMarketType.USStocks to "gb_",
+            StockerMarketType.Crypto to "btc_"
         )
     )
 }

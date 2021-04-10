@@ -31,7 +31,7 @@ object StockerQuoteHttpUtil {
             return emptyList()
         }
         val codesParam =
-            if (isUpperCase(marketType)) {
+            if (marketType == StockerMarketType.HKStocks) {
                 codes.joinToString(",") { code ->
                     "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
                 }
@@ -57,7 +57,7 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         code: String
     ): Boolean {
-        val url = if (isUpperCase(marketType)) {
+        val url = if (marketType == StockerMarketType.HKStocks) {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
         } else {
             "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
@@ -72,10 +72,6 @@ object StockerQuoteHttpUtil {
             return false
         }
         return firstLine.subSequence(start, end).contains(",")
-    }
-
-    private fun isUpperCase(marketType: StockerMarketType): Boolean {
-        return marketType == StockerMarketType.HKStocks
     }
 
 }

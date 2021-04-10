@@ -23,6 +23,8 @@ public class StockerActionUtil {
                         return setting.getHkStocksList().add(code);
                     case USStocks:
                         return setting.getUsStocksList().add(code);
+                    case Crypto:
+                        return setting.getCryptoList().add(code);
                 }
             } else {
                 String errMessage = fullName + " is not supported.";

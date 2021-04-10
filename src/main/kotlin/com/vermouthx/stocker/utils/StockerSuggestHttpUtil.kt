@@ -59,6 +59,7 @@ object StockerSuggestHttpUtil {
                 }
                 "31" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
                 "41" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
+                "71" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.Crypto))
             }
         }
         return result

@@ -61,6 +61,11 @@ class StockerToolWindow : ToolWindowFactory {
                                     val publisher = messageBus.syncPublisher(STOCK_US_QUOTE_DELETE_TOPIC)
                                     publisher.after(code)
                                 }
+                                StockerMarketType.Crypto -> {
+                                    val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_DELETE_TOPIC)
+                                    publisher.after(code)
+
+                                }
                             }
                         } else {
                             val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_DELETE_TOPIC)
@@ -80,7 +85,8 @@ class StockerToolWindow : ToolWindowFactory {
         tabViewMap = mapOf(
             StockerMarketType.AShare to StockerSimpleToolWindow(),
             StockerMarketType.HKStocks to StockerSimpleToolWindow(),
-            StockerMarketType.USStocks to StockerSimpleToolWindow()
+            StockerMarketType.USStocks to StockerSimpleToolWindow(),
+            StockerMarketType.Crypto to StockerSimpleToolWindow()
         )
     }
 
@@ -115,6 +121,14 @@ class StockerToolWindow : ToolWindowFactory {
             injectPopupMenu(project, tabViewMap[StockerMarketType.USStocks], false)
         }
         contentManager.addContent(usStocksContent)
+        val cryptoContent = contentFactory.createContent(
+            tabViewMap[StockerMarketType.Crypto]?.component,
+            StockerMarketType.Crypto.title,
+            false
+        ).also {
+            injectPopupMenu(project, tabViewMap[StockerMarketType.Crypto], false)
+        }
+        contentManager.addContent(cryptoContent)
         this.subscribeMessage()
         StockerApp.schedule()
     }
@@ -175,6 +189,22 @@ class StockerToolWindow : ToolWindowFactory {
                     messageBus.connect()
                         .subscribe(
                             STOCK_US_QUOTE_DELETE_TOPIC,
+                            StockerQuoteDeleteListener(
+                                myTableView.tableView
+                            )
+                        )
+                }
+                StockerMarketType.Crypto -> {
+                    messageBus.connect()
+                        .subscribe(
+                            CRYPTO_QUOTE_UPDATE_TOPIC,
+                            StockerQuoteUpdateListener(
+                                myTableView.tableView
+                            )
+                        )
+                    messageBus.connect()
+                        .subscribe(
+                            CRYPTO_QUOTE_DELETE_TOPIC,
                             StockerQuoteDeleteListener(
                                 myTableView.tableView
                             )
