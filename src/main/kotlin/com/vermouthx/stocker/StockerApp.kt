@@ -57,6 +57,10 @@ object StockerApp {
         scheduledExecutorService.shutdown()
     }
 
+    fun isShutdown(): Boolean {
+        return scheduledExecutorService.isShutdown
+    }
+
     private fun createAllQuoteUpdateThread(): Runnable {
         return Runnable {
             val quoteProvider = setting.quoteProvider

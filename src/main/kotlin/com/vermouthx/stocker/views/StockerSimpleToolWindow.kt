@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.vermouthx.stocker.actions.StockerRefreshAction
 import com.vermouthx.stocker.actions.StockerStockAddAction
 import com.vermouthx.stocker.actions.StockerStockDeleteAction
+import com.vermouthx.stocker.actions.StockerStopAction
 
 class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
     var tableView: StockerTableView = StockerTableView()
@@ -17,6 +18,7 @@ class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
             DefaultActionGroup(
                 listOf(
                     StockerRefreshAction::class.qualifiedName?.let { actionManager.getAction(it) },
+                    StockerStopAction::class.qualifiedName?.let { actionManager.getAction(it) },
                     StockerStockAddAction::class.qualifiedName?.let { actionManager.getAction(it) },
                     StockerStockDeleteAction::class.qualifiedName?.let { actionManager.getAction(it) }
                 )
