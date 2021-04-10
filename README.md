@@ -22,6 +22,10 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ![Install](https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/screenshots/Install.png)
 
+## Usage
+
+All instructions can be found at [here](https://vermouthx.com/stocker-jetbrains-ide/).
+
 ## Licence
 
 Apache License
