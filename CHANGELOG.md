@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.5.0
+
+- New action: Stop refresh
+- New pane: Crypto
+- Deprecated: Tencent API
+
 ### 1.4.4
 
 - Fix Long stock name wrapping
