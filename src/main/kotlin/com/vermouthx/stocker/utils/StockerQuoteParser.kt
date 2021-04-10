@@ -13,14 +13,13 @@ object StockerQuoteParser {
     }
 
     fun parseSinaResponseText(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
-        return responseText.split("\n")
-            .asSequence()
+        val regex = Regex("var hq_str_(\\w+?)=\"(.*?)\";")
+        return responseText.split("\n").asSequence()
             .filter { text -> text.isNotEmpty() }
             .map { text ->
-                val code = text.subSequence(text.indexOfLast { c -> c == '_' } + 1, text.indexOfFirst { c -> c == '=' })
-                val start = text.indexOfFirst { c -> c == '"' } + 1
-                val end = text.indexOfLast { c -> c == '"' }
-                "${code},${text.subSequence(start, end)}"
+                val matchResult = regex.find(text)
+                val (_, code, quote) = matchResult!!.groupValues
+                "${code},${quote}"
             }
             .map { text -> text.split(",") }
             .map { textArray ->

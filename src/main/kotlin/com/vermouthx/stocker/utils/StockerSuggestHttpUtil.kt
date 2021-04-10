@@ -40,12 +40,9 @@ object StockerSuggestHttpUtil {
 
     private fun parseSinaResponse(responseText: String): List<StockerSuggest> {
         val result = mutableListOf<StockerSuggest>()
-        val snippetsText = responseText
-            .replace("var suggestvalue=\"", "")
-            .replace("\";", "")
-        if (snippetsText.isEmpty()) {
-            return result
-        }
+        val regex = Regex("var suggestvalue=\"(.*?)\";")
+        val matchResult = regex.find(responseText)
+        val (_, snippetsText) = matchResult!!.groupValues
         val snippets = snippetsText.split(";")
         snippets.forEach { snippet ->
             val columns = snippet.split(",")
