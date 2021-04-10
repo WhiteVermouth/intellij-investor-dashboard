@@ -50,6 +50,10 @@ public class StockerActionUtil {
                 break;
             case USStocks:
                 publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_US_QUOTE_DELETE_TOPIC);
+                break;
+            case Crypto:
+                publisher = messageBus.syncPublisher(StockerQuoteDeleteNotifier.CRYPTO_QUOTE_DELETE_TOPIC);
+
         }
         StockerQuoteDeleteNotifier publisherToAll = messageBus.syncPublisher(StockerQuoteDeleteNotifier.STOCK_ALL_QUOTE_DELETE_TOPIC);
         if (publisher != null) {

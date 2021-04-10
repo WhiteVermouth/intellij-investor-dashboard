@@ -44,6 +44,7 @@ public class StockerStockDeleteDialog extends DialogWrapper {
         tabbedPane.add("CN", createTabContent(0));
         tabbedPane.add("HK", createTabContent(1));
         tabbedPane.add("US", createTabContent(2));
+        tabbedPane.add("Crypto", createTabContent(3));
         tabbedPane.addChangeListener(e -> {
             String selectedMarket = null;
             switch (tabbedPane.getSelectedIndex()) {
@@ -55,6 +56,9 @@ public class StockerStockDeleteDialog extends DialogWrapper {
                     break;
                 case 2:
                     selectedMarket = StockerMarketType.USStocks.getTitle();
+                    break;
+                case 3:
+                    selectedMarket = StockerMarketType.Crypto.getTitle();
             }
             StockerSetting setting = StockerSetting.Companion.getInstance();
             if (StockerMarketType.AShare.getTitle().equals(selectedMarket)) {
@@ -72,6 +76,11 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             if (StockerMarketType.USStocks.getTitle().equals(selectedMarket)) {
                 currentMarketSelection = StockerMarketType.USStocks;
                 List<StockerQuote> quotes = StockerQuoteHttpUtil.INSTANCE.get(StockerMarketType.USStocks, setting.getQuoteProvider(), setting.getUsStocksList());
+                setupStockSymbols(quotes);
+            }
+            if (StockerMarketType.Crypto.getTitle().equals(selectedMarket)) {
+                currentMarketSelection = StockerMarketType.Crypto;
+                List<StockerQuote> quotes = StockerQuoteHttpUtil.INSTANCE.get(StockerMarketType.Crypto, setting.getQuoteProvider(), setting.getCryptoList());
                 setupStockSymbols(quotes);
             }
         });
