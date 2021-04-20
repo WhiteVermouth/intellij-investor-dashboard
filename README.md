@@ -24,7 +24,7 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ## Usage
 
-All instructions can be found at [here](https://vermouthx.com/stocker-jetbrains-ide/).
+All instructions can be found at [here](https://vermouthx.com/stocker/).
 
 ## Licence
 
