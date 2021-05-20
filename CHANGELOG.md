@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.5.1
+
+- Fixed price accuracy [#11](https://github.com/WhiteVermouth/intellij-investor-dashboard/issues/11)
+
 ### 1.5.0
 
 - New action: Stop refresh

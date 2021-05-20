@@ -15,16 +15,8 @@ object StockerNotification {
     private val whatsNew: String = """
         <ul>
             <li>
-                <p>支持比特币等加密货币</p>
-                <p>Support Crypto</p>
-            </li>
-            <li>
-                <p>可手动停止刷新</p>
-                <p>New action: Stop Refresh</p>
-            </li>
-            <li>
-                <p>移除腾讯行情API</p>
-                <p>Deprecated Tencent API</p>
+                <p>修正价格显示精度</p>
+                <p>Fixed price accuracy</p>
             </li>
         </ul>
     """.trimIndent()
