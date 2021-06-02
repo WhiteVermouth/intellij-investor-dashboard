@@ -22,19 +22,44 @@ object StockerNotification {
     """.trimIndent()
 
     @Language("HTML")
-    private val releaseNote: String = """
-        <h3>What's new</h3>
-        $whatsNew
+    private val footnote: String = """
         <p>Thank you for choosing Stocker.</p>
-        <p><a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a></p>
+        <p><a href="https://nszihan.com/posts/stocker">How to Use</a> | <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a></p>
+    """.trimIndent()
+
+    @Language("HTML")
+    private val releaseNote: String = """
+        <div>
+            <h3>What's new</h3>
+            $whatsNew
+            $footnote
+        </div>
+    """.trimIndent()
+
+    @Language("HTML")
+    private val welcomeMessage: String = """
+        <div>
+            $footnote
+        </div>
     """.trimIndent()
 
     @JvmField
     val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
+    fun notifyWelcome(project: Project, version: String) {
+        NOTIFICATION_GROUP.createNotification(
+            "Stocker v$version installed",
+            welcomeMessage,
+            NotificationType.INFORMATION,
+            NotificationListener.URL_OPENING_LISTENER
+        )
+            .setIcon(logoIcon)
+            .notify(project)
+    }
+
     fun notifyReleaseNote(project: Project, version: String) {
         NOTIFICATION_GROUP.createNotification(
-            "Stocker Updated to v$version",
+            "Stocker updated to v$version",
             releaseNote,
             NotificationType.INFORMATION,
             NotificationListener.URL_OPENING_LISTENER
