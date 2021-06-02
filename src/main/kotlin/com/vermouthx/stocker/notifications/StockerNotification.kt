@@ -15,8 +15,8 @@ object StockerNotification {
     private val whatsNew: String = """
         <ul>
             <li>
-                <p>修正价格显示精度</p>
-                <p>Fixed price accuracy</p>
+                <p>支持IntelliJ 2021.2 EAP</p>
+                <p>Support IntelliJ 2021.2 EAP</p>
             </li>
         </ul>
     """.trimIndent()
@@ -24,6 +24,7 @@ object StockerNotification {
     @Language("HTML")
     private val footnote: String = """
         <p>Thank you for choosing Stocker.</p>
+        <br/>
         <p><a href="https://nszihan.com/posts/stocker">How to Use</a> | <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a></p>
     """.trimIndent()
 

@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.5.2
+
+- Support IntelliJ 2021.2 EAP
+
 ### 1.5.1
 
 - Fixed price accuracy [#11](https://github.com/WhiteVermouth/intellij-investor-dashboard/issues/11)

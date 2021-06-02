@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.vermouthx"
-version = "1.5.1"
+version = "1.5.2"
 
 repositories {
     mavenCentral()
@@ -55,7 +55,7 @@ tasks {
     }
     patchPluginXml {
         sinceBuild("201.6668.113")
-        untilBuild("211.*")
+        untilBuild("212.*")
         val changelogPath = "$projectDir/build/html/CHANGELOG.html"
         val readmePath = "$projectDir/build/html/README.html"
         if (file(changelogPath).exists()) {
@@ -64,11 +64,10 @@ tasks {
         if (file(readmePath).exists()) {
             pluginDescription(file(readmePath).readText())
         }
-
         dependsOn("patchHtml")
     }
     runPluginVerifier {
-        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57"))
+        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57", "211.6693.111"))
         setFailureLevel(FailureLevel.COMPATIBILITY_PROBLEMS)
     }
     publishPlugin {
