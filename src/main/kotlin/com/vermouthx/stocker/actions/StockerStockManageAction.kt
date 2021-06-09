@@ -7,7 +7,7 @@ import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import com.vermouthx.stocker.views.StockerStockDeleteDialog
 
-class StockerStockDeleteAction : AnAction() {
+class StockerStockManageAction : AnAction() {
     override fun update(e: AnActionEvent) {
         val project = e.project
         val presentation = e.presentation

@@ -24,13 +24,13 @@
                     id="com.vermouthx.stocker.actions.StockerStopAction"
                     text="Stop" description="Stop refresh" icon="AllIcons.Actions.StopRefresh"
             />
-            <action class="com.vermouthx.stocker.actions.StockerStockAddAction"
-                    id="com.vermouthx.stocker.actions.StockerStockAddAction"
-                    text="Add Stock Code" description="Add stock symbols" icon="AllIcons.General.Add">
+            <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
+                    id="com.vermouthx.stocker.actions.StockerStockSearchAction"
+                    text="Add Stock Code" description="Search and add stock symbols" icon="AllIcons.Actions.Search">
             </action>
-            <action class="com.vermouthx.stocker.actions.StockerStockDeleteAction"
-                    id="com.vermouthx.stocker.actions.StockerStockDeleteAction"
-                    text="Remove Stock Code" description="Remove stock symbols" icon="AllIcons.General.Remove">
+            <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
+                    id="com.vermouthx.stocker.actions.StockerStockManageAction"
+                    text="Remove Stock Code" description="Manage stock symbols" icon="AllIcons.Actions.ListFiles">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"

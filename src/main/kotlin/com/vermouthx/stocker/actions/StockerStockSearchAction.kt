@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.vermouthx.stocker.views.StockerStockAddDialog
 
-class StockerStockAddAction : AnAction() {
+class StockerStockSearchAction : AnAction() {
     override fun update(e: AnActionEvent) {
         val project = e.project
         val presentation = e.presentation
