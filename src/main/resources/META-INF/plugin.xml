@@ -2,11 +2,12 @@
     <id>com.vermouthx.intellij-investor-dashboard</id>
     <name>Stocker</name>
     <vendor email="developer@nszihan.com" url="https://nszihan.com">Zihan Ma</vendor>
-    <idea-version since-build="201.6668.113"/>
+    <idea-version since-build="203"/>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
         <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerStartupActivity"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="Stocker" isLogByDefault="true"/>
         <toolWindow id="Stocker" anchor="left" icon="/icons/logo.svg" secondary="true"
                     factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
         <applicationConfigurable parentId="tools" displayName="Stocker"
@@ -26,7 +27,7 @@
             />
             <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
                     id="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    text="Add Stock Code" description="Search and add stock symbols" icon="AllIcons.Actions.Search">
+                    text="Add Stock Code" description="Search and add stock symbols" icon="AllIcons.General.Add">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"

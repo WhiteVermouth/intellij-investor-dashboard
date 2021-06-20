@@ -1,76 +1,108 @@
+import org.jetbrains.changelog.closure
 import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.3.72"
-    id("org.jetbrains.intellij") version "0.7.2"
-    id("org.kordamp.gradle.markdown") version "2.2.0"
-    id("stocker-gradle-helper")
+    id("org.jetbrains.kotlin.jvm") version "1.4.0"
+    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.changelog") version "1.1.2"
 }
 
-group = "com.vermouthx"
-version = "1.5.2"
+group = properties("pluginGroup")
+version = properties("pluginVersion")
 
 repositories {
     mavenCentral()
 }
 
 intellij {
-    version = "2020.1"
-    type = "IC"
+    pluginName.set(properties("pluginName"))
+    version.set(properties("platformVersion"))
+    type.set(properties("platformType"))
+}
+
+changelog {
+    version = properties("pluginVersion")
+    path = "${project.projectDir}/CHANGELOG.md"
+    header = closure { version }
+    itemPrefix = "-"
+    keepUnreleasedSection = false
+    groups = emptyList()
 }
 
 tasks {
-    compileJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+    withType<JavaCompile> {
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
-    compileTestJava {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
-    }
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
     }
     buildSearchableOptions {
         enabled = false
     }
-    copyReadme {
-        dependsOn("createDirectory")
-    }
-    copyChangelog {
-        dependsOn("createDirectory")
-    }
-    markdownToHtml {
-        sourceDir = file("$projectDir/build/markdown")
-        outputDir = file("$projectDir/build/html")
-
-        dependsOn("copyReadme", "copyChangelog")
-    }
-    patchHtml {
-        dependsOn("markdownToHtml")
-    }
     patchPluginXml {
-        sinceBuild("201.6668.113")
-        untilBuild("212.*")
-        val changelogPath = "$projectDir/build/html/CHANGELOG.html"
-        val readmePath = "$projectDir/build/html/README.html"
-        if (file(changelogPath).exists()) {
-            changeNotes(file(changelogPath).readText())
-        }
-        if (file(readmePath).exists()) {
-            pluginDescription(file(readmePath).readText())
-        }
-        dependsOn("patchHtml")
+        version.set(properties("pluginVersion"))
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
+
+        val description = """
+            <div>
+              <p>
+                Stocker is a JetBrains IDE extension dashboard for investors to track
+                realtime stock market conditions.
+              </p>
+              <br />
+              <p>
+                <img
+                  src="https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/screenshots/Dashboard.png"
+                  alt="Dashboard"
+                  width="650"
+                />
+              </p>
+              <h2>Installation</h2>
+              <p>
+                Search <strong>Stocker</strong> in <code>Plugin Marketplace</code> and click
+                <code>Install</code>.
+              </p>
+              <p>
+                <img
+                  src="https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/screenshots/Install.png"
+                  alt="Install"
+                  width="650"
+                />
+              </p>
+              <h2>Usage</h2>
+              <p>
+                All instructions can be found at
+                <a href="https://nszihan.com/posts/stocker">here</a>.
+              </p>
+              <h2>Licence</h2>
+              <p>Apache License</p>
+            </div>
+        """.trimIndent()
+
+        pluginDescription.set(description)
+        changeNotes.set(provider { changelog.getLatest().toHTML() })
     }
     runPluginVerifier {
-        ideVersions(listOf("201.8743.12", "202.8194.7", "203.7148.57", "211.6693.111"))
-        setFailureLevel(FailureLevel.COMPATIBILITY_PROBLEMS)
+        ideVersions.set(
+            properties("pluginVerifierIdeVersions")
+                .split(",")
+                .map(String::trim)
+                .filter(String::isNotEmpty)
+        )
+        failureLevel.set(
+            listOf(
+                FailureLevel.COMPATIBILITY_PROBLEMS,
+                FailureLevel.INVALID_PLUGIN
+            )
+        )
     }
     publishPlugin {
-        token(System.getProperty("jetbrains.token"))
+        token.set(System.getProperty("jetbrains.token"))
     }
 }

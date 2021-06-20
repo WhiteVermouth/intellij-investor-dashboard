@@ -1,7 +1,6 @@
 package com.vermouthx.stocker.notifications
 
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
@@ -9,13 +8,11 @@ import com.intellij.openapi.util.IconLoader
 import org.intellij.lang.annotations.Language
 
 object StockerNotification {
-    private val NOTIFICATION_GROUP = NotificationGroup("Stocker", NotificationDisplayType.STICKY_BALLOON, true)
 
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
             <li>
-                <p>支持IntelliJ 2021.2 EAP</p>
                 <p>Support IntelliJ 2021.2 EAP</p>
             </li>
         </ul>
@@ -25,7 +22,11 @@ object StockerNotification {
     private val footnote: String = """
         <p>Thank you for choosing Stocker.</p>
         <br/>
-        <p><a href="https://nszihan.com/posts/stocker">How to Use</a> | <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a></p>
+        <p>
+            <a href="https://nszihan.com/posts/stocker">How to Use</a> | 
+            <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | 
+            <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a>
+        </p>
     """.trimIndent()
 
     @Language("HTML")
@@ -44,11 +45,13 @@ object StockerNotification {
         </div>
     """.trimIndent()
 
+    private const val notificationGroupId = "Stocker"
+
     @JvmField
     val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
     fun notifyWelcome(project: Project, version: String) {
-        NOTIFICATION_GROUP.createNotification(
+        NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
             "Stocker v$version installed",
             welcomeMessage,
             NotificationType.INFORMATION,
@@ -59,7 +62,7 @@ object StockerNotification {
     }
 
     fun notifyReleaseNote(project: Project, version: String) {
-        NOTIFICATION_GROUP.createNotification(
+        NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
             "Stocker updated to v$version",
             releaseNote,
             NotificationType.INFORMATION,
