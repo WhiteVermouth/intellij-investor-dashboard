@@ -103,6 +103,7 @@ tasks {
         )
     }
     publishPlugin {
+        dependsOn("patchChangelog")
         token.set(System.getProperty("jetbrains.token"))
     }
 }
