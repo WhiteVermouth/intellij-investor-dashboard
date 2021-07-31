@@ -10,6 +10,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.vermouthx.stocker.StockerApp
+import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteListener
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier.*
@@ -25,6 +26,7 @@ class StockerToolWindow : ToolWindowFactory {
 
     private lateinit var allView: StockerSimpleToolWindow
     private lateinit var tabViewMap: Map<StockerMarketType, StockerSimpleToolWindow>
+    private lateinit var myApplication: StockerApp
 
     private fun injectPopupMenu(project: Project?, window: StockerSimpleToolWindow?, insideAll: Boolean) {
         if (window != null) {
@@ -88,6 +90,7 @@ class StockerToolWindow : ToolWindowFactory {
             StockerMarketType.USStocks to StockerSimpleToolWindow(),
             StockerMarketType.Crypto to StockerSimpleToolWindow()
         )
+        myApplication = StockerApp()
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -130,7 +133,8 @@ class StockerToolWindow : ToolWindowFactory {
         }
         contentManager.addContent(cryptoContent)
         this.subscribeMessage()
-        StockerApp.schedule()
+        StockerAppManager.myApplicationMap[project] = myApplication
+        myApplication.schedule()
     }
 
     private fun subscribeMessage() {

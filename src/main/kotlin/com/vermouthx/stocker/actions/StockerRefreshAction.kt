@@ -2,9 +2,10 @@ package com.vermouthx.stocker.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.StockerApp
+import com.vermouthx.stocker.StockerAppManager
 
 class StockerRefreshAction : AnAction() {
+
     override fun update(e: AnActionEvent) {
         val project = e.project
         val presentation = e.presentation
@@ -14,7 +15,7 @@ class StockerRefreshAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        StockerApp.shutdown()
-        StockerApp.schedule()
+        StockerAppManager.myApplicationMap[e.project]?.shutdown()
+        StockerAppManager.myApplicationMap[e.project]?.schedule()
     }
 }

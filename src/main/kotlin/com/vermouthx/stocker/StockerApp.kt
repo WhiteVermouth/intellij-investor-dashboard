@@ -11,9 +11,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-object StockerApp {
-
-    const val PLUGIN_ID = "com.vermouthx.intellij-investor-dashboard"
+class StockerApp {
 
     private val setting = StockerSetting.instance
     private val messageBus = ApplicationManager.getApplication().messageBus

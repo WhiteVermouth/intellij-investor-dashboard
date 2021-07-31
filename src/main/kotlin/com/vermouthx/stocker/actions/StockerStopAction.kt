@@ -2,7 +2,7 @@ package com.vermouthx.stocker.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.StockerApp
+import com.vermouthx.stocker.StockerAppManager
 
 class StockerStopAction : AnAction() {
     override fun update(e: AnActionEvent) {
@@ -11,12 +11,14 @@ class StockerStopAction : AnAction() {
         if (project == null) {
             presentation.isEnabled = false
         }
-        if (StockerApp.isShutdown()) {
+        val myApplication = StockerAppManager.myApplication(project)
+        if (myApplication?.isShutdown() == true) {
             presentation.isEnabled = false
         }
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        StockerApp.shutdown()
+        val myApplication = StockerAppManager.myApplication(e.project)
+        myApplication?.shutdown()
     }
 }

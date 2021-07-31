@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.vermouthx.stocker.StockerApp;
+import com.vermouthx.stocker.StockerAppManager;
 import com.vermouthx.stocker.entities.StockerQuote;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
@@ -119,21 +120,24 @@ public class StockerStockDeleteDialog extends DialogWrapper {
             JLabel lbName = new JBLabel(lbNameText);
             JButton btnOperation = new JButton(StockerStockOperation.STOCK_DELETE.getOperation());
             btnOperation.addActionListener(e -> {
-                StockerApp.INSTANCE.shutdown();
-                String txt = btnOperation.getText();
-                StockerStockOperation operation = StockerStockOperation.mapOf(txt);
-                switch (operation) {
-                    case STOCK_ADD:
-                        if (StockerActionUtil.addStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection), project)) {
-                            btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
-                        }
-                        break;
-                    case STOCK_DELETE:
-                        if (StockerActionUtil.removeStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection))) {
-                            btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
-                        }
+                StockerApp myApplication = StockerAppManager.INSTANCE.getMyApplicationMap().get(project);
+                if (myApplication != null) {
+                    myApplication.shutdown();
+                    String txt = btnOperation.getText();
+                    StockerStockOperation operation = StockerStockOperation.mapOf(txt);
+                    switch (operation) {
+                        case STOCK_ADD:
+                            if (StockerActionUtil.addStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection), project)) {
+                                btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
+                            }
+                            break;
+                        case STOCK_DELETE:
+                            if (StockerActionUtil.removeStock(currentMarketSelection, new StockerSuggest(symbol.getCode(), symbol.getName(), currentMarketSelection))) {
+                                btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
+                            }
+                    }
+                    myApplication.schedule();
                 }
-                StockerApp.INSTANCE.schedule();
             });
             row.add(lbCode);
             row.add(lbName);

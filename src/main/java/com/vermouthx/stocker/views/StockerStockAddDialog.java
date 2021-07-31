@@ -8,6 +8,7 @@ import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.vermouthx.stocker.StockerApp;
+import com.vermouthx.stocker.StockerAppManager;
 import com.vermouthx.stocker.entities.StockerSuggest;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.enums.StockerQuoteProvider;
@@ -104,22 +105,25 @@ public class StockerStockAddDialog extends DialogWrapper {
             }
             StockerMarketType market = suggest.getMarket();
             btnOperation.addActionListener(e -> {
-                StockerApp.INSTANCE.shutdown();
-                String txt = btnOperation.getText();
-                StockerStockOperation operation = StockerStockOperation.mapOf(txt);
-                switch (operation) {
-                    case STOCK_ADD:
-                        if (StockerActionUtil.addStock(market, suggest, project)) {
-                            btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
-                        }
-                        break;
-                    case STOCK_DELETE:
-                        if (StockerActionUtil.removeStock(market, suggest)) {
-                            btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
-                        }
+                StockerApp myApplication = StockerAppManager.INSTANCE.getMyApplicationMap().get(project);
+                if (myApplication != null) {
+                    myApplication.shutdown();
+                    String txt = btnOperation.getText();
+                    StockerStockOperation operation = StockerStockOperation.mapOf(txt);
+                    switch (operation) {
+                        case STOCK_ADD:
+                            if (StockerActionUtil.addStock(market, suggest, project)) {
+                                btnOperation.setText(StockerStockOperation.STOCK_DELETE.getOperation());
+                            }
+                            break;
+                        case STOCK_DELETE:
+                            if (StockerActionUtil.removeStock(market, suggest)) {
+                                btnOperation.setText(StockerStockOperation.STOCK_ADD.getOperation());
+                            }
 
+                    }
+                    myApplication.schedule();
                 }
-                StockerApp.INSTANCE.schedule();
             });
             GridBagConstraints c = new GridBagConstraints();
             c.anchor = GridBagConstraints.WEST;

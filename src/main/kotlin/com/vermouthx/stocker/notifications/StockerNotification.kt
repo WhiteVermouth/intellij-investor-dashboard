@@ -50,9 +50,9 @@ object StockerNotification {
     @JvmField
     val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
-    fun notifyWelcome(project: Project, version: String) {
+    fun notifyWelcome(project: Project) {
         NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
-            "Stocker v$version installed",
+            "Stocker is installed",
             welcomeMessage,
             NotificationType.INFORMATION,
             NotificationListener.URL_OPENING_LISTENER
