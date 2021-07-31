@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.3
+
+- Fixed multiple projects compatibility [#12](https://github.com/WhiteVermouth/intellij-investor-dashboard/issues/12)
+- Fixed API compatibility
+
 ## 1.5.2
 
 - Support IntelliJ 2021.2 EAP

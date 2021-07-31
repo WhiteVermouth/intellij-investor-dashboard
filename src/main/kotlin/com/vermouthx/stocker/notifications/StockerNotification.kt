@@ -13,7 +13,7 @@ object StockerNotification {
     private val whatsNew: String = """
         <ul>
             <li>
-                <p>Support IntelliJ 2021.2 EAP</p>
+                <p>修复多项目下不正常显示</p>
             </li>
         </ul>
     """.trimIndent()
@@ -25,14 +25,14 @@ object StockerNotification {
         <p>
             <a href="https://nszihan.com/posts/stocker">How to Use</a> | 
             <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | 
-            <a href='https://github.com/WhiteVermouth/intellij-investor-dashboard'>Star Repository</a>
+            <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard">Repository</a>
         </p>
     """.trimIndent()
 
     @Language("HTML")
     private val releaseNote: String = """
         <div>
-            <h3>What's new</h3>
+            <h3>What's new?</h3>
             $whatsNew
             $footnote
         </div>
