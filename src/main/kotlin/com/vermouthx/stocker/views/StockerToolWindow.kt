@@ -28,7 +28,7 @@ class StockerToolWindow : ToolWindowFactory {
     private lateinit var tabViewMap: Map<StockerMarketType, StockerSimpleToolWindow>
     private lateinit var myApplication: StockerApp
 
-    private fun injectPopupMenu(project: Project?, window: StockerSimpleToolWindow?, insideAll: Boolean) {
+    private fun injectPopupMenu(project: Project?, window: StockerSimpleToolWindow?) {
         if (window != null) {
             val tbBody = window.tableView.tableBody
             val tbModel = window.tableView.tableModel
@@ -36,43 +36,41 @@ class StockerToolWindow : ToolWindowFactory {
             val tbPopupDeleteMenuItem = JBMenuItem("Delete", AllIcons.General.Remove)
             tbPopupDeleteMenuItem.addActionListener {
                 if (tbBody.selectedRowCount == 0) {
-                    Messages.showErrorDialog(project, "You have not selected any stock code.", "Require Code Selection")
+                    Messages.showErrorDialog(
+                        project,
+                        "You have not selected any stock symbol.",
+                        "Require Symbol Selection"
+                    )
                     return@addActionListener
                 }
                 val setting = StockerSetting.instance
-                for (selectedRow in tbBody.selectedRows.reversed()) {
+                for (selectedRow in tbBody.selectedRows) {
                     val code = tbModel.getValueAt(selectedRow, 0).toString()
                     val market = setting.marketOf(code)
                     if (market != null) {
+                        myApplication.shutdown()
                         setting.removeCode(market, code)
-                        synchronized(window.tableView.tableModel) {
-                            tbModel.removeRow(selectedRow)
-                            tbModel.fireTableRowsDeleted(selectedRow, selectedRow)
-                        }
-                        if (insideAll) {
-                            when (market) {
-                                StockerMarketType.AShare -> {
-                                    val publisher = messageBus.syncPublisher(STOCK_CN_QUOTE_DELETE_TOPIC)
-                                    publisher.after(code)
-                                }
-                                StockerMarketType.HKStocks -> {
-                                    val publisher = messageBus.syncPublisher(STOCK_HK_QUOTE_DELETE_TOPIC)
-                                    publisher.after(code)
-                                }
-                                StockerMarketType.USStocks -> {
-                                    val publisher = messageBus.syncPublisher(STOCK_US_QUOTE_DELETE_TOPIC)
-                                    publisher.after(code)
-                                }
-                                StockerMarketType.Crypto -> {
-                                    val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_DELETE_TOPIC)
-                                    publisher.after(code)
-
-                                }
+                        when (market) {
+                            StockerMarketType.AShare -> {
+                                val publisher = messageBus.syncPublisher(STOCK_CN_QUOTE_DELETE_TOPIC)
+                                publisher.after(code)
                             }
-                        } else {
-                            val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_DELETE_TOPIC)
-                            publisher.after(code)
+                            StockerMarketType.HKStocks -> {
+                                val publisher = messageBus.syncPublisher(STOCK_HK_QUOTE_DELETE_TOPIC)
+                                publisher.after(code)
+                            }
+                            StockerMarketType.USStocks -> {
+                                val publisher = messageBus.syncPublisher(STOCK_US_QUOTE_DELETE_TOPIC)
+                                publisher.after(code)
+                            }
+                            StockerMarketType.Crypto -> {
+                                val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_DELETE_TOPIC)
+                                publisher.after(code)
+                            }
                         }
+                        val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_DELETE_TOPIC)
+                        publisher.after(code)
+                        myApplication.schedule()
                     }
                 }
             }
@@ -98,14 +96,14 @@ class StockerToolWindow : ToolWindowFactory {
         val contentFactory = ContentFactory.SERVICE.getInstance()
         val allContent =
             contentFactory.createContent(allView.component, "ALL", false)
-                .also { injectPopupMenu(project, allView, true) }
+                .also { injectPopupMenu(project, allView) }
         contentManager.addContent(allContent)
         val aShareContent = contentFactory.createContent(
             tabViewMap[StockerMarketType.AShare]?.component,
             StockerMarketType.AShare.title,
             false
         ).also {
-            injectPopupMenu(project, tabViewMap[StockerMarketType.AShare], false)
+            injectPopupMenu(project, tabViewMap[StockerMarketType.AShare])
         }
         contentManager.addContent(aShareContent)
         val hkStocksContent = contentFactory.createContent(
@@ -113,7 +111,7 @@ class StockerToolWindow : ToolWindowFactory {
             StockerMarketType.HKStocks.title,
             false
         ).also {
-            injectPopupMenu(project, tabViewMap[StockerMarketType.HKStocks], false)
+            injectPopupMenu(project, tabViewMap[StockerMarketType.HKStocks])
         }
         contentManager.addContent(hkStocksContent)
         val usStocksContent = contentFactory.createContent(
@@ -121,7 +119,7 @@ class StockerToolWindow : ToolWindowFactory {
             StockerMarketType.USStocks.title,
             false
         ).also {
-            injectPopupMenu(project, tabViewMap[StockerMarketType.USStocks], false)
+            injectPopupMenu(project, tabViewMap[StockerMarketType.USStocks])
         }
         contentManager.addContent(usStocksContent)
         val cryptoContent = contentFactory.createContent(
@@ -129,7 +127,7 @@ class StockerToolWindow : ToolWindowFactory {
             StockerMarketType.Crypto.title,
             false
         ).also {
-            injectPopupMenu(project, tabViewMap[StockerMarketType.Crypto], false)
+            injectPopupMenu(project, tabViewMap[StockerMarketType.Crypto])
         }
         contentManager.addContent(cryptoContent)
         this.subscribeMessage()

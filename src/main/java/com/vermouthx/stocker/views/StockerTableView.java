@@ -27,7 +27,7 @@ public class StockerTableView {
     private Color downColor;
     private Color zeroColor;
     private JBTable tbBody;
-    private DefaultTableModel tbModel;
+    private StockerTableModel tbModel;
 
     private final ComboBox<String> cbIndex = new ComboBox<>();
     private final JBLabel lbIndexValue = new JBLabel("", SwingConstants.CENTER);

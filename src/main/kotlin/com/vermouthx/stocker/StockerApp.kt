@@ -16,7 +16,7 @@ class StockerApp {
     private val setting = StockerSetting.instance
     private val messageBus = ApplicationManager.getApplication().messageBus
 
-    private var scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
+    private var scheduledExecutorService: ScheduledExecutorService = Executors.newScheduledThreadPool(4)
 
     private var scheduleInitialDelay: Long = 3
     private val schedulePeriod: Long = StockerSetting.instance.refreshInterval
