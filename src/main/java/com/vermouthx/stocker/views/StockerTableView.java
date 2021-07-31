@@ -118,7 +118,7 @@ public class StockerTableView {
     private static final String codeColumn = "Symbol";
     private static final String nameColumn = "Name";
     private static final String currentColumn = "Current";
-    private static final String percentColumn = "Percentage";
+    private static final String percentColumn = "Change%";
 
     private void initTable() {
         tbBody = new JBTable();

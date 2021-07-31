@@ -22,7 +22,7 @@
         </constraints>
         <properties>
           <selected value="true"/>
-          <text value="Red Up, Green Down"/>
+          <text value="Red up / Green down"/>
         </properties>
       </component>
       <component id="67a42" class="javax.swing.JLabel">
@@ -51,7 +51,7 @@
           <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Green Up, Red Down"/>
+          <text value="Green up / Red down"/>
         </properties>
       </component>
       <hspacer id="b154">

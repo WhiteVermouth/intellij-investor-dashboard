@@ -44,10 +44,15 @@ object StockerSuggestHttpUtil {
         val matchResult = regex.find(responseText)
         val (_, snippetsText) = matchResult!!.groupValues
         val snippets = snippetsText.split(";")
-        snippets.forEach { snippet ->
+        for (snippet in snippets) {
             val columns = snippet.split(",")
             when (columns[1]) {
-                "11" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                "11" -> {
+                    if (columns[4].startsWith("S*ST")) {
+                        continue
+                    }
+                    result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                }
                 "22" -> {
                     val code = columns[3].replace("of", "")
                     when {
