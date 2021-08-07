@@ -106,7 +106,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                         actionButton()
                     }
                 }
-            }.withBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8))
+            }.withBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16))
         )
     }
 
