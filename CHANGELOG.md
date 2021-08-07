@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+- Enhanced setting window UI
+- Enhanced search dialog UI
+- Enhanced management dialog UI
+
 ## 1.5.3
 
 - Fixed multiple projects compatibility [#12](https://github.com/WhiteVermouth/intellij-investor-dashboard/issues/12)

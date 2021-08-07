@@ -12,9 +12,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>
-                <p>修复多项目下不正常显示</p>
-            </li>
+            <li>改进设置、搜索、管理界面UI</li>
         </ul>
     """.trimIndent()
 
