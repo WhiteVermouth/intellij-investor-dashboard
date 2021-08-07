@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class StockerStockDeleteDialog extends DialogWrapper {
     private final JPanel mPane = new JBPanel<>(new BorderLayout());
     private final JTabbedPane tabbedPane = new JBTabbedPane();

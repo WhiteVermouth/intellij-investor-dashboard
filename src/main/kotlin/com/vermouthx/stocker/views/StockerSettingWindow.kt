@@ -1,40 +1,59 @@
 package com.vermouthx.stocker.views
 
-import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.BoundConfigurable
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.layout.buttonGroup
+import com.intellij.ui.layout.panel
+import com.intellij.util.containers.map2Array
+import com.vermouthx.stocker.enums.StockerQuoteColorPattern
+import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.settings.StockerSetting
-import javax.swing.JComponent
+import javax.swing.DefaultComboBoxModel
 
-class StockerSettingWindow : Configurable {
-
-    private lateinit var view: StockerSettingView
+class StockerSettingWindow : BoundConfigurable("Stocker") {
 
     companion object {
         val setting = StockerSetting.instance
     }
 
-    override fun createComponent(): JComponent? {
-        view = StockerSettingView()
-        view.resetQuoteProvider(setting.quoteProvider)
-        return view.content
+    private var colorPattern: StockerQuoteColorPattern = setting.quoteColorPattern
+    private var quoteProvider: String = setting.quoteProvider.title
+
+    override fun createPanel(): DialogPanel {
+        return panel {
+            titledRow("General") {
+                row {
+                    cell {
+                        label("Provider: ")
+                        comboBox(
+                            DefaultComboBoxModel(StockerQuoteProvider.values().map2Array { it.title }), ::quoteProvider
+                        ).enabled(false)
+                    }
+                }
+            }
+            titledRow("Appearance") {
+                row {
+                    label("Color Pattern: ")
+                    buttonGroup(::colorPattern) {
+                        row {
+                            radioButton("Red up and green down", StockerQuoteColorPattern.RED_UP_GREEN_DOWN)
+                        }
+                        row {
+                            radioButton("Green up and red down", StockerQuoteColorPattern.GREEN_UP_RED_DOWN)
+                        }
+                        row {
+                            radioButton("None", StockerQuoteColorPattern.NONE)
+                        }
+                    }
+                }
+            }.onGlobalIsModified {
+                colorPattern != setting.quoteColorPattern
+            }.onGlobalReset {
+                colorPattern = setting.quoteColorPattern
+            }.onGlobalApply {
+                setting.quoteColorPattern = colorPattern
+            }
+        }
     }
 
-    override fun isModified(): Boolean {
-        val quoteColorPattern = view.selectedQuoteColorPattern
-        val quoteProvider = view.selectedQuoteProvider
-        return quoteProvider != setting.quoteProvider || quoteColorPattern != setting.quoteColorPattern
-    }
-
-    override fun apply() {
-        setting.quoteProvider = view.selectedQuoteProvider
-        setting.quoteColorPattern = view.selectedQuoteColorPattern
-    }
-
-    override fun getDisplayName(): String {
-        return "Stocker"
-    }
-
-    override fun reset() {
-        view.resetQuoteProvider(setting.quoteProvider)
-        view.resetQuoteColorPattern(setting.quoteColorPattern)
-    }
 }

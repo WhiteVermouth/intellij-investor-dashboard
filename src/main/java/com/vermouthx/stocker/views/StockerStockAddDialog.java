@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Deprecated
 public class StockerStockAddDialog extends DialogWrapper {
     private final JPanel mPane = new JPanel(new BorderLayout());
     private final JBScrollPane container = new JBScrollPane();
