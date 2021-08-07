@@ -23,14 +23,14 @@ import javax.swing.event.DocumentEvent
 
 class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
 
+    private val service = Executors.newFixedThreadPool(1)
+
+    private lateinit var suggestions: List<StockerSuggest>
+
     init {
         title = "Search Stocks"
         init()
     }
-
-    private val service = Executors.newFixedThreadPool(1)
-
-    private lateinit var suggestions: List<StockerSuggest>
 
     override fun createCenterPanel(): DialogPanel {
         val searchTextField = SearchTextField(true)
@@ -78,7 +78,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                             } else {
                                 "${suggestion.name.substring(0, 20)}..."
                             }
-                        ).constraints(CCFlags.pushX)
+                        )
                         if (StockerSetting.instance.containsCode(suggestion.code)) {
                             actionButton.text = StockerStockOperation.STOCK_DELETE.operation
                         } else {
@@ -98,12 +98,16 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                                         actionButton.text = StockerStockOperation.STOCK_ADD.operation
                                     }
                                     else -> {
+                                        myApplication.schedule()
+                                        return@addActionListener
                                     }
                                 }
                                 myApplication.schedule()
                             }
                         }
-                        actionButton()
+                        right {
+                            actionButton()
+                        }
                     }
                 }
             }.withBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16))

@@ -2,10 +2,7 @@ package com.vermouthx.stocker.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.enums.StockerMarketType
-import com.vermouthx.stocker.settings.StockerSetting
-import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
-import com.vermouthx.stocker.views.StockerStockDeleteDialog
+import com.vermouthx.stocker.views.dialog.StockerManagementDialog
 
 class StockerStockManageAction : AnAction() {
     override fun update(e: AnActionEvent) {
@@ -18,10 +15,6 @@ class StockerStockManageAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
-        val setting = StockerSetting.instance
-        val dialog = StockerStockDeleteDialog(project)
-        val quotes = StockerQuoteHttpUtil.get(StockerMarketType.AShare, setting.quoteProvider, setting.aShareList)
-        dialog.setupStockSymbols(quotes)
-        dialog.show()
+        StockerManagementDialog(project).show()
     }
 }
