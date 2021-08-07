@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.views
+package com.vermouthx.stocker.views.dialog
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel

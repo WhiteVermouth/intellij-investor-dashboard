@@ -2,7 +2,7 @@ package com.vermouthx.stocker.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.views.StockerSuggestionDialog
+import com.vermouthx.stocker.views.dialog.StockerSuggestionDialog
 
 class StockerStockSearchAction : AnAction() {
     override fun update(e: AnActionEvent) {
