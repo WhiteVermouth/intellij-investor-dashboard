@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.JBColor
 import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.layout.CCFlags
@@ -19,6 +20,7 @@ import java.util.concurrent.Executors
 import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.JButton
+import javax.swing.JSeparator
 import javax.swing.event.DocumentEvent
 
 class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
@@ -58,7 +60,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             row {
                 scrollPane(scrollPane)
             }
-        }.withPreferredHeight(500)
+        }.withPreferredWidth(400).withPreferredHeight(500)
     }
 
     override fun createActions(): Array<Action> {
@@ -70,6 +72,10 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             panel {
                 suggestions.forEach { suggestion ->
                     val actionButton = JButton()
+                    val separator = JSeparator().also {
+                        it.foreground = JBColor.border()
+                        it.background = JBColor.background()
+                    }
                     row {
                         label(suggestion.code)
                         label(
@@ -108,6 +114,9 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                         right {
                             actionButton()
                         }
+                    }
+                    row {
+                        separator(CCFlags.growX)
                     }
                 }
             }.withBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16))

@@ -3,6 +3,7 @@ package com.vermouthx.stocker.views.dialog
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.layout.CCFlags
@@ -15,10 +16,7 @@ import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerActionUtil
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
-import javax.swing.Action
-import javax.swing.BorderFactory
-import javax.swing.JButton
-import javax.swing.JComponent
+import javax.swing.*
 
 class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
@@ -89,9 +87,9 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
         return panel {
             row {
-                tabbedPane(CCFlags.growX)
+                tabbedPane(CCFlags.grow)
             }
-        }.withPreferredHeight(500)
+        }.withPreferredWidth(400).withPreferredHeight(500)
     }
 
     override fun createActions(): Array<Action> {
@@ -105,7 +103,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             row {
                 scrollPane(scrollPane)
             }
-        }
+        }.withPreferredHeight(500)
     }
 
     private fun refreshTabPane(scrollPane: JBScrollPane, symbols: List<StockerQuote>) {
@@ -113,6 +111,10 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             panel {
                 symbols.forEach { symbol ->
                     val actionButton = JButton(StockerStockOperation.STOCK_DELETE.operation)
+                    val separator = JSeparator().also {
+                        it.foreground = JBColor.border()
+                        it.background = JBColor.background()
+                    }
                     row {
                         label(symbol.code)
                         label(
@@ -157,6 +159,9 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         right {
                             actionButton()
                         }
+                    }
+                    row {
+                        separator(CCFlags.growX)
                     }
                 }
             }.withBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16))
