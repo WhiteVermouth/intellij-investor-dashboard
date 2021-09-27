@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- Support JetBrains 2021.3 series
+
 ## 1.6.0
 
 - Enhanced setting window UI
