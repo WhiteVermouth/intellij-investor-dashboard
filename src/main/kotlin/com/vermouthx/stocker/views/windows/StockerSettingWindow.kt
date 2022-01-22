@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.views
+package com.vermouthx.stocker.views.windows
 
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel

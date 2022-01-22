@@ -6,6 +6,9 @@ enum class StockerQuoteProvider(
     val suggestHost: String,
     val providerPrefixMap: Map<StockerMarketType, String>
 ) {
+    /**
+     * Sina API is banned
+     */
     SINA(
         title = "Sina", host = "https://hq.sinajs.cn/list=",
         suggestHost = "https://suggest3.sinajs.cn/suggest/key=",
@@ -18,8 +21,7 @@ enum class StockerQuoteProvider(
     ),
 
     /**
-     * Tencent API is deprecated
-     * Keep this item only for compatibility concern
+     * Tencent API
      */
     TENCENT(
         title = "Tencent", host = "https://qt.gtimg.cn/q=",
@@ -30,5 +32,14 @@ enum class StockerQuoteProvider(
             StockerMarketType.USStocks to "us",
             StockerMarketType.Crypto to "btc_"
         )
+    ),
+
+    /**
+     * Snowball API
+     */
+    SNOWBALL(
+        title = "Snowball", host = "https://stock.xueqiu.com/v5/stock/quote.json?symbol=",
+        suggestHost = "https://xueqiu.com/stock/search.json?code=",
+        providerPrefixMap = mapOf()
     )
 }

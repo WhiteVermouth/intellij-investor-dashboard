@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.views
+package com.vermouthx.stocker.views.windows
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
@@ -8,6 +8,7 @@ import com.vermouthx.stocker.actions.StockerRefreshAction
 import com.vermouthx.stocker.actions.StockerStockManageAction
 import com.vermouthx.stocker.actions.StockerStockSearchAction
 import com.vermouthx.stocker.actions.StockerStopAction
+import com.vermouthx.stocker.views.StockerTableView
 
 class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
     var tableView: StockerTableView = StockerTableView()

@@ -1,4 +1,4 @@
-package com.vermouthx.stocker.views
+package com.vermouthx.stocker.views.windows
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager

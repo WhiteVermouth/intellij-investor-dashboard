@@ -9,10 +9,10 @@
         <postStartupActivity implementation="com.vermouthx.stocker.activities.StockerStartupActivity"/>
         <notificationGroup displayType="STICKY_BALLOON" id="Stocker" isLogByDefault="true"/>
         <toolWindow id="Stocker" anchor="left" icon="/icons/logo.svg" secondary="true"
-                    factoryClass="com.vermouthx.stocker.views.StockerToolWindow"/>
+                    factoryClass="com.vermouthx.stocker.views.windows.StockerToolWindow"/>
         <applicationConfigurable parentId="tools" displayName="Stocker"
-                                 id="com.vermouthx.stocker.views.StockerSettingWindow"
-                                 instance="com.vermouthx.stocker.views.StockerSettingWindow"/>
+                                 id="com.vermouthx.stocker.views.windows.StockerSettingWindow"
+                                 instance="com.vermouthx.stocker.views.windows.StockerSettingWindow"/>
     </extensions>
     <actions>
         <group id="com.vermouthx.stocker.actions.StockerActionGroup" text="Stocker" popup="true" icon="/icons/logo.svg">
