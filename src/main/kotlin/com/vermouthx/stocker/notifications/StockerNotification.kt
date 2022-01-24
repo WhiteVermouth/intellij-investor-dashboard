@@ -12,7 +12,8 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>支持JetBrains 2021.3系列</li>
+            <li>修复新浪关闭API导致的插件不可用，目前使用腾讯API替代</li>
+            <li>由于腾讯API不支持加密货币行情，加密货币的支持暂时移除</li>
         </ul>
     """.trimIndent()
 

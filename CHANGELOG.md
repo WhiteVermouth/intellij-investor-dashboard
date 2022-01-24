@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0
+
+- Replace Sina API with Tencent API due to Sina API is closed
+- Crypto support is temporary removed since Sina API is no longer available
+
 ## 1.6.1
 
 - Support JetBrains 2021.3 series
