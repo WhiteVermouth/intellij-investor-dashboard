@@ -1,9 +1,10 @@
 package com.vermouthx.stocker.utils
 
 import com.intellij.openapi.diagnostic.Logger
-import com.vermouthx.stocker.entities.StockerSuggest
+import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
@@ -22,24 +23,32 @@ object StockerSuggestHttpUtil {
             .useSystemProperties().build()
     }
 
-    fun suggest(key: String, provider: StockerQuoteProvider): List<StockerSuggest> {
-        if (key.contains(" ")) {
-            return emptyList()
-        }
+    fun suggest(key: String, provider: StockerQuoteProvider): List<StockerSuggestion> {
         val url = "${provider.suggestHost}$key"
         val httpGet = HttpGet(url)
         return try {
             val response = httpClientPool.execute(httpGet)
-            val responseText = EntityUtils.toString(response.entity, "UTF-8")
-            parseSinaResponse(responseText)
+            when (provider) {
+                StockerQuoteProvider.SINA -> {
+                    val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                    parseSinaSuggestion(responseText)
+                }
+                StockerQuoteProvider.TENCENT -> {
+                    val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                    parseTencentSuggestion(responseText)
+                }
+                StockerQuoteProvider.SNOWBALL -> {
+                    emptyList()
+                }
+            }
         } catch (e: Exception) {
             log.warn(e)
             emptyList()
         }
     }
 
-    private fun parseSinaResponse(responseText: String): List<StockerSuggest> {
-        val result = mutableListOf<StockerSuggest>()
+    private fun parseSinaSuggestion(responseText: String): List<StockerSuggestion> {
+        val result = mutableListOf<StockerSuggestion>()
         val regex = Regex("var suggestvalue=\"(.*?)\";")
         val matchResult = regex.find(responseText)
         val (_, snippetsText) = matchResult!!.groupValues
@@ -51,20 +60,43 @@ object StockerSuggestHttpUtil {
                     if (columns[4].startsWith("S*ST")) {
                         continue
                     }
-                    result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                    result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
                 }
                 "22" -> {
                     val code = columns[3].replace("of", "")
                     when {
                         code.startsWith("15") || code.startsWith("16") || code.startsWith("18") ->
-                            result.add(StockerSuggest("SZ$code", columns[4], StockerMarketType.AShare))
+                            result.add(StockerSuggestion("SZ$code", columns[4], StockerMarketType.AShare))
                         code.startsWith("50") || code.startsWith("51") ->
-                            result.add(StockerSuggest("SH$code", columns[4], StockerMarketType.AShare))
+                            result.add(StockerSuggestion("SH$code", columns[4], StockerMarketType.AShare))
                     }
                 }
-                "31" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
-                "41" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
-                "71" -> result.add(StockerSuggest(columns[3].toUpperCase(), columns[4], StockerMarketType.Crypto))
+                "31" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
+                "41" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
+                "71" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.Crypto))
+            }
+        }
+        return result
+    }
+
+    private fun parseTencentSuggestion(responseText: String): List<StockerSuggestion> {
+        val result = mutableListOf<StockerSuggestion>()
+        val snippets = responseText.replace("v_hint=\"", "")
+            .replace("\"", "")
+            .split("^")
+        for (snippet in snippets) {
+            val columns = snippet.split("~")
+            val type = columns[0]
+            val code = columns[1]
+            val rawName = columns[2]
+            val name = StringEscapeUtils.unescapeJava(rawName)
+            when (type) {
+                "sz", "sh" ->
+                    result.add(StockerSuggestion(type.toUpperCase() + code, name, StockerMarketType.AShare))
+                "hk" ->
+                    result.add(StockerSuggestion(code, name, StockerMarketType.HKStocks))
+                "us" ->
+                    result.add(StockerSuggestion(code.split(".")[0].toUpperCase(), name, StockerMarketType.USStocks))
             }
         }
         return result

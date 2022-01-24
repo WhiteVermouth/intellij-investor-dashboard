@@ -10,7 +10,7 @@ import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.panel
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerQuote
-import com.vermouthx.stocker.entities.StockerSuggest
+import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
@@ -34,7 +34,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabbedPane.add("CN", createTabContent(0))
         tabbedPane.add("HK", createTabContent(1))
         tabbedPane.add("US", createTabContent(2))
-        tabbedPane.add("Crypto", createTabContent(3))
+//        tabbedPane.add("Crypto", createTabContent(3))
         tabbedPane.addChangeListener {
             val setting = StockerSetting.instance
             when (tabbedPane.selectedIndex) {
@@ -132,7 +132,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                                     StockerStockOperation.STOCK_ADD -> {
                                         if (StockerActionUtil.addStock(
                                                 currentMarketSelection,
-                                                StockerSuggest(symbol.code, symbol.name, currentMarketSelection),
+                                                StockerSuggestion(symbol.code, symbol.name, currentMarketSelection),
                                                 project
                                             )
                                         ) {
@@ -142,7 +142,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                                     StockerStockOperation.STOCK_DELETE -> {
                                         if (StockerActionUtil.removeStock(
                                                 currentMarketSelection,
-                                                StockerSuggest(symbol.code, symbol.name, currentMarketSelection)
+                                                StockerSuggestion(symbol.code, symbol.name, currentMarketSelection)
                                             )
                                         ) {
                                             actionButton.text = StockerStockOperation.STOCK_ADD.operation

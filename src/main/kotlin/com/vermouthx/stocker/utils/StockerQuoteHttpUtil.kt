@@ -30,22 +30,38 @@ object StockerQuoteHttpUtil {
         if (codes.isEmpty()) {
             return emptyList()
         }
-        val codesParam =
-            if (marketType == StockerMarketType.HKStocks) {
-                codes.joinToString(",") { code ->
-                    "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
-                }
-            } else {
-                codes.joinToString(",") { code ->
-                    "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+        val codesParam = when (quoteProvider) {
+            StockerQuoteProvider.SINA -> {
+                if (marketType == StockerMarketType.HKStocks) {
+                    codes.joinToString(",") { code ->
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                    }
+                } else {
+                    codes.joinToString(",") { code ->
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                    }
                 }
             }
+            StockerQuoteProvider.TENCENT -> {
+                if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
+                    codes.joinToString(",") { code ->
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                    }
+                } else {
+                    codes.joinToString(",") { code ->
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                    }
+                }
+            }
+            StockerQuoteProvider.SNOWBALL -> ""
+        }
+
         val url = "${quoteProvider.host}${codesParam}"
         val httpGet = HttpGet(url)
         return try {
             val response = httpClientPool.execute(httpGet)
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
-            StockerQuoteParser.parseSinaResponseText(marketType, responseText)
+            StockerQuoteParser.parseQuoteResponse(quoteProvider, marketType, responseText)
         } catch (e: Exception) {
             log.warn(e)
             emptyList()
@@ -57,21 +73,38 @@ object StockerQuoteHttpUtil {
         quoteProvider: StockerQuoteProvider,
         code: String
     ): Boolean {
-        val url = if (marketType == StockerMarketType.HKStocks) {
-            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
-        } else {
-            "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+        when (quoteProvider) {
+            StockerQuoteProvider.SINA -> {
+                val url = if (marketType == StockerMarketType.HKStocks) {
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                } else {
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                }
+                val httpGet = HttpGet(url)
+                val response = httpClientPool.execute(httpGet)
+                val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                val firstLine = responseText.split("\n")[0]
+                val start = firstLine.indexOfFirst { c -> c == '"' } + 1
+                val end = firstLine.indexOfLast { c -> c == '"' }
+                if (start == end) {
+                    return false
+                }
+                return firstLine.subSequence(start, end).contains(",")
+            }
+            StockerQuoteProvider.TENCENT -> {
+                val url = if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                } else {
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                }
+                val httpGet = HttpGet(url)
+                val response = httpClientPool.execute(httpGet)
+                val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                return !responseText.startsWith("v_pv_none_match")
+            }
+            StockerQuoteProvider.SNOWBALL -> {
+                return false
+            }
         }
-        val httpGet = HttpGet(url)
-        val response = httpClientPool.execute(httpGet)
-        val responseText = EntityUtils.toString(response.entity, "UTF-8")
-        val firstLine = responseText.split("\n")[0]
-        val start = firstLine.indexOfFirst { c -> c == '"' } + 1
-        val end = firstLine.indexOfLast { c -> c == '"' }
-        if (start == end) {
-            return false
-        }
-        return firstLine.subSequence(start, end).contains(",")
     }
-
 }

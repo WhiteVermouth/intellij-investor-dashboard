@@ -4,13 +4,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.messages.MessageBus;
-import com.vermouthx.stocker.entities.StockerSuggest;
+import com.vermouthx.stocker.entities.StockerSuggestion;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier;
 import com.vermouthx.stocker.settings.StockerSetting;
 
 public class StockerActionUtil {
-    public static boolean addStock(StockerMarketType market, StockerSuggest suggest, Project project) {
+    public static boolean addStock(StockerMarketType market, StockerSuggestion suggest, Project project) {
         StockerSetting setting = StockerSetting.Companion.getInstance();
         String code = suggest.getCode();
         String fullName = suggest.getName();
@@ -36,7 +36,7 @@ public class StockerActionUtil {
         return false;
     }
 
-    public static boolean removeStock(StockerMarketType market, StockerSuggest suggest) {
+    public static boolean removeStock(StockerMarketType market, StockerSuggestion suggest) {
         StockerSetting setting = StockerSetting.Companion.getInstance();
         MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
         setting.removeCode(market, suggest.getCode());

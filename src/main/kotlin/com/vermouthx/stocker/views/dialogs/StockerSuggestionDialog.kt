@@ -10,8 +10,7 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.panel
 import com.vermouthx.stocker.StockerAppManager
-import com.vermouthx.stocker.entities.StockerSuggest
-import com.vermouthx.stocker.enums.StockerQuoteProvider
+import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerActionUtil
@@ -26,8 +25,9 @@ import javax.swing.event.DocumentEvent
 class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
 
     private val service = Executors.newFixedThreadPool(1)
+    private val setting = StockerSetting.instance
 
-    private lateinit var suggestions: List<StockerSuggest>
+    private lateinit var suggestions: List<StockerSuggestion>
 
     init {
         title = "Search Stocks"
@@ -41,16 +41,16 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         searchTextField.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
                 service.submit {
-                    val text = searchTextField.text
-                    if (!text.isNullOrEmpty()) {
-                        suggestions = StockerSuggestHttpUtil.suggest(text, StockerQuoteProvider.SINA)
+                    val text = searchTextField.text.trim()
+                    if (text.isNotEmpty()) {
+                        suggestions = StockerSuggestHttpUtil.suggest(text, setting.quoteProvider)
                         refreshScrollPane(scrollPane)
                     }
                 }
             }
         })
 
-        suggestions = StockerSuggestHttpUtil.suggest("SH600", StockerQuoteProvider.SINA)
+        suggestions = StockerSuggestHttpUtil.suggest("02400", setting.quoteProvider)
         refreshScrollPane(scrollPane)
 
         return panel {

@@ -22,8 +22,9 @@ class StockerApp {
     private val schedulePeriod: Long = StockerSetting.instance.refreshInterval
 
     fun schedule() {
-        if (setting.quoteProvider != StockerQuoteProvider.SINA) {
-            setting.quoteProvider = StockerQuoteProvider.SINA
+        // failover SINA API to Tencent API
+        if (setting.quoteProvider == StockerQuoteProvider.SINA) {
+            setting.quoteProvider = StockerQuoteProvider.TENCENT
         }
         if (scheduledExecutorService.isShutdown) {
             scheduledExecutorService = Executors.newScheduledThreadPool(4)
@@ -41,10 +42,10 @@ class StockerApp {
             createQuoteUpdateThread(StockerMarketType.USStocks, setting.usStocksList),
             scheduleInitialDelay, schedulePeriod, TimeUnit.SECONDS
         )
-        scheduledExecutorService.scheduleAtFixedRate(
-            createQuoteUpdateThread(StockerMarketType.Crypto, setting.cryptoList),
-            scheduleInitialDelay, schedulePeriod, TimeUnit.SECONDS
-        )
+//        scheduledExecutorService.scheduleAtFixedRate(
+//            createQuoteUpdateThread(StockerMarketType.Crypto, setting.cryptoList),
+//            scheduleInitialDelay, schedulePeriod, TimeUnit.SECONDS
+//        )
         scheduledExecutorService.scheduleAtFixedRate(
             createAllQuoteUpdateThread(),
             scheduleInitialDelay, schedulePeriod, TimeUnit.SECONDS
@@ -66,13 +67,13 @@ class StockerApp {
                 StockerQuoteHttpUtil.get(StockerMarketType.AShare, quoteProvider, setting.aShareList),
                 StockerQuoteHttpUtil.get(StockerMarketType.HKStocks, quoteProvider, setting.hkStocksList),
                 StockerQuoteHttpUtil.get(StockerMarketType.USStocks, quoteProvider, setting.usStocksList),
-                StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, setting.cryptoList)
+//                StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, setting.cryptoList)
             ).flatten()
             val allStockIndices = listOf(
                 StockerQuoteHttpUtil.get(StockerMarketType.AShare, quoteProvider, StockerMarketIndex.CN.codes),
                 StockerQuoteHttpUtil.get(StockerMarketType.HKStocks, quoteProvider, StockerMarketIndex.HK.codes),
                 StockerQuoteHttpUtil.get(StockerMarketType.USStocks, quoteProvider, StockerMarketIndex.US.codes),
-                StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, StockerMarketIndex.Crypto.codes)
+//                StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, StockerMarketIndex.Crypto.codes)
             ).flatten()
             val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_UPDATE_TOPIC)
             publisher.syncQuotes(allStockQuotes, setting.allStockListSize)
@@ -123,6 +124,4 @@ class StockerApp {
             }
         }
     }
-
-
 }
