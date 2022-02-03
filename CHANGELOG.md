@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1
+
+- Fix compatibility issue
+
 ## 1.8.0
 
 - Support JetBrains 2022 EAP
