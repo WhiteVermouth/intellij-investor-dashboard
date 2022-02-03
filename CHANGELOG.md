@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0
+
+- Support JetBrains 2022 EAP
+
 ## 1.7.0
 
 - Replace Sina API with Tencent API due to Sina API is closed
