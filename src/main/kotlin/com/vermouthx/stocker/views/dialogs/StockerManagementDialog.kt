@@ -25,59 +25,60 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
     private var currentMarketSelection: StockerMarketType = StockerMarketType.AShare
 
     init {
-        title = "Manage Stock Symbols"
+        title = "Manage Favorite Stocks"
         init()
     }
 
     override fun createCenterPanel(): DialogPanel {
         val tabbedPane = JBTabbedPane()
-        tabbedPane.add("CN", createTabContent(0))
-        tabbedPane.add("HK", createTabContent(1))
-        tabbedPane.add("US", createTabContent(2))
+        tabbedPane.add("ALL", createTabContent(0))
+        tabbedPane.add("CN", createTabContent(1))
+        tabbedPane.add("HK", createTabContent(2))
+        tabbedPane.add("US", createTabContent(3))
 //        tabbedPane.add("Crypto", createTabContent(3))
         tabbedPane.addChangeListener {
             val setting = StockerSetting.instance
             when (tabbedPane.selectedIndex) {
-                0 -> {
+                1 -> {
                     currentMarketSelection = StockerMarketType.AShare
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.AShare,
                         setting.quoteProvider,
                         setting.aShareList
                     )
-                    tabMap[0]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                1 -> {
+                2 -> {
                     currentMarketSelection = StockerMarketType.HKStocks
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.HKStocks,
                         setting.quoteProvider,
                         setting.hkStocksList
                     )
-                    tabMap[1]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                2 -> {
+                3 -> {
                     currentMarketSelection = StockerMarketType.USStocks
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.USStocks,
                         setting.quoteProvider,
                         setting.usStocksList
                     )
-                    tabMap[2]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                3 -> {
+                4 -> {
                     currentMarketSelection = StockerMarketType.Crypto
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.Crypto,
                         setting.quoteProvider,
                         setting.cryptoList
                     )
-                    tabMap[3]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
                 else -> return@addChangeListener
             }
         }
-        tabMap[0]?.let { sp ->
+        tabMap[1]?.let { sp ->
             val setting = StockerSetting.instance
             refreshTabPane(
                 sp,

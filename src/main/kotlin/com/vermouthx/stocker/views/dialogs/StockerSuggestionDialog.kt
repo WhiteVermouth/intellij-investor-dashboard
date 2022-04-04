@@ -27,7 +27,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
     private val service = Executors.newFixedThreadPool(1)
     private val setting = StockerSetting.instance
 
-    private lateinit var suggestions: List<StockerSuggestion>
+    private var suggestions: List<StockerSuggestion> = emptyList()
 
     init {
         title = "Search Stocks"
@@ -50,7 +50,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             }
         })
 
-        suggestions = StockerSuggestHttpUtil.suggest("02400", setting.quoteProvider)
+        suggestions = StockerSuggestHttpUtil.suggest("600", setting.quoteProvider)
         refreshScrollPane(scrollPane)
 
         return panel {

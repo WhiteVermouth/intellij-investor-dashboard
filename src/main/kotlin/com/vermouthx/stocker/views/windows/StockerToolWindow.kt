@@ -14,6 +14,8 @@ import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteListener
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier.*
+import com.vermouthx.stocker.listeners.StockerQuoteReloadListener
+import com.vermouthx.stocker.listeners.StockerQuoteReloadNotifier.*
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateListener
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier.*
 import com.vermouthx.stocker.settings.StockerSetting
@@ -146,6 +148,11 @@ class StockerToolWindow : ToolWindowFactory {
                 STOCK_ALL_QUOTE_DELETE_TOPIC,
                 StockerQuoteDeleteListener(allView.tableView)
             )
+        messageBus.connect()
+            .subscribe(
+                STOCK_ALL_QUOTE_RELOAD_TOPIC,
+                StockerQuoteReloadListener(allView.tableView)
+            )
         tabViewMap.forEach { (market, myTableView) ->
             when (market) {
                 StockerMarketType.AShare -> {
@@ -163,6 +170,11 @@ class StockerToolWindow : ToolWindowFactory {
                                 myTableView.tableView
                             )
                         )
+                    messageBus.connect()
+                        .subscribe(
+                            STOCK_CN_QUOTE_RELOAD_TOPIC,
+                            StockerQuoteReloadListener(myTableView.tableView)
+                        )
                 }
                 StockerMarketType.HKStocks -> {
                     messageBus.connect()
@@ -178,6 +190,11 @@ class StockerToolWindow : ToolWindowFactory {
                             StockerQuoteDeleteListener(
                                 myTableView.tableView
                             )
+                        )
+                    messageBus.connect()
+                        .subscribe(
+                            STOCK_HK_QUOTE_RELOAD_TOPIC,
+                            StockerQuoteReloadListener(myTableView.tableView)
                         )
                 }
                 StockerMarketType.USStocks -> {
@@ -195,6 +212,13 @@ class StockerToolWindow : ToolWindowFactory {
                                 myTableView.tableView
                             )
                         )
+                    messageBus.connect()
+                        .subscribe(
+                            STOCK_US_QUOTE_RELOAD_TOPIC,
+                            StockerQuoteReloadListener(
+                                myTableView.tableView
+                            )
+                        )
                 }
                 StockerMarketType.Crypto -> {
                     messageBus.connect()
@@ -208,6 +232,13 @@ class StockerToolWindow : ToolWindowFactory {
                         .subscribe(
                             CRYPTO_QUOTE_DELETE_TOPIC,
                             StockerQuoteDeleteListener(
+                                myTableView.tableView
+                            )
+                        )
+                    messageBus.connect()
+                        .subscribe(
+                            STOCK_CRYPTO_QUOTE_RELOAD_TOPIC,
+                            StockerQuoteReloadListener(
                                 myTableView.tableView
                             )
                         )

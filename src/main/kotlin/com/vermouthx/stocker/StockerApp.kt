@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.vermouthx.stocker.enums.StockerMarketIndex
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import com.vermouthx.stocker.listeners.StockerQuoteReloadNotifier.*
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier.*
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
@@ -54,6 +55,10 @@ class StockerApp {
 
     fun shutdown() {
         scheduledExecutorService.shutdown()
+        messageBus.syncPublisher(STOCK_ALL_QUOTE_RELOAD_TOPIC).clear()
+        messageBus.syncPublisher(STOCK_CN_QUOTE_RELOAD_TOPIC).clear()
+        messageBus.syncPublisher(STOCK_HK_QUOTE_RELOAD_TOPIC).clear()
+        messageBus.syncPublisher(STOCK_US_QUOTE_RELOAD_TOPIC).clear()
     }
 
     fun isShutdown(): Boolean {
