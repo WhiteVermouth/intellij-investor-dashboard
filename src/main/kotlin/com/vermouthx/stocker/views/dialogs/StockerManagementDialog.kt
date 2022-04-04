@@ -31,15 +31,14 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     override fun createCenterPanel(): DialogPanel {
         val tabbedPane = JBTabbedPane()
-        tabbedPane.add("ALL", createTabContent(0))
-        tabbedPane.add("CN", createTabContent(1))
-        tabbedPane.add("HK", createTabContent(2))
-        tabbedPane.add("US", createTabContent(3))
+        tabbedPane.add("CN", createTabContent(0))
+        tabbedPane.add("HK", createTabContent(1))
+        tabbedPane.add("US", createTabContent(2))
 //        tabbedPane.add("Crypto", createTabContent(3))
         tabbedPane.addChangeListener {
             val setting = StockerSetting.instance
             when (tabbedPane.selectedIndex) {
-                1 -> {
+                0 -> {
                     currentMarketSelection = StockerMarketType.AShare
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.AShare,
@@ -48,7 +47,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                     )
                     tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                2 -> {
+                1 -> {
                     currentMarketSelection = StockerMarketType.HKStocks
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.HKStocks,
@@ -57,7 +56,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                     )
                     tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                3 -> {
+                2 -> {
                     currentMarketSelection = StockerMarketType.USStocks
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.USStocks,
@@ -66,7 +65,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                     )
                     tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
                 }
-                4 -> {
+                3 -> {
                     currentMarketSelection = StockerMarketType.Crypto
                     val quotes = StockerQuoteHttpUtil.get(
                         StockerMarketType.Crypto,
@@ -78,7 +77,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                 else -> return@addChangeListener
             }
         }
-        tabMap[1]?.let { sp ->
+        tabMap[0]?.let { sp ->
             val setting = StockerSetting.instance
             refreshTabPane(
                 sp,
