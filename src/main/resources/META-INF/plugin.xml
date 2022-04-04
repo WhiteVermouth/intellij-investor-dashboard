@@ -23,19 +23,20 @@
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStopAction"
                     id="com.vermouthx.stocker.actions.StockerStopAction"
-                    text="Stop" description="Stop refresh" icon="AllIcons.Actions.StopRefresh"
+                    text="Stop Refresh" description="Stop refresh" icon="AllIcons.Actions.StopRefresh"
             />
             <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
                     id="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    text="Add Stock Symbol" description="Search and add stock symbols" icon="AllIcons.General.Add">
+                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.General.Add">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
-                    text="Manage Stock Symbols" description="Manage stock symbols" icon="AllIcons.Actions.ListFiles">
+                    text="Manage Favorite Stocks" description="Manage stock symbols" icon="AllIcons.Actions.ListFiles">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"
-                    text="Remove All Stock Codes" description="Remove all stock symbols" icon="AllIcons.General.Reset">
+                    text="Remove All Favorite Stocks" description="Remove all stock symbols"
+                    icon="AllIcons.General.Reset">
             </action>
         </group>
     </actions>
