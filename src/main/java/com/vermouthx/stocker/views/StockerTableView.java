@@ -5,6 +5,9 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.vermouthx.stocker.components.StockerDefaultTableCellRender;
+import com.vermouthx.stocker.components.StockerTableHeaderRender;
+import com.vermouthx.stocker.components.StockerTableModel;
 import com.vermouthx.stocker.entities.StockerQuote;
 import com.vermouthx.stocker.settings.StockerSetting;
 
@@ -121,6 +124,7 @@ public class StockerTableView {
     private static final String percentColumn = "Change%";
 
     private void initTable() {
+        tbModel = new StockerTableModel();
         tbBody = new JBTable();
         tbBody.addMouseListener(new MouseAdapter() {
             @Override
@@ -135,33 +139,17 @@ public class StockerTableView {
                 }
             }
         });
-        tbModel = new StockerTableModel();
-        tbBody.setShowVerticalLines(false);
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
+
+        tbBody.setShowVerticalLines(false);
         tbBody.setModel(tbModel);
+
         tbBody.getTableHeader().setReorderingAllowed(false);
-        tbBody.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            }
-        });
-        tbBody.getColumn(codeColumn).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            }
-        });
-        tbBody.getColumn(nameColumn).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            }
-        });
-        tbBody.getColumn(currentColumn).setCellRenderer(new DefaultTableCellRenderer() {
+        tbBody.getTableHeader().setDefaultRenderer(new StockerTableHeaderRender(tbBody));
+
+        tbBody.getColumn(codeColumn).setCellRenderer(new StockerDefaultTableCellRender());
+        tbBody.getColumn(nameColumn).setCellRenderer(new StockerDefaultTableCellRender());
+        tbBody.getColumn(currentColumn).setCellRenderer(new StockerDefaultTableCellRender() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 syncColorPatternSetting();
@@ -172,7 +160,7 @@ public class StockerTableView {
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         });
-        tbBody.getColumn(percentColumn).setCellRenderer(new DefaultTableCellRenderer() {
+        tbBody.getColumn(percentColumn).setCellRenderer(new StockerDefaultTableCellRender() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 syncColorPatternSetting();
