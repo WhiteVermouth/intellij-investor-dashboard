@@ -55,14 +55,22 @@ class StockerApp {
 
     fun shutdown() {
         scheduledExecutorService.shutdown()
+    }
+
+    fun isShutdown(): Boolean {
+        return scheduledExecutorService.isShutdown
+    }
+
+    fun clear() {
         messageBus.syncPublisher(STOCK_ALL_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_CN_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_HK_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_US_QUOTE_RELOAD_TOPIC).clear()
     }
 
-    fun isShutdown(): Boolean {
-        return scheduledExecutorService.isShutdown
+    fun shutdownThenClear() {
+        shutdown()
+        clear()
     }
 
     private fun createAllQuoteUpdateThread(): Runnable {

@@ -20,6 +20,8 @@ import javax.swing.*
 
 class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
+    private val setting = StockerSetting.instance
+
     private val tabMap: MutableMap<Int, JBScrollPane> = mutableMapOf()
 
     private var currentMarketSelection: StockerMarketType = StockerMarketType.AShare
@@ -45,7 +47,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         setting.quoteProvider,
                         setting.aShareList
                     )
-                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> renderTabPane(sp, quotes) }
                 }
                 1 -> {
                     currentMarketSelection = StockerMarketType.HKStocks
@@ -54,7 +56,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         setting.quoteProvider,
                         setting.hkStocksList
                     )
-                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> renderTabPane(sp, quotes) }
                 }
                 2 -> {
                     currentMarketSelection = StockerMarketType.USStocks
@@ -63,7 +65,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         setting.quoteProvider,
                         setting.usStocksList
                     )
-                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> renderTabPane(sp, quotes) }
                 }
                 3 -> {
                     currentMarketSelection = StockerMarketType.Crypto
@@ -72,14 +74,14 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         setting.quoteProvider,
                         setting.cryptoList
                     )
-                    tabMap[tabbedPane.selectedIndex]?.let { sp -> refreshTabPane(sp, quotes) }
+                    tabMap[tabbedPane.selectedIndex]?.let { sp -> renderTabPane(sp, quotes) }
                 }
                 else -> return@addChangeListener
             }
         }
         tabMap[0]?.let { sp ->
             val setting = StockerSetting.instance
-            refreshTabPane(
+            renderTabPane(
                 sp,
                 StockerQuoteHttpUtil.get(StockerMarketType.AShare, setting.quoteProvider, setting.aShareList)
             )
@@ -106,7 +108,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         }.withPreferredHeight(500)
     }
 
-    private fun refreshTabPane(scrollPane: JBScrollPane, symbols: List<StockerQuote>) {
+    private fun renderTabPane(scrollPane: JBScrollPane, symbols: List<StockerQuote>) {
         scrollPane.setViewportView(
             panel {
                 symbols.forEach { symbol ->
@@ -127,7 +129,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         actionButton.addActionListener {
                             val myApplication = StockerAppManager.myApplication(project)
                             if (myApplication != null) {
-                                myApplication.shutdown()
+                                myApplication.shutdownThenClear()
                                 when (StockerStockOperation.mapOf(actionButton.text)) {
                                     StockerStockOperation.STOCK_ADD -> {
                                         if (StockerActionUtil.addStock(

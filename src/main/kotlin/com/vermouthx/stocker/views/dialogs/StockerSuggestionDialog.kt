@@ -93,7 +93,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                         actionButton.addActionListener {
                             val myApplication = StockerAppManager.myApplication(project)
                             if (myApplication != null) {
-                                myApplication.shutdown()
+                                myApplication.shutdownThenClear()
                                 when (StockerStockOperation.mapOf(actionButton.text)) {
                                     StockerStockOperation.STOCK_ADD -> {
                                         StockerActionUtil.addStock(suggestion.market, suggestion, project)

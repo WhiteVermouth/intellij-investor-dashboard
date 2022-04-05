@@ -50,7 +50,7 @@ class StockerToolWindow : ToolWindowFactory {
                     val code = tbModel.getValueAt(selectedRow, 0).toString()
                     val market = setting.marketOf(code)
                     if (market != null) {
-                        myApplication.shutdown()
+                        myApplication.shutdownThenClear()
                         setting.removeCode(market, code)
                         when (market) {
                             StockerMarketType.AShare -> {
