@@ -102,7 +102,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             row {
                 tabbedPane(CCFlags.grow)
             }
-        }.withPreferredWidth(300).withPreferredHeight(500)
+        }.withPreferredWidth(300)
     }
 
     override fun createActions(): Array<Action> {
@@ -137,7 +137,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             row {
                 pane(CCFlags.grow)
             }
-        }.withPreferredHeight(500)
+        }
     }
 
     private fun renderTabPane(pane: JPanel, listModel: CollectionListModel<StockerQuote>) {
