@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.0
+
+- New management dialog: batch delete & reorder symbols
+
 ## 1.8.1
 
 - Fix compatibility issue

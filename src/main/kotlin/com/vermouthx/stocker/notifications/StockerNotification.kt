@@ -12,7 +12,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>Fix compatibility issue</li>
+            <li>新的自选股票管理界面：可批量删除、重排序自选股票</li>
         </ul>
     """.trimIndent()
 
