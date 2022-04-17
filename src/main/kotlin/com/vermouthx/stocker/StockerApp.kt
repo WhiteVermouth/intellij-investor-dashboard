@@ -61,7 +61,7 @@ class StockerApp {
         return scheduledExecutorService.isShutdown
     }
 
-    fun clear() {
+    private fun clear() {
         messageBus.syncPublisher(STOCK_ALL_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_CN_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_HK_QUOTE_RELOAD_TOPIC).clear()
