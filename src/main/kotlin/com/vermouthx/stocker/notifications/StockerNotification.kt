@@ -1,7 +1,6 @@
 package com.vermouthx.stocker.notifications
 
 import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
@@ -52,8 +51,7 @@ object StockerNotification {
         NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
             "Stocker is installed",
             welcomeMessage,
-            NotificationType.INFORMATION,
-            NotificationListener.URL_OPENING_LISTENER
+            NotificationType.INFORMATION
         )
             .setIcon(logoIcon)
             .notify(project)
@@ -63,8 +61,7 @@ object StockerNotification {
         NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
             "Stocker updated to v$version",
             releaseNote,
-            NotificationType.INFORMATION,
-            NotificationListener.URL_OPENING_LISTENER
+            NotificationType.INFORMATION
         )
             .setIcon(logoIcon)
             .notify(project)
