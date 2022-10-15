@@ -1,9 +1,9 @@
 package com.vermouthx.stocker.settings
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
@@ -16,8 +16,8 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
     private val log = Logger.getInstance(javaClass)
 
     companion object {
-        val instance
-            get() = service<StockerSetting>()
+        val instance: StockerSetting
+            get() = ApplicationManager.getApplication().getService(StockerSetting::class.java)
     }
 
     var version: String
@@ -105,16 +105,19 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
                     aShareList.remove(code)
                 }
             }
+
             StockerMarketType.HKStocks -> {
                 synchronized(hkStocksList) {
                     hkStocksList.remove(code)
                 }
             }
+
             StockerMarketType.USStocks -> {
                 synchronized(usStocksList) {
                     usStocksList.remove(code)
                 }
             }
+
             StockerMarketType.Crypto -> {
                 synchronized(cryptoList) {
                     cryptoList.remove(code)
