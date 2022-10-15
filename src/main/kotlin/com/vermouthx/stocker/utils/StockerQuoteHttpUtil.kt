@@ -34,25 +34,27 @@ object StockerQuoteHttpUtil {
             StockerQuoteProvider.SINA -> {
                 if (marketType == StockerMarketType.HKStocks) {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
                     }
                 } else {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
                     }
                 }
             }
+
             StockerQuoteProvider.TENCENT -> {
                 if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
                     }
                 } else {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                        "${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
                     }
                 }
             }
+
             StockerQuoteProvider.SNOWBALL -> ""
         }
 
@@ -76,9 +78,9 @@ object StockerQuoteHttpUtil {
         when (quoteProvider) {
             StockerQuoteProvider.SINA -> {
                 val url = if (marketType == StockerMarketType.HKStocks) {
-                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
                 } else {
-                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
                 }
                 val httpGet = HttpGet(url)
                 val response = httpClientPool.execute(httpGet)
@@ -91,17 +93,19 @@ object StockerQuoteHttpUtil {
                 }
                 return firstLine.subSequence(start, end).contains(",")
             }
+
             StockerQuoteProvider.TENCENT -> {
                 val url = if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
-                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toUpperCase()}"
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
                 } else {
-                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.toLowerCase()}"
+                    "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
                 }
                 val httpGet = HttpGet(url)
                 val response = httpClientPool.execute(httpGet)
                 val responseText = EntityUtils.toString(response.entity, "UTF-8")
                 return !responseText.startsWith("v_pv_none_match")
             }
+
             StockerQuoteProvider.SNOWBALL -> {
                 return false
             }
