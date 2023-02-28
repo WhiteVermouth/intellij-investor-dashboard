@@ -1,5 +1,8 @@
 package com.vermouthx.stocker.notifications
 
+import com.intellij.ide.BrowserUtil
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
@@ -15,31 +18,20 @@ object StockerNotification {
         </ul>
     """.trimIndent()
 
-    @Language("HTML")
-    private val footnote: String = """
-        <p>Thank you for choosing Stocker.</p>
-        <br/>
-        <p>
-            <a href="https://nszihan.com/posts/stocker">How to Use</a> | 
-            <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a> | 
-            <a href="https://github.com/WhiteVermouth/intellij-investor-dashboard">Repository</a>
-        </p>
-    """.trimIndent()
+    private const val howToUseLink = "https://nszihan.com/posts/stocker"
+    private const val changelogLink =
+        "https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md"
+    private const val githubRepoLink = "https://github.com/WhiteVermouth/intellij-investor-dashboard"
 
     @Language("HTML")
     private val releaseNote: String = """
-        <div>
-            <h3>What's new?</h3>
-            $whatsNew
-            $footnote
-        </div>
+        <p>What's new?</p>
+        $whatsNew
     """.trimIndent()
 
     @Language("HTML")
     private val welcomeMessage: String = """
-        <div>
-            $footnote
-        </div>
+        <p>Thank you for choosing Stocker.</p>
     """.trimIndent()
 
     private const val notificationGroupId = "Stocker"
@@ -48,22 +40,34 @@ object StockerNotification {
     val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
     fun notifyWelcome(project: Project) {
-        NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
-            "Stocker is installed",
-            welcomeMessage,
-            NotificationType.INFORMATION
-        )
-            .setIcon(logoIcon)
-            .notify(project)
+        val notification =
+            NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
+                "Stocker is installed", welcomeMessage, NotificationType.INFORMATION
+            )
+        addNotificationActions(notification)
+        notification.icon = logoIcon
+        notification.notify(project)
     }
 
     fun notifyReleaseNote(project: Project, version: String) {
-        NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
-            "Stocker updated to v$version",
-            releaseNote,
-            NotificationType.INFORMATION
-        )
-            .setIcon(logoIcon)
-            .notify(project)
+        val notification =
+            NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
+                "Stocker updated to v$version", releaseNote, NotificationType.INFORMATION
+            )
+        addNotificationActions(notification)
+        notification.icon = logoIcon
+        notification.notify(project)
+    }
+
+    private fun addNotificationActions(notification: Notification) {
+        notification.addAction(NotificationAction.createSimple("Changelog") {
+            BrowserUtil.browse(changelogLink)
+        })
+        notification.addAction(NotificationAction.createSimple("Usage") {
+            BrowserUtil.browse(howToUseLink)
+        })
+        notification.addAction(NotificationAction.createSimple("GitHub") {
+            BrowserUtil.browse(githubRepoLink)
+        })
     }
 }
