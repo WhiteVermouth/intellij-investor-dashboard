@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.1
+
+- Fix three digits price accuracy issue
+
 ## 1.9.0
 
 - New management dialog: batch delete & reorder symbols

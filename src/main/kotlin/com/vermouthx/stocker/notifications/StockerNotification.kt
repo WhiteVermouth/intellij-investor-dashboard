@@ -14,7 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>新的自选股票管理界面：可批量删除、重排序自选股票</li>
+            <li>修复部分品种不能正常显示三位小数价格</li>
         </ul>
     """.trimIndent()
 
