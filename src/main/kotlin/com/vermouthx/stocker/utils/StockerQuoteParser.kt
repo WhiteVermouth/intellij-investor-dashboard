@@ -95,7 +95,7 @@ object StockerQuoteParser {
                         )
                     }
                     StockerMarketType.Crypto -> {
-                        val code = textArray[0].substring(4).toUpperCase()
+                        val code = textArray[0].substring(4).uppercase()
                         val name = textArray[10]
                         val current = textArray[9].toDouble()
                         val low = textArray[8].toDouble()
@@ -130,13 +130,13 @@ object StockerQuoteParser {
             }
             .map { text -> text.split("~") }
             .map { textArray ->
-                val code = textArray[0].toUpperCase()
+                val code = textArray[0].uppercase()
                 val name = textArray[2]
-                val opening = textArray[6].toDouble().twoDigits()
-                val close = textArray[5].toDouble().twoDigits()
-                val current = textArray[4].toDouble().twoDigits()
-                val high = textArray[34].toDouble().twoDigits()
-                val low = textArray[35].toDouble().twoDigits()
+                val opening = textArray[6].toDouble()
+                val close = textArray[5].toDouble()
+                val current = textArray[4].toDouble()
+                val high = textArray[34].toDouble()
+                val low = textArray[35].toDouble()
                 val change = (current - close).twoDigits()
                 val percentage = textArray[33].toDouble().twoDigits()
                 val updateAt = when (marketType) {
