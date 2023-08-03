@@ -18,7 +18,7 @@ object StockerNotification {
         </ul>
     """.trimIndent()
 
-    private const val howToUseLink = "https://nszihan.com/posts/stocker"
+    private const val howToUseLink = "https://nszihan.com/2021/04/11/stocker"
     private const val changelogLink =
         "https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md"
     private const val githubRepoLink = "https://github.com/WhiteVermouth/intellij-investor-dashboard"
