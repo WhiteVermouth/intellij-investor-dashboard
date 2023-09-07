@@ -29,3 +29,7 @@ All instructions can be found at [here](https://nszihan.com/2021/04/11/stocker).
 ## Licence
 
 Apache License
+
+## Donation
+
+If you like this plugin, you can [buy me a cup of coffee](https://www.buymeacoffee.com/nszihan). Thank you!
