@@ -28,7 +28,7 @@ All instructions can be found at [here](https://nszihan.com/2021/04/11/stocker).
 
 ## Licence
 
-Apache License
+[Apache-2.0 Licence](https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/LICENSE)
 
 ## Donation
 
