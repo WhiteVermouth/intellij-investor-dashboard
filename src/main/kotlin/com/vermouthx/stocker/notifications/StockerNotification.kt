@@ -14,14 +14,13 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>修复部分品种不能正常显示三位小数价格</li>
+            <li>恢复新浪行情接口的支持</li>
         </ul>
     """.trimIndent()
 
-    private const val howToUseLink = "https://nszihan.com/2021/04/11/stocker"
-    private const val changelogLink =
-        "https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md"
-    private const val githubRepoLink = "https://github.com/WhiteVermouth/intellij-investor-dashboard"
+    private const val TUTORIAL_LINK = "https://nszihan.com/2021/04/11/stocker"
+    private const val GITHUB_REPO_LINK = "https://github.com/WhiteVermouth/intellij-investor-dashboard"
+    private const val DONATE_LINK = "https://www.buymeacoffee.com/nszihan"
 
     @Language("HTML")
     private val releaseNote: String = """
@@ -34,14 +33,14 @@ object StockerNotification {
         <p>Thank you for choosing Stocker.</p>
     """.trimIndent()
 
-    private const val notificationGroupId = "Stocker"
+    private const val NOTIFICATION_GROUP_ID = "Stocker"
 
     @JvmField
     val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
 
     fun notifyWelcome(project: Project) {
         val notification =
-            NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
+            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
                 "Stocker is installed", welcomeMessage, NotificationType.INFORMATION
             )
         addNotificationActions(notification)
@@ -51,7 +50,7 @@ object StockerNotification {
 
     fun notifyReleaseNote(project: Project, version: String) {
         val notification =
-            NotificationGroupManager.getInstance().getNotificationGroup(notificationGroupId).createNotification(
+            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
                 "Stocker updated to v$version", releaseNote, NotificationType.INFORMATION
             )
         addNotificationActions(notification)
@@ -60,14 +59,14 @@ object StockerNotification {
     }
 
     private fun addNotificationActions(notification: Notification) {
-        notification.addAction(NotificationAction.createSimple("Changelog") {
-            BrowserUtil.browse(changelogLink)
-        })
-        notification.addAction(NotificationAction.createSimple("Usage") {
-            BrowserUtil.browse(howToUseLink)
+        notification.addAction(NotificationAction.createSimple("Tutorial") {
+            BrowserUtil.browse(TUTORIAL_LINK)
         })
         notification.addAction(NotificationAction.createSimple("GitHub") {
-            BrowserUtil.browse(githubRepoLink)
+            BrowserUtil.browse(GITHUB_REPO_LINK)
+        })
+        notification.addAction(NotificationAction.createSimple("Donate") {
+            BrowserUtil.browse(DONATE_LINK)
         })
     }
 }

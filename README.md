@@ -22,7 +22,7 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ![Install](https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/screenshots/Install.png)
 
-## Usage
+## Tutorial
 
 All instructions can be found at [here](https://nszihan.com/2021/04/11/stocker).
 

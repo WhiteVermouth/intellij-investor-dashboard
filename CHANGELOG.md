@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0
+
+- Bring back SINA provider support
+
 ## 1.9.1
 
 - Fix three digits price accuracy issue
