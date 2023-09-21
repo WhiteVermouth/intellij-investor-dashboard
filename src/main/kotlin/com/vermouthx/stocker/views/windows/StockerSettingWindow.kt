@@ -12,12 +12,10 @@ import javax.swing.DefaultComboBoxModel
 
 class StockerSettingWindow : BoundConfigurable("Stocker") {
 
-    companion object {
-        val setting = StockerSetting.instance
-    }
+    private val setting = StockerSetting.instance
 
     private var colorPattern: StockerQuoteColorPattern = setting.quoteColorPattern
-    private var quoteProvider: String = setting.quoteProvider.title
+    private var quoteProviderTitle: String = setting.quoteProvider.title
 
     override fun createPanel(): DialogPanel {
         return panel {
@@ -26,11 +24,19 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                     cell {
                         label("Provider: ")
                         comboBox(
-                            DefaultComboBoxModel(StockerQuoteProvider.values().map2Array { it.title }), ::quoteProvider
-                        ).enabled(false)
+                            DefaultComboBoxModel(StockerQuoteProvider.values().map2Array { it.title }),
+                            ::quoteProviderTitle
+                        )
                     }
                 }
+            }.onGlobalIsModified {
+                quoteProviderTitle != setting.quoteProvider.title
+            }.onGlobalReset {
+                quoteProviderTitle = setting.quoteProvider.title
+            }.onGlobalApply {
+                setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
             }
+
             titledRow("Appearance") {
                 row {
                     label("Color Pattern: ")

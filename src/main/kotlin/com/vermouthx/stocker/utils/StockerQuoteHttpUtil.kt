@@ -23,9 +23,7 @@ object StockerQuoteHttpUtil {
     }
 
     fun get(
-        marketType: StockerMarketType,
-        quoteProvider: StockerQuoteProvider,
-        codes: List<String>
+        marketType: StockerMarketType, quoteProvider: StockerQuoteProvider, codes: List<String>
     ): List<StockerQuote> {
         if (codes.isEmpty()) {
             return emptyList()
@@ -54,12 +52,13 @@ object StockerQuoteHttpUtil {
                     }
                 }
             }
-
-            StockerQuoteProvider.SNOWBALL -> ""
         }
 
         val url = "${quoteProvider.host}${codesParam}"
         val httpGet = HttpGet(url)
+        if (quoteProvider == StockerQuoteProvider.SINA) {
+            httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
+        }
         return try {
             val response = httpClientPool.execute(httpGet)
             val responseText = EntityUtils.toString(response.entity, "UTF-8")
@@ -71,9 +70,7 @@ object StockerQuoteHttpUtil {
     }
 
     fun validateCode(
-        marketType: StockerMarketType,
-        quoteProvider: StockerQuoteProvider,
-        code: String
+        marketType: StockerMarketType, quoteProvider: StockerQuoteProvider, code: String
     ): Boolean {
         when (quoteProvider) {
             StockerQuoteProvider.SINA -> {
@@ -83,6 +80,7 @@ object StockerQuoteHttpUtil {
                     "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
                 }
                 val httpGet = HttpGet(url)
+                httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
                 val response = httpClientPool.execute(httpGet)
                 val responseText = EntityUtils.toString(response.entity, "UTF-8")
                 val firstLine = responseText.split("\n")[0]
@@ -104,10 +102,6 @@ object StockerQuoteHttpUtil {
                 val response = httpClientPool.execute(httpGet)
                 val responseText = EntityUtils.toString(response.entity, "UTF-8")
                 return !responseText.startsWith("v_pv_none_match")
-            }
-
-            StockerQuoteProvider.SNOWBALL -> {
-                return false
             }
         }
     }

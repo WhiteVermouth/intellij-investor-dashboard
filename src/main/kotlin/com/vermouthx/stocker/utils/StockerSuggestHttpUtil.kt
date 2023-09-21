@@ -26,6 +26,9 @@ object StockerSuggestHttpUtil {
     fun suggest(key: String, provider: StockerQuoteProvider): List<StockerSuggestion> {
         val url = "${provider.suggestHost}$key"
         val httpGet = HttpGet(url)
+        if (provider == StockerQuoteProvider.SINA) {
+            httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
+        }
         return try {
             val response = httpClientPool.execute(httpGet)
             when (provider) {
@@ -33,13 +36,12 @@ object StockerSuggestHttpUtil {
                     val responseText = EntityUtils.toString(response.entity, "UTF-8")
                     parseSinaSuggestion(responseText)
                 }
+
                 StockerQuoteProvider.TENCENT -> {
                     val responseText = EntityUtils.toString(response.entity, "UTF-8")
                     parseTencentSuggestion(responseText)
                 }
-                StockerQuoteProvider.SNOWBALL -> {
-                    emptyList()
-                }
+
             }
         } catch (e: Exception) {
             log.warn(e)
@@ -60,20 +62,27 @@ object StockerSuggestHttpUtil {
                     if (columns[4].startsWith("S*ST")) {
                         continue
                     }
-                    result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.AShare))
+                    result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.AShare))
                 }
+
                 "22" -> {
                     val code = columns[3].replace("of", "")
                     when {
-                        code.startsWith("15") || code.startsWith("16") || code.startsWith("18") ->
-                            result.add(StockerSuggestion("SZ$code", columns[4], StockerMarketType.AShare))
-                        code.startsWith("50") || code.startsWith("51") ->
-                            result.add(StockerSuggestion("SH$code", columns[4], StockerMarketType.AShare))
+                        code.startsWith("15") || code.startsWith("16") || code.startsWith("18") -> result.add(
+                            StockerSuggestion("SZ$code", columns[4], StockerMarketType.AShare)
+                        )
+
+                        code.startsWith("50") || code.startsWith("51") -> result.add(
+                            StockerSuggestion(
+                                "SH$code", columns[4], StockerMarketType.AShare
+                            )
+                        )
                     }
                 }
-                "31" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.HKStocks))
-                "41" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.USStocks))
-                "71" -> result.add(StockerSuggestion(columns[3].toUpperCase(), columns[4], StockerMarketType.Crypto))
+
+                "31" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.HKStocks))
+                "41" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.USStocks))
+                "71" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.Crypto))
             }
         }
         return result
@@ -81,9 +90,7 @@ object StockerSuggestHttpUtil {
 
     private fun parseTencentSuggestion(responseText: String): List<StockerSuggestion> {
         val result = mutableListOf<StockerSuggestion>()
-        val snippets = responseText.replace("v_hint=\"", "")
-            .replace("\"", "")
-            .split("^")
+        val snippets = responseText.replace("v_hint=\"", "").replace("\"", "").split("^")
         for (snippet in snippets) {
             val columns = snippet.split("~")
             val type = columns[0]
@@ -91,12 +98,11 @@ object StockerSuggestHttpUtil {
             val rawName = columns[2]
             val name = StringEscapeUtils.unescapeJava(rawName)
             when (type) {
-                "sz", "sh" ->
-                    result.add(StockerSuggestion(type.toUpperCase() + code, name, StockerMarketType.AShare))
-                "hk" ->
-                    result.add(StockerSuggestion(code, name, StockerMarketType.HKStocks))
-                "us" ->
-                    result.add(StockerSuggestion(code.split(".")[0].toUpperCase(), name, StockerMarketType.USStocks))
+                "sz", "sh" -> result.add(StockerSuggestion(type.uppercase() + code, name, StockerMarketType.AShare))
+
+                "hk" -> result.add(StockerSuggestion(code, name, StockerMarketType.HKStocks))
+
+                "us" -> result.add(StockerSuggestion(code.split(".")[0].uppercase(), name, StockerMarketType.USStocks))
             }
         }
         return result

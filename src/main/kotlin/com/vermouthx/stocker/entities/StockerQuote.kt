@@ -1,10 +1,17 @@
 package com.vermouthx.stocker.entities
 
 data class StockerQuote(
-    var code: String, var name: String,
-    var current: Double, var opening: Double, var close: Double,
-    var low: Double, var high: Double, var change: Double, var percentage: Double,
-    var buys: Array<Double> = emptyArray(), var sells: Array<Double> = emptyArray(),
+    var code: String,
+    var name: String,
+    var current: Double,
+    var opening: Double,
+    var close: Double,
+    var low: Double,
+    var high: Double,
+    var change: Double,
+    var percentage: Double,
+    var buys: Array<Double> = emptyArray(),
+    var sells: Array<Double> = emptyArray(),
     var updateAt: String
 ) {
     override fun equals(other: Any?): Boolean {
@@ -13,9 +20,7 @@ data class StockerQuote(
 
         other as StockerQuote
 
-        if (code != other.code) return false
-
-        return true
+        return code == other.code
     }
 
     override fun hashCode(): Int {
