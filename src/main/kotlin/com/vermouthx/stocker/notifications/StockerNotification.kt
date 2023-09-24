@@ -36,7 +36,7 @@ object StockerNotification {
     private const val NOTIFICATION_GROUP_ID = "Stocker"
 
     @JvmField
-    val logoIcon = IconLoader.getIcon("/icons/logo.svg", javaClass)
+    val logoIcon = IconLoader.getIcon("/icons/logo.png", javaClass)
 
     fun notifyWelcome(project: Project) {
         val notification =

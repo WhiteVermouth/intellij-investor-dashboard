@@ -54,9 +54,15 @@ object StockerSuggestHttpUtil {
         val regex = Regex("var suggestvalue=\"(.*?)\";")
         val matchResult = regex.find(responseText)
         val (_, snippetsText) = matchResult!!.groupValues
+        if (snippetsText.isEmpty()) {
+            return emptyList()
+        }
         val snippets = snippetsText.split(";")
         for (snippet in snippets) {
             val columns = snippet.split(",")
+            if (columns.size < 5) {
+                continue
+            }
             when (columns[1]) {
                 "11" -> {
                     if (columns[4].startsWith("S*ST")) {
@@ -83,16 +89,23 @@ object StockerSuggestHttpUtil {
                 "31" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.HKStocks))
                 "41" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.USStocks))
                 "71" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.Crypto))
+                "81" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.AShare))
             }
         }
         return result
     }
 
     private fun parseTencentSuggestion(responseText: String): List<StockerSuggestion> {
+        if (responseText.isEmpty()) {
+            return emptyList()
+        }
         val result = mutableListOf<StockerSuggestion>()
         val snippets = responseText.replace("v_hint=\"", "").replace("\"", "").split("^")
         for (snippet in snippets) {
             val columns = snippet.split("~")
+            if (columns.size < 3) {
+                continue
+            }
             val type = columns[0]
             val code = columns[1]
             val rawName = columns[2]
