@@ -14,7 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>恢复新浪行情接口的支持</li>
+            <li>支持A股可转债（Provider需设置为Sina才能搜索添加）</li>
         </ul>
     """.trimIndent()
 

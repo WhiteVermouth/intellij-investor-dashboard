@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.1
+
+- Add A-Share Convertible Bond support
+
 ## 1.10.0
 
 - Bring back SINA provider support
