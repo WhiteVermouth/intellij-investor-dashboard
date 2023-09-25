@@ -2,13 +2,13 @@ package com.vermouthx.stocker.views.windows
 
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.layout.buttonGroup
-import com.intellij.ui.layout.panel
-import com.intellij.util.containers.map2Array
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.toMutableProperty
+import com.intellij.ui.dsl.builder.toNullableProperty
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.settings.StockerSetting
-import javax.swing.DefaultComboBoxModel
 
 class StockerSettingWindow : BoundConfigurable("Stocker") {
 
@@ -19,45 +19,39 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
 
     override fun createPanel(): DialogPanel {
         return panel {
-            titledRow("General") {
-                row {
-                    cell {
-                        label("Provider: ")
-                        comboBox(
-                            DefaultComboBoxModel(StockerQuoteProvider.values().map2Array { it.title }),
-                            ::quoteProviderTitle
-                        )
-                    }
+            group("General") {
+                row("Provider: ") {
+                    comboBox(
+                        StockerQuoteProvider.values()
+                            .map { it.title }).bindItem(::quoteProviderTitle.toNullableProperty())
                 }
-            }.onGlobalIsModified {
-                quoteProviderTitle != setting.quoteProvider.title
-            }.onGlobalReset {
-                quoteProviderTitle = setting.quoteProvider.title
-            }.onGlobalApply {
-                setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
             }
 
-            titledRow("Appearance") {
-                row {
-                    label("Color Pattern: ")
-                    buttonGroup(::colorPattern) {
-                        row {
-                            radioButton("Red up and green down", StockerQuoteColorPattern.RED_UP_GREEN_DOWN)
-                        }
-                        row {
-                            radioButton("Green up and red down", StockerQuoteColorPattern.GREEN_UP_RED_DOWN)
-                        }
-                        row {
-                            radioButton("None", StockerQuoteColorPattern.NONE)
-                        }
+            group("Appearance") {
+                buttonsGroup("Color Pattern: ") {
+                    row {
+                        radioButton("Red up and green down", StockerQuoteColorPattern.RED_UP_GREEN_DOWN)
                     }
-                }
-            }.onGlobalIsModified {
-                colorPattern != setting.quoteColorPattern
-            }.onGlobalReset {
-                colorPattern = setting.quoteColorPattern
-            }.onGlobalApply {
+                    row {
+                        radioButton("Green up and red down", StockerQuoteColorPattern.GREEN_UP_RED_DOWN)
+                    }
+                    row {
+                        radioButton("None", StockerQuoteColorPattern.NONE)
+                    }
+                }.bind(::colorPattern.toMutableProperty(), StockerQuoteColorPattern::class.java)
+            }
+
+            onApply {
+                setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
                 setting.quoteColorPattern = colorPattern
+            }
+            onIsModified {
+                quoteProviderTitle != setting.quoteProvider.title
+                colorPattern != setting.quoteColorPattern
+            }
+            onReset {
+                quoteProviderTitle = setting.quoteProvider.title
+                colorPattern = setting.quoteColorPattern
             }
         }
     }
