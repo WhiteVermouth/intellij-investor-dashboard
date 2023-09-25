@@ -9,7 +9,7 @@ plugins {
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.8.21"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.15.0"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
 }
@@ -23,7 +23,7 @@ repositories {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -74,13 +74,15 @@ tasks {
                   width="650"
                 />
               </p>
-              <h2>Usage</h2>
+              <h2>Tutorial</h2>
               <p>
                 All instructions can be found at
-                <a href="https://nszihan.com/posts/stocker">here</a>.
+                <a href="https://nszihan.com/2021/04/11/stocker">here</a>.
               </p>
               <h2>Licence</h2>
-              <p>Apache License</p>
+              <a href="https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/LICENSE">Apache 2.0 License</a>
+              <h2>Donation</h2>
+              <p>If you like this plugin, you can <a href="https://www.buymeacoffee.com/nszihan">buy me a cup of coffee</a>. Thank you!</p>
             </div>
         """.trimIndent()
 
