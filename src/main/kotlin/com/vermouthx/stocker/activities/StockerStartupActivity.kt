@@ -10,10 +10,8 @@ import com.vermouthx.stocker.settings.StockerSetting
 
 class StockerStartupActivity : StartupActivity, DumbAware {
 
-    companion object {
-        private val setting = StockerSetting.instance
-        private const val pluginId = "com.vermouthx.intellij-investor-dashboard"
-    }
+    private val setting = StockerSetting.instance
+    private val pluginId = "com.vermouthx.intellij-investor-dashboard"
 
     override fun runActivity(project: Project) {
         val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(pluginId))?.version ?: ""

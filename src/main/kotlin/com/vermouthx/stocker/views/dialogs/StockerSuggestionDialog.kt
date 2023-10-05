@@ -4,22 +4,22 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.DocumentAdapter
-import com.intellij.ui.JBColor
 import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.layout.CCFlags
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerActionUtil
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil
+import java.awt.BorderLayout
+import java.awt.Dimension
 import java.util.concurrent.Executors
 import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.JButton
-import javax.swing.JSeparator
 import javax.swing.event.DocumentEvent
 
 class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
@@ -35,6 +35,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
     }
 
     override fun createCenterPanel(): DialogPanel {
+        val dialogPanel = DialogPanel(BorderLayout())
         val searchTextField = SearchTextField(true)
         val scrollPane = JBScrollPane()
 
@@ -53,14 +54,11 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         suggestions = StockerSuggestHttpUtil.suggest("600", setting.quoteProvider)
         refreshScrollPane(scrollPane)
 
-        return panel {
-            row {
-                searchTextField(CCFlags.growX)
-            }
-            row {
-                scrollPane(scrollPane)
-            }
-        }.withPreferredWidth(400).withPreferredHeight(500)
+        searchTextField.border = BorderFactory.createEmptyBorder(0, 0, 8, 0)
+        dialogPanel.add(searchTextField, BorderLayout.NORTH)
+        dialogPanel.add(scrollPane, BorderLayout.CENTER)
+        dialogPanel.preferredSize = Dimension(300, 500)
+        return dialogPanel
     }
 
     override fun createActions(): Array<Action> {
@@ -72,10 +70,6 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             panel {
                 suggestions.forEach { suggestion ->
                     val actionButton = JButton()
-                    val separator = JSeparator().also {
-                        it.foreground = JBColor.border()
-                        it.background = JBColor.background()
-                    }
                     row {
                         label(suggestion.code)
                         label(
@@ -99,10 +93,12 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                                         StockerActionUtil.addStock(suggestion.market, suggestion, project)
                                         actionButton.text = StockerStockOperation.STOCK_DELETE.operation
                                     }
+
                                     StockerStockOperation.STOCK_DELETE -> {
                                         StockerActionUtil.removeStock(suggestion.market, suggestion)
                                         actionButton.text = StockerStockOperation.STOCK_ADD.operation
                                     }
+
                                     else -> {
                                         myApplication.schedule()
                                         return@addActionListener
@@ -111,15 +107,11 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                                 myApplication.schedule()
                             }
                         }
-                        right {
-                            actionButton()
-                        }
+                        cell(actionButton).horizontalAlign(HorizontalAlign.RIGHT)
                     }
-                    row {
-                        separator(CCFlags.growX)
-                    }
+                    separator()
                 }
-            }.withBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16))
+            }.withBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8))
         )
     }
 

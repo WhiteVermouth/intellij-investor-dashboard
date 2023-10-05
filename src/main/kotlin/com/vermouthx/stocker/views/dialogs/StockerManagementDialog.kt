@@ -3,13 +3,13 @@ package com.vermouthx.stocker.views.dialogs
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.CollectionListModel
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.layout.CCFlags
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
@@ -17,10 +17,7 @@ import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
-import javax.swing.Action
-import javax.swing.BorderFactory
-import javax.swing.JComponent
-import javax.swing.JPanel
+import javax.swing.*
 
 class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
@@ -28,7 +25,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     private val tabMap: MutableMap<Int, JPanel> = mutableMapOf()
 
-    private val currentSymbols: MutableMap<StockerMarketType, CollectionListModel<StockerQuote>> = mutableMapOf()
+    private val currentSymbols: MutableMap<StockerMarketType, DefaultListModel<StockerQuote>> = mutableMapOf()
 
     private var currentMarketSelection: StockerMarketType = StockerMarketType.AShare
 
@@ -48,9 +45,11 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                 0 -> {
                     StockerMarketType.AShare
                 }
+
                 1 -> {
                     StockerMarketType.HKStocks
                 }
+
                 2 -> {
                     StockerMarketType.USStocks
                 }
@@ -61,11 +60,10 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             }
         }
 
-        val aShareListModel = CollectionListModel(
+        val aShareListModel = DefaultListModel<StockerQuote>()
+        aShareListModel.addAll(
             StockerQuoteHttpUtil.get(
-                StockerMarketType.AShare,
-                setting.quoteProvider,
-                setting.aShareList
+                StockerMarketType.AShare, setting.quoteProvider, setting.aShareList
             )
         )
         currentSymbols[StockerMarketType.AShare] = aShareListModel
@@ -73,11 +71,10 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             renderTabPane(pane, aShareListModel)
         }
 
-        val hkStocksListModel = CollectionListModel(
+        val hkStocksListModel = DefaultListModel<StockerQuote>()
+        hkStocksListModel.addAll(
             StockerQuoteHttpUtil.get(
-                StockerMarketType.HKStocks,
-                setting.quoteProvider,
-                setting.hkStocksList
+                StockerMarketType.HKStocks, setting.quoteProvider, setting.hkStocksList
             )
         )
         currentSymbols[StockerMarketType.HKStocks] = hkStocksListModel
@@ -85,11 +82,10 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             renderTabPane(pane, hkStocksListModel)
         }
 
-        val usStocksListModel = CollectionListModel(
+        val usStocksListModel = DefaultListModel<StockerQuote>()
+        usStocksListModel.addAll(
             StockerQuoteHttpUtil.get(
-                StockerMarketType.USStocks,
-                setting.quoteProvider,
-                setting.usStocksList
+                StockerMarketType.USStocks, setting.quoteProvider, setting.usStocksList
             )
         )
         currentSymbols[StockerMarketType.USStocks] = usStocksListModel
@@ -100,7 +96,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabbedPane.selectedIndex = 0
         return panel {
             row {
-                tabbedPane(CCFlags.grow)
+                cell(tabbedPane).horizontalAlign(HorizontalAlign.FILL)
             }
         }.withPreferredWidth(300)
     }
@@ -113,20 +109,19 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                     if (myApplication != null) {
                         myApplication.shutdownThenClear()
                         currentSymbols[StockerMarketType.AShare]?.let { symbols ->
-                            setting.aShareList = symbols.items.map { it.code }.toMutableList()
+                            setting.aShareList = symbols.elements().asSequence().map { it.code }.toMutableList()
                         }
                         currentSymbols[StockerMarketType.HKStocks]?.let { symbols ->
-                            setting.hkStocksList = symbols.items.map { it.code }.toMutableList()
+                            setting.hkStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
                         }
                         currentSymbols[StockerMarketType.USStocks]?.let { symbols ->
-                            setting.usStocksList = symbols.items.map { it.code }.toMutableList()
+                            setting.usStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
                         }
                         myApplication.schedule()
                     }
                     super.actionPerformed(e)
                 }
-            },
-            cancelAction
+            }, cancelAction
         )
     }
 
@@ -135,31 +130,32 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabMap[index] = pane
         return panel {
             row {
-                pane(CCFlags.grow)
+                cell(pane)
+                    .horizontalAlign(HorizontalAlign.FILL)
+                    .verticalAlign(VerticalAlign.FILL)
             }
         }
     }
 
-    private fun renderTabPane(pane: JPanel, listModel: CollectionListModel<StockerQuote>) {
+    private fun renderTabPane(pane: JPanel, listModel: DefaultListModel<StockerQuote>) {
         val list = JBList(listModel)
-        val toolbar = ToolbarDecorator.createDecorator(list)
-        val toolbarPane = toolbar.createPanel()
+        val decorator = ToolbarDecorator.createDecorator(list)
+        val toolbarPane = decorator.createPanel()
         list.installCellRenderer { symbol ->
             panel {
                 row {
-                    label(symbol.code)
+                    label(symbol.code).horizontalAlign(HorizontalAlign.LEFT)
                     label(
                         if (symbol.name.length <= 20) {
                             symbol.name
                         } else {
                             "${symbol.name.substring(0, 20)}..."
                         }
-                    )
+                    ).horizontalAlign(HorizontalAlign.CENTER)
                 }
             }.withBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16))
         }
-        val scrollPane = JBScrollPane()
-        scrollPane.setViewportView(list)
+        val scrollPane = JBScrollPane(list)
         pane.add(toolbarPane, BorderLayout.NORTH)
         pane.add(scrollPane, BorderLayout.CENTER)
     }
