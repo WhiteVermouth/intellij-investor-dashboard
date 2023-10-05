@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.2
+
+- Fix compiler warnings
+
 ## 1.10.1
 
 - Add A-Share Convertible Bond support
