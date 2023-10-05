@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.actions
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.vermouthx.stocker.settings.StockerSetting
@@ -18,5 +19,9 @@ class StockerResetAction : AnAction() {
         setting.aShareList.clear()
         setting.hkStocksList.clear()
         setting.usStocksList.clear()
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 }
