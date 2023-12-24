@@ -7,9 +7,9 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.AlignY
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
@@ -96,7 +96,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabbedPane.selectedIndex = 0
         return panel {
             row {
-                cell(tabbedPane).horizontalAlign(HorizontalAlign.FILL)
+                cell(tabbedPane).align(AlignX.FILL)
             }
         }.withPreferredWidth(300)
     }
@@ -130,9 +130,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabMap[index] = pane
         return panel {
             row {
-                cell(pane)
-                    .horizontalAlign(HorizontalAlign.FILL)
-                    .verticalAlign(VerticalAlign.FILL)
+                cell(pane).align(AlignX.FILL).align(AlignY.FILL)
             }
         }
     }
@@ -144,14 +142,14 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         list.installCellRenderer { symbol ->
             panel {
                 row {
-                    label(symbol.code).horizontalAlign(HorizontalAlign.LEFT)
+                    label(symbol.code).align(AlignX.LEFT)
                     label(
                         if (symbol.name.length <= 20) {
                             symbol.name
                         } else {
                             "${symbol.name.substring(0, 20)}..."
                         }
-                    ).horizontalAlign(HorizontalAlign.CENTER)
+                    ).align(AlignX.CENTER)
                 }
             }.withBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16))
         }

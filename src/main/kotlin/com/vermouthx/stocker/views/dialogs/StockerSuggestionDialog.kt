@@ -6,8 +6,8 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerStockOperation
@@ -107,7 +107,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                                 myApplication.schedule()
                             }
                         }
-                        cell(actionButton).horizontalAlign(HorizontalAlign.RIGHT)
+                        cell(actionButton).align(AlignX.RIGHT)
                     }
                     separator()
                 }
