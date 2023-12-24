@@ -14,7 +14,7 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew: String = """
         <ul>
-            <li>支持A股可转债（Provider需设置为Sina才能搜索添加）</li>
+            <li>修复IntelliJ 2023.3版本下的兼容性问题</li>
         </ul>
     """.trimIndent()
 

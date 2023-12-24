@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.0
+
+- Fix IntelliJ 2023.3 series compatibility issues
+
 ## 1.10.2
 
 - Fix compiler warnings
