@@ -24,19 +24,19 @@ steps:
       restoreKeys: gradle
       path: $(GRADLE_USER_HOME)
     displayName: Gradle build cache
-  - task: Gradle@2
+  - task: Gradle@3
     inputs:
       workingDirectory: ''
       gradleWrapperFile: 'gradlew'
       gradleOptions: '-Xmx3072m'
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '17'
+      jdkVersionOption: '1.17'
       jdkArchitectureOption: 'x64'
       publishJUnitResults: true
       testResultsFiles: '**/TEST-*.xml'
       tasks: 'buildPlugin'
     displayName: 'Build plugin'
-  - task: GitHubRelease@0
+  - task: GitHubRelease@1
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     inputs:
       gitHubConnection: 'GitHub Release'
@@ -47,10 +47,10 @@ steps:
       tagSource: 'auto'
       target: '$(Build.SourceVersion)'
     displayName: 'Publish to GitHub Release'
-  - task: Gradle@2
+  - task: Gradle@3
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     inputs:
-      jdkVersionOption: '17'
+      jdkVersionOption: '1.17'
       options: '-Djetbrains.token=$(jetbrains.token)'
       tasks: 'publishPlugin'
     displayName: 'Publish to JetBrains Plugin Repository'
