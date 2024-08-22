@@ -28,6 +28,7 @@ dependencies {
         pluginVerifier()
         instrumentationTools()
     }
+    implementation("org.apache.commons:commons-text:1.12.0")
 }
 
 changelog {
