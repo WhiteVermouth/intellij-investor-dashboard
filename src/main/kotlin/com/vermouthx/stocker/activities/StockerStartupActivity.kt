@@ -15,14 +15,9 @@ class StockerStartupActivity : ProjectActivity, DumbAware {
 
     override suspend fun execute(project: Project) {
         val currentVersion = PluginManagerCore.getPlugin(PluginId.getId(pluginId))?.version ?: ""
-        if (setting.version.isEmpty()) {
-            setting.version = currentVersion
-            StockerNotification.notifyWelcome(project)
-            return
-        }
         if (setting.version != currentVersion) {
             setting.version = currentVersion
-            StockerNotification.notifyReleaseNote(project, currentVersion)
+            StockerNotification.notifyInviteSupporter(project)
         }
     }
 }

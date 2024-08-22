@@ -11,26 +11,11 @@ import org.intellij.lang.annotations.Language
 
 object StockerNotification {
 
-    @Language("HTML")
-    private val whatsNew: String = """
-        <ul>
-            <li>修复IntelliJ 2023.3版本下的兼容性问题</li>
-        </ul>
-    """.trimIndent()
-
-    private const val TUTORIAL_LINK = "https://nszihan.com/2021/04/11/stocker"
-    private const val GITHUB_REPO_LINK = "https://github.com/WhiteVermouth/intellij-investor-dashboard"
     private const val DONATE_LINK = "https://www.buymeacoffee.com/nszihan"
 
     @Language("HTML")
-    private val releaseNote: String = """
-        <p>What's new?</p>
-        $whatsNew
-    """.trimIndent()
-
-    @Language("HTML")
-    private val welcomeMessage: String = """
-        <p>Thank you for choosing Stocker.</p>
+    private val inviteSupporterMessage: String = """
+        <p>Your support helps me continue creating and improving the plugin.</p>
     """.trimIndent()
 
     private const val NOTIFICATION_GROUP_ID = "Stocker"
@@ -38,34 +23,16 @@ object StockerNotification {
     @JvmField
     val logoIcon = IconLoader.getIcon("/icons/logo.png", javaClass)
 
-    fun notifyWelcome(project: Project) {
-        val notification =
-            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
-                "Stocker is installed", welcomeMessage, NotificationType.INFORMATION
-            )
-        addNotificationActions(notification)
-        notification.icon = logoIcon
-        notification.notify(project)
-    }
-
-    fun notifyReleaseNote(project: Project, version: String) {
-        val notification =
-            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
-                "Stocker updated to v$version", releaseNote, NotificationType.INFORMATION
-            )
+    fun notifyInviteSupporter(project: Project) {
+        val notification = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
+            .createNotification("Become Stocker Supporter", inviteSupporterMessage, NotificationType.INFORMATION)
         addNotificationActions(notification)
         notification.icon = logoIcon
         notification.notify(project)
     }
 
     private fun addNotificationActions(notification: Notification) {
-        notification.addAction(NotificationAction.createSimple("Tutorial") {
-            BrowserUtil.browse(TUTORIAL_LINK)
-        })
-        notification.addAction(NotificationAction.createSimple("GitHub") {
-            BrowserUtil.browse(GITHUB_REPO_LINK)
-        })
-        notification.addAction(NotificationAction.createSimple("Donate") {
+        notification.addAction(NotificationAction.createSimple("Support Now") {
             BrowserUtil.browse(DONATE_LINK)
         })
     }
