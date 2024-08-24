@@ -23,12 +23,12 @@ repositories {
 }
 
 dependencies {
+    implementation("org.apache.commons:commons-text:1.12.0")
     intellijPlatform {
         create(properties("platformType"), properties("platformVersion"))
         pluginVerifier()
         instrumentationTools()
     }
-    implementation("org.apache.commons:commons-text:1.12.0")
 }
 
 changelog {
@@ -77,7 +77,7 @@ intellijPlatform {
             select {
                 types = listOf(IntelliJPlatformType.IntellijIdeaCommunity, IntelliJPlatformType.IntellijIdeaUltimate)
                 channels = listOf(ProductRelease.Channel.RELEASE)
-                sinceBuild = "233"
+                sinceBuild = "241"
                 untilBuild = "242.*"
             }
         }
