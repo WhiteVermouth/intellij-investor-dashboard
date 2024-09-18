@@ -24,7 +24,7 @@ Search **Stocker** in `Plugin Marketplace` and click `Install`.
 
 ## Tutorial
 
-All instructions can be found at [here](https://nszihan.com/2021/04/11/stocker).
+All instructions can be found at [here](https://vermouthx.com/2021/04/11/stocker).
 
 ## Licence
 
