@@ -1,0 +1,6 @@
+### Sina
+GET https://hq.sinajs.cn/list=sh113031
+Referer: https://finance.sina.com.cn
+
+### Sina Suggest
+GET https://suggest3.sinajs.cn/suggest/key=2400
