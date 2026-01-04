@@ -27,3 +27,5 @@ out
 gen
 .intellijPlatform
 .kotlin
+# GitHub Copilot instructions
+.github/copilot-instructions.md
