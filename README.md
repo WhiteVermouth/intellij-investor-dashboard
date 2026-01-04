@@ -7,7 +7,7 @@ Stocker
 Stocker is a JetBrains IDE extension dashboard for investors to track realtime stock market conditions.
 </p>
 <p align="center">
-<img src="https://dev.azure.com/nszihan/Stocker/_apis/build/status%2FWhiteVermouth.intellij-investor-dashboard?branchName=master" alt="Build Status" />
+<img src="https://github.com/WhiteVermouth/intellij-investor-dashboard/actions/workflows/build.yml/badge.svg" alt="Build Status" />
 <img src="https://img.shields.io/github/v/release/WhiteVermouth/intellij-investor-dashboard" alt="GitHub Release" />
 <img src="https://img.shields.io/jetbrains/plugin/v/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Release" />
 <img src="https://img.shields.io/jetbrains/plugin/d/com.vermouthx.intellij-investor-dashboard" alt="Marketplace Downloads" />
