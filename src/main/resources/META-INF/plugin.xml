@@ -27,11 +27,11 @@
             />
             <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
                     id="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.General.Add">
+                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.Actions.Find">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
-                    text="Manage Favorite Stocks" description="Manage stock symbols" icon="AllIcons.Actions.ListFiles">
+                    text="Manage Favorite Stocks" description="Manage stock symbols" icon="AllIcons.Actions.Edit">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"

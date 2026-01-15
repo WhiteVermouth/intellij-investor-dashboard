@@ -14,8 +14,10 @@ public class StockerTableHeaderRender implements TableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        return label;
+        Component component = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        if (component instanceof JLabel) {
+            ((JLabel) component).setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        return component;
     }
 }
