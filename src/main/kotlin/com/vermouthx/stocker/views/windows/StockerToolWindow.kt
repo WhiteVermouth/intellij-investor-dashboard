@@ -42,11 +42,12 @@ class StockerToolWindow : ToolWindowFactory {
                     return@addActionListener
                 }
                 val setting = StockerSetting.instance
+                myApplication.shutdown()
+                
                 for (selectedRow in tbBody.selectedRows) {
                     val code = tbModel.getValueAt(selectedRow, 0).toString()
                     val market = setting.marketOf(code)
                     if (market != null) {
-                        myApplication.shutdown()
                         setting.removeCode(market, code)
                         when (market) {
                             StockerMarketType.AShare -> {
@@ -71,9 +72,9 @@ class StockerToolWindow : ToolWindowFactory {
                         }
                         val publisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_DELETE_TOPIC)
                         publisher.after(code)
-                        myApplication.schedule()
                     }
                 }
+                myApplication.schedule()
             }
             tbPopupMenu.add(tbPopupDeleteMenuItem)
             tbBody.componentPopupMenu = tbPopupMenu

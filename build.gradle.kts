@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
+    implementation("com.belerweb:pinyin4j:2.5.1")
     intellijPlatform {
         create(properties("platformType"), properties("platformVersion"))
         pluginVerifier()

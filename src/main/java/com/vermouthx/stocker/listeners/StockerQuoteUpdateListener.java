@@ -1,6 +1,8 @@
 package com.vermouthx.stocker.listeners;
 
 import com.vermouthx.stocker.entities.StockerQuote;
+import com.vermouthx.stocker.settings.StockerSetting;
+import com.vermouthx.stocker.utils.StockerPinyinUtil;
 import com.vermouthx.stocker.utils.StockerTableModelUtil;
 import com.vermouthx.stocker.views.StockerTableView;
 
@@ -17,12 +19,16 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     @Override
     public void syncQuotes(List<StockerQuote> quotes, int size) {
         DefaultTableModel tableModel = myTableView.getTableModel();
+        StockerSetting setting = StockerSetting.Companion.getInstance();
+        boolean usePinyin = setting.getDisplayNameWithPinyin();
+        
         quotes.forEach(quote -> {
             synchronized (myTableView.getTableModel()) {
+                String displayName = usePinyin ? StockerPinyinUtil.INSTANCE.toPinyin(quote.getName()) : quote.getName();
                 int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
                 if (rowIndex != -1) {
-                    if (!tableModel.getValueAt(rowIndex, 1).equals(quote.getName())) {
-                        tableModel.setValueAt(quote.getName(), rowIndex, 1);
+                    if (!tableModel.getValueAt(rowIndex, 1).equals(displayName)) {
+                        tableModel.setValueAt(displayName, rowIndex, 1);
                         tableModel.fireTableCellUpdated(rowIndex, 1);
                     }
                     if (!tableModel.getValueAt(rowIndex, 2).equals(quote.getCurrent())) {
@@ -35,7 +41,7 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                     }
                 } else {
                     if (quotes.size() == size) {
-                        tableModel.addRow(new Object[]{quote.getCode(), quote.getName(), quote.getCurrent(), quote.getPercentage() + "%"});
+                        tableModel.addRow(new Object[]{quote.getCode(), displayName, quote.getCurrent(), quote.getPercentage() + "%"});
                     }
                 }
             }

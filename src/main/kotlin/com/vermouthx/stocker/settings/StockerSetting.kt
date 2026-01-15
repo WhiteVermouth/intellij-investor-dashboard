@@ -41,6 +41,13 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             log.info("Stocker quote color pattern switched to ${value.title}")
         }
 
+    var displayNameWithPinyin: Boolean
+        get() = myState.displayNameWithPinyin
+        set(value) {
+            myState.displayNameWithPinyin = value
+            log.info("Stocker display name with pinyin set to $value")
+        }
+
     var refreshInterval: Long
         get() = myState.refreshInterval
         set(value) {

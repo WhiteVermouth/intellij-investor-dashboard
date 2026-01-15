@@ -15,6 +15,7 @@ import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.settings.StockerSetting
+import com.vermouthx.stocker.utils.StockerPinyinUtil
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
@@ -142,16 +143,24 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         // Clear existing components to prevent stacking
         pane.removeAll()
         
+        val usePinyin = setting.displayNameWithPinyin
+        
         val list = JBList(listModel)
         list.installCellRenderer { symbol ->
+            val displayName = if (usePinyin) {
+                StockerPinyinUtil.toPinyin(symbol.name)
+            } else {
+                symbol.name
+            }
+            
             panel {
                 row {
                     label(symbol.code).align(AlignX.LEFT)
                     label(
-                        if (symbol.name.length <= 20) {
-                            symbol.name
+                        if (displayName.length <= 20) {
+                            displayName
                         } else {
-                            "${symbol.name.substring(0, 20)}..."
+                            "${displayName.substring(0, 20)}..."
                         }
                     ).align(AlignX.CENTER)
                 }

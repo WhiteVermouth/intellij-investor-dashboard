@@ -14,6 +14,7 @@ import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerActionUtil
+import com.vermouthx.stocker.utils.StockerPinyinUtil
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -114,6 +115,8 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
     }
 
     private fun refreshScrollPane(scrollPane: JBScrollPane) {
+        val usePinyin = setting.displayNameWithPinyin
+        
         val contentPanel = if (isLoading) {
             panel {
                 row {
@@ -130,13 +133,19 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             panel {
                 suggestions.forEach { suggestion ->
                     val actionButton = JButton()
+                    val displayName = if (usePinyin) {
+                        StockerPinyinUtil.toPinyin(suggestion.name)
+                    } else {
+                        suggestion.name
+                    }
+                    
                     row {
                         label(suggestion.code)
                         label(
-                            if (suggestion.name.length <= 20) {
-                                suggestion.name
+                            if (displayName.length <= 20) {
+                                displayName
                             } else {
-                                "${suggestion.name.substring(0, 20)}..."
+                                "${displayName.substring(0, 20)}..."
                             }
                         )
                         if (StockerSetting.instance.containsCode(suggestion.code)) {

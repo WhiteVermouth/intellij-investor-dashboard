@@ -9,6 +9,7 @@ public class StockerDefaultTableCellRender extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         setHorizontalAlignment(SwingConstants.CENTER);
-        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        // Always pass false for hasFocus to prevent cell focus border
+        return super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
     }
 }

@@ -8,6 +8,7 @@ class StockerSettingState {
     var refreshInterval: Long = 5
     var quoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
+    var displayNameWithPinyin: Boolean = false
     var aShareList: MutableList<String> = mutableListOf()
     var hkStocksList: MutableList<String> = mutableListOf()
     var usStocksList: MutableList<String> = mutableListOf()
