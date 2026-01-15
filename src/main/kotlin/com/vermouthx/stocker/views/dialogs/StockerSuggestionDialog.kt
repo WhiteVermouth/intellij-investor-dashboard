@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.views.dialogs
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
@@ -17,17 +18,24 @@ import com.vermouthx.stocker.utils.StockerSuggestHttpUtil
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.JButton
+import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 
 class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
 
-    private val service = Executors.newFixedThreadPool(1)
+    private val log = Logger.getInstance(StockerSuggestionDialog::class.java)
+    private val service: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private val setting = StockerSetting.instance
 
     private var suggestions: List<StockerSuggestion> = emptyList()
+    private var searchTask: ScheduledFuture<*>? = null
+    private var isLoading: Boolean = false
 
     init {
         title = "Search Stocks"
@@ -41,17 +49,43 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
 
         searchTextField.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
-                service.submit {
-                    val text = searchTextField.text.trim()
-                    if (text.isNotEmpty()) {
-                        suggestions = StockerSuggestHttpUtil.suggest(text, setting.quoteProvider)
-                        refreshScrollPane(scrollPane)
-                    }
+                // Cancel any pending search task
+                searchTask?.cancel(false)
+                
+                val text = searchTextField.text.trim()
+                if (text.isEmpty()) {
+                    isLoading = false
+                    suggestions = emptyList()
+                    SwingUtilities.invokeLater { refreshScrollPane(scrollPane) }
+                    return
                 }
+                
+                // Show loading state immediately
+                isLoading = true
+                SwingUtilities.invokeLater { refreshScrollPane(scrollPane) }
+                
+                // Debounce: schedule search after 300ms delay
+                searchTask = service.schedule({
+                    try {
+                        val newSuggestions = StockerSuggestHttpUtil.suggest(text, setting.quoteProvider)
+                        // Update UI on EDT
+                        SwingUtilities.invokeLater {
+                            isLoading = false
+                            suggestions = newSuggestions
+                            refreshScrollPane(scrollPane)
+                        }
+                    } catch (e: Exception) {
+                        log.warn("Failed to fetch stock suggestions", e)
+                        SwingUtilities.invokeLater {
+                            isLoading = false
+                            refreshScrollPane(scrollPane)
+                        }
+                    }
+                }, 300, TimeUnit.MILLISECONDS)
             }
         })
 
-        suggestions = StockerSuggestHttpUtil.suggest("600", setting.quoteProvider)
+        // Initialize with empty state instead of hardcoded search
         refreshScrollPane(scrollPane)
 
         searchTextField.border = BorderFactory.createEmptyBorder(0, 0, 8, 0)
@@ -65,8 +99,34 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         return emptyArray()
     }
 
+    override fun dispose() {
+        try {
+            searchTask?.cancel(true)
+            service.shutdown()
+            if (!service.awaitTermination(1, TimeUnit.SECONDS)) {
+                service.shutdownNow()
+            }
+        } catch (e: InterruptedException) {
+            service.shutdownNow()
+            Thread.currentThread().interrupt()
+        }
+        super.dispose()
+    }
+
     private fun refreshScrollPane(scrollPane: JBScrollPane) {
-        scrollPane.setViewportView(
+        val contentPanel = if (isLoading) {
+            panel {
+                row {
+                    label("Searching...").align(AlignX.CENTER)
+                }
+            }.withBorder(BorderFactory.createEmptyBorder(16, 8, 8, 8))
+        } else if (suggestions.isEmpty()) {
+            panel {
+                row {
+                    label("Type to search for stocks...").align(AlignX.CENTER)
+                }
+            }.withBorder(BorderFactory.createEmptyBorder(16, 8, 8, 8))
+        } else {
             panel {
                 suggestions.forEach { suggestion ->
                     val actionButton = JButton()
@@ -112,7 +172,12 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                     separator()
                 }
             }.withBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8))
-        )
+        }
+        
+        scrollPane.setViewportView(contentPanel)
+        // Force UI refresh to prevent flickering
+        scrollPane.revalidate()
+        scrollPane.repaint()
     }
 
 }

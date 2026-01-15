@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.views.dialogs
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
@@ -17,13 +18,15 @@ import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
+import java.util.concurrent.CompletableFuture
 import javax.swing.*
 
 class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
+    private val log = Logger.getInstance(StockerManagementDialog::class.java)
     private val setting = StockerSetting.instance
 
-    private val tabMap: MutableMap<Int, JPanel> = mutableMapOf()
+    private val tabMap: MutableMap<StockerMarketType, JPanel> = mutableMapOf()
 
     private val currentSymbols: MutableMap<StockerMarketType, DefaultListModel<StockerQuote>> = mutableMapOf()
 
@@ -36,62 +39,23 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     override fun createCenterPanel(): DialogPanel {
         val tabbedPane = JBTabbedPane()
-        tabbedPane.add("CN", createTabContent(0))
-        tabbedPane.add("HK", createTabContent(1))
-        tabbedPane.add("US", createTabContent(2))
-//        tabbedPane.add("Crypto", createTabContent(3))
+        tabbedPane.add("CN", createTabContent(StockerMarketType.AShare))
+        tabbedPane.add("HK", createTabContent(StockerMarketType.HKStocks))
+        tabbedPane.add("US", createTabContent(StockerMarketType.USStocks))
+        
         tabbedPane.addChangeListener {
             currentMarketSelection = when (tabbedPane.selectedIndex) {
-                0 -> {
-                    StockerMarketType.AShare
-                }
-
-                1 -> {
-                    StockerMarketType.HKStocks
-                }
-
-                2 -> {
-                    StockerMarketType.USStocks
-                }
-//                3 -> {
-//                    StockerMarketType.Crypto
-//                }
+                0 -> StockerMarketType.AShare
+                1 -> StockerMarketType.HKStocks
+                2 -> StockerMarketType.USStocks
                 else -> return@addChangeListener
             }
         }
 
-        val aShareListModel = DefaultListModel<StockerQuote>()
-        aShareListModel.addAll(
-            StockerQuoteHttpUtil.get(
-                StockerMarketType.AShare, setting.quoteProvider, setting.aShareList
-            )
-        )
-        currentSymbols[StockerMarketType.AShare] = aShareListModel
-        tabMap[0]?.let { pane ->
-            renderTabPane(pane, aShareListModel)
-        }
-
-        val hkStocksListModel = DefaultListModel<StockerQuote>()
-        hkStocksListModel.addAll(
-            StockerQuoteHttpUtil.get(
-                StockerMarketType.HKStocks, setting.quoteProvider, setting.hkStocksList
-            )
-        )
-        currentSymbols[StockerMarketType.HKStocks] = hkStocksListModel
-        tabMap[1]?.let { pane ->
-            renderTabPane(pane, hkStocksListModel)
-        }
-
-        val usStocksListModel = DefaultListModel<StockerQuote>()
-        usStocksListModel.addAll(
-            StockerQuoteHttpUtil.get(
-                StockerMarketType.USStocks, setting.quoteProvider, setting.usStocksList
-            )
-        )
-        currentSymbols[StockerMarketType.USStocks] = usStocksListModel
-        tabMap[2]?.let { pane ->
-            renderTabPane(pane, usStocksListModel)
-        }
+        // Load data asynchronously for each market type
+        loadMarketData(StockerMarketType.AShare, setting.aShareList)
+        loadMarketData(StockerMarketType.HKStocks, setting.hkStocksList)
+        loadMarketData(StockerMarketType.USStocks, setting.usStocksList)
 
         tabbedPane.selectedIndex = 0
         return panel {
@@ -99,6 +63,45 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                 cell(tabbedPane).align(AlignX.FILL)
             }
         }.withPreferredWidth(300)
+    }
+    
+    private fun loadMarketData(marketType: StockerMarketType, codes: List<String>) {
+        val listModel = DefaultListModel<StockerQuote>()
+        currentSymbols[marketType] = listModel
+        
+        // Show loading state
+        tabMap[marketType]?.let { pane ->
+            showLoadingState(pane)
+        }
+        
+        CompletableFuture.supplyAsync {
+            try {
+                StockerQuoteHttpUtil.get(marketType, setting.quoteProvider, codes)
+            } catch (e: Exception) {
+                log.warn("Failed to load quotes for market type $marketType", e)
+                emptyList()
+            }
+        }.thenAccept { quotes ->
+            SwingUtilities.invokeLater {
+                listModel.addAll(quotes)
+                tabMap[marketType]?.let { pane ->
+                    renderTabPane(pane, listModel)
+                }
+            }
+        }
+    }
+    
+    private fun showLoadingState(pane: JPanel) {
+        pane.removeAll()
+        pane.add(
+            panel {
+                row {
+                    label("Loading...").align(AlignX.CENTER)
+                }
+            }, BorderLayout.CENTER
+        )
+        pane.revalidate()
+        pane.repaint()
     }
 
     override fun createActions(): Array<Action> {
@@ -125,9 +128,9 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         )
     }
 
-    private fun createTabContent(index: Int): JComponent {
+    private fun createTabContent(marketType: StockerMarketType): JComponent {
         val pane = JPanel(BorderLayout())
-        tabMap[index] = pane
+        tabMap[marketType] = pane
         return panel {
             row {
                 cell(pane).align(AlignX.FILL).align(AlignY.FILL)
@@ -136,9 +139,10 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
     }
 
     private fun renderTabPane(pane: JPanel, listModel: DefaultListModel<StockerQuote>) {
+        // Clear existing components to prevent stacking
+        pane.removeAll()
+        
         val list = JBList(listModel)
-        val decorator = ToolbarDecorator.createDecorator(list)
-        val toolbarPane = decorator.createPanel()
         list.installCellRenderer { symbol ->
             panel {
                 row {
@@ -153,9 +157,17 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                 }
             }.withBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16))
         }
-        val scrollPane = JBScrollPane(list)
-        pane.add(toolbarPane, BorderLayout.NORTH)
-        pane.add(scrollPane, BorderLayout.CENTER)
+        
+        // ToolbarDecorator.createPanel() already includes the list with scrolling
+        val decorator = ToolbarDecorator.createDecorator(list)
+        val decoratedPanel = decorator.createPanel()
+        
+        // Add only the decorated panel (which contains toolbar + list + scrollpane)
+        pane.add(decoratedPanel, BorderLayout.CENTER)
+        
+        // Refresh the UI to show new components
+        pane.revalidate()
+        pane.repaint()
     }
 
 }
