@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0
+
+- Add Pinyin support for stock names with display settings
+- Enhanced welcome and release note notifications
+- Various technical improvements and dependency updates
+
 ## 1.11.1
 
 - Fix IntelliJ 2024.2 series compatibility issues

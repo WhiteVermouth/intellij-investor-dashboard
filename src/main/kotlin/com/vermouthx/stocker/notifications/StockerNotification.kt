@@ -39,9 +39,9 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">📊 Enhanced real-time stock quote updates</li>
-                <li style="${Styles.LIST_ITEM}">🎨 Improved table rendering and color patterns</li>
-                <li style="${Styles.LIST_ITEM}">🐛 Bug fixes and performance improvements</li>
+                <li style="${Styles.LIST_ITEM}">🔤 Added Pinyin support for stock names with display settings</li>
+                <li style="${Styles.LIST_ITEM}">📬 Enhanced welcome and release note notifications</li>
+                <li style="${Styles.LIST_ITEM}">🔧 Various technical improvements and bug fixes</li>
             </ul>
         </div>
     """.trimIndent()
