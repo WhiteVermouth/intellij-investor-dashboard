@@ -37,9 +37,8 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">✏️ Custom stock name feature with edit functionality (custom names take highest priority)</li>
-                <li style="${Styles.LIST_ITEM}">📊 Enhanced management dialog with three-column layout (Code, Original Name, Custom Name)</li>
-                <li style="${Styles.LIST_ITEM}">🔍 Enhanced suggestion dialog with improved search results layout</li>
+                <li style="${Styles.LIST_ITEM}">🔤 Fix index names not obeying Pinyin display mode</li>
+                <li style="${Styles.LIST_ITEM}">📈 Add Hang Seng Tech Index (恒生科技指数)</li>
             </ul>
         </div>
     """.trimIndent()

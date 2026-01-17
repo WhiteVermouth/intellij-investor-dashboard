@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.12.2
+
+- Fix index names not obeying Pinyin display mode
+- Add Hang Seng Tech Index (恒生科技指数, HSTECH)
+
 ## 1.12.1
 
 - Add custom stock name feature with edit functionality in management dialog (custom names take highest priority)
