@@ -48,13 +48,37 @@ public class StockerTableView {
     public void syncIndices(List<StockerQuote> indices) {
         this.indices = indices;
         StockerSetting setting = StockerSetting.Companion.getInstance();
-        
-        if (cbIndex.getItemCount() == 0 && !indices.isEmpty()) {
+
+        boolean shouldRefresh = cbIndex.getItemCount() != indices.size();
+        if (!shouldRefresh) {
+            for (int i = 0; i < indices.size(); i++) {
+                StockerQuote index = indices.get(i);
+                String displayName = setting.getDisplayName(index.getCode(), index.getName());
+                if (!Objects.equals(displayName, cbIndex.getItemAt(i))) {
+                    shouldRefresh = true;
+                    break;
+                }
+            }
+        }
+
+        if (shouldRefresh && !indices.isEmpty()) {
+            String selectedDisplayName = cbIndex.getSelectedItem() == null ? null : cbIndex.getSelectedItem().toString();
+            String selectedCode = findIndexCodeByDisplayName(selectedDisplayName, setting);
+            cbIndex.removeAllItems();
             indices.forEach(i -> {
                 String displayName = setting.getDisplayName(i.getCode(), i.getName());
                 cbIndex.addItem(displayName);
             });
-            cbIndex.setSelectedIndex(0);
+            if (selectedCode != null) {
+                for (int i = 0; i < indices.size(); i++) {
+                    if (indices.get(i).getCode().equals(selectedCode)) {
+                        cbIndex.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            } else {
+                cbIndex.setSelectedIndex(0);
+            }
         }
         syncColorPatternSetting();
         updateIndex();
@@ -85,10 +109,14 @@ public class StockerTableView {
         if (cbIndex.getSelectedIndex() != -1 && cbIndex.getSelectedItem() != null) {
             String selectedDisplayName = cbIndex.getSelectedItem().toString();
             StockerSetting setting = StockerSetting.Companion.getInstance();
-            
+            String selectedCode = findIndexCodeByDisplayName(selectedDisplayName, setting);
+
             for (StockerQuote index : indices) {
                 String displayName = setting.getDisplayName(index.getCode(), index.getName());
-                if (displayName.equals(selectedDisplayName)) {
+                boolean isSelected = selectedCode != null
+                        ? index.getCode().equals(selectedCode)
+                        : displayName.equals(selectedDisplayName);
+                if (isSelected) {
                     lbIndexValue.setText(Double.toString(index.getCurrent()));
                     lbIndexExtent.setText(Double.toString(index.getChange()));
                     lbIndexPercent.setText(index.getPercentage() + "%");
@@ -110,6 +138,27 @@ public class StockerTableView {
                 }
             }
         }
+    }
+
+    private String findIndexCodeByDisplayName(String displayName, StockerSetting setting) {
+        if (displayName == null || displayName.isEmpty()) {
+            return null;
+        }
+        for (StockerQuote index : indices) {
+            String code = index.getCode();
+            String customName = setting.getCustomName(code);
+            if (customName != null && customName.equals(displayName)) {
+                return code;
+            }
+            String originalName = index.getName();
+            if (displayName.equals(originalName)) {
+                return code;
+            }
+            if (displayName.equals(StockerPinyinUtil.INSTANCE.toPinyin(originalName))) {
+                return code;
+            }
+        }
+        return null;
     }
 
     private void initPane() {
