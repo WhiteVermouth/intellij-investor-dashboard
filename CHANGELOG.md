@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.1
+
+- Add custom stock name feature with edit functionality in management dialog (custom names take highest priority)
+- Enhanced management dialog UI with three-column layout (Code, Original Name, Custom Name)
+- Enhanced suggestion dialog UI with improved search results layout
+
 ## 1.12.0
 
 - Add Pinyin support for stock names with display settings

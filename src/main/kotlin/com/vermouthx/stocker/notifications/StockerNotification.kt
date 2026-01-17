@@ -17,8 +17,6 @@ object StockerNotification {
         const val PRIMARY = "#4CAF50"          // Green (for stock market theme)
         const val SECONDARY = "#2196F3"        // Blue
         const val ACCENT = "#FF9800"           // Orange (for highlights)
-        const val TEXT_PRIMARY = "#212121"     // Dark Text
-        const val TEXT_SECONDARY = "#757575"   // Muted Text
         const val BACKGROUND = "rgba(33, 150, 243, 0.08)" // Subtle background
         const val BORDER = "#2196F3"           // Border color
     }
@@ -27,9 +25,9 @@ object StockerNotification {
     private object Styles {
         const val CONTAINER = "margin: 8px 0; line-height: 1.4;"
         const val HEADING = "margin: 0 0 8px 0; color: ${Colors.PRIMARY}; font-size: 14px; font-weight: 600;"
-        const val PARAGRAPH = "margin: 0 0 12px 0; color: ${Colors.TEXT_PRIMARY}; font-size: 13px;"
-        const val SMALL_TEXT = "margin: 12px 0 0 0; color: ${Colors.TEXT_SECONDARY}; font-size: 12px; font-style: italic;"
-        const val LIST_ITEM = "margin: 6px 0; color: ${Colors.TEXT_PRIMARY};"
+        const val PARAGRAPH = "margin: 0 0 12px 0; font-size: 13px;"
+        const val SMALL_TEXT = "margin: 12px 0 0 0; font-size: 12px; font-style: italic; opacity: 0.7;"
+        const val LIST_ITEM = "margin: 6px 0;"
         const val INFO_BOX = "background: ${Colors.BACKGROUND}; border-left: 3px solid ${Colors.BORDER}; padding: 10px 12px; margin: 12px 0; border-radius: 3px;"
         const val HIGHLIGHT = "color: ${Colors.ACCENT}; font-weight: 500;"
     }
@@ -39,9 +37,9 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🔤 Added Pinyin support for stock names with display settings</li>
-                <li style="${Styles.LIST_ITEM}">📬 Enhanced welcome and release note notifications</li>
-                <li style="${Styles.LIST_ITEM}">🔧 Various technical improvements and bug fixes</li>
+                <li style="${Styles.LIST_ITEM}">✏️ Custom stock name feature with edit functionality (custom names take highest priority)</li>
+                <li style="${Styles.LIST_ITEM}">📊 Enhanced management dialog with three-column layout (Code, Original Name, Custom Name)</li>
+                <li style="${Styles.LIST_ITEM}">🔍 Enhanced suggestion dialog with improved search results layout</li>
             </ul>
         </div>
     """.trimIndent()
@@ -54,8 +52,8 @@ object StockerNotification {
             </p>
             $whatsNew
             <div style="${Styles.INFO_BOX}">
-                <p style="margin: 0; color: ${Colors.TEXT_PRIMARY}; font-size: 12px;">
-                    💡 <strong>Pro tip:</strong> Customize your dashboard in <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span>
+                <p style="margin: 0; font-size: 12px;">
+                    💡 <strong>Pro tip:</strong> Edit stock names in <span style="${Styles.HIGHLIGHT}">Tools → Manage Favorite Stocks</span>
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
@@ -71,10 +69,10 @@ object StockerNotification {
                 🎉 <strong>Welcome to Stocker!</strong> Your investment dashboard is now installed and ready to track your favorite stocks.
             </p>
             <div style="${Styles.INFO_BOX}">
-                <p style="margin: 0 0 8px 0; color: ${Colors.TEXT_PRIMARY}; font-size: 12px;">
+                <p style="margin: 0 0 8px 0; font-size: 12px;">
                     💡 <strong>Quick Setup:</strong>
                 </p>
-                <ul style="margin: 0; padding-left: 16px; color: ${Colors.TEXT_PRIMARY}; font-size: 12px;">
+                <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
                     <li style="margin: 4px 0;">Open the <span style="${Styles.HIGHLIGHT}">Stocker</span> tool window from the left panel</li>
                     <li style="margin: 4px 0;">Click <span style="${Styles.HIGHLIGHT}">Add Favorite Stocks</span> to search and add stocks</li>
                     <li style="margin: 4px 0;">Configure settings at <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span></li>
