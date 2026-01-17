@@ -48,11 +48,10 @@ public class StockerTableView {
     public void syncIndices(List<StockerQuote> indices) {
         this.indices = indices;
         StockerSetting setting = StockerSetting.Companion.getInstance();
-        boolean usePinyin = setting.getDisplayNameWithPinyin();
         
         if (cbIndex.getItemCount() == 0 && !indices.isEmpty()) {
             indices.forEach(i -> {
-                String displayName = usePinyin ? StockerPinyinUtil.INSTANCE.toPinyin(i.getName()) : i.getName();
+                String displayName = setting.getDisplayName(i.getCode(), i.getName());
                 cbIndex.addItem(displayName);
             });
             cbIndex.setSelectedIndex(0);
@@ -86,10 +85,9 @@ public class StockerTableView {
         if (cbIndex.getSelectedIndex() != -1 && cbIndex.getSelectedItem() != null) {
             String selectedDisplayName = cbIndex.getSelectedItem().toString();
             StockerSetting setting = StockerSetting.Companion.getInstance();
-            boolean usePinyin = setting.getDisplayNameWithPinyin();
             
             for (StockerQuote index : indices) {
-                String displayName = usePinyin ? StockerPinyinUtil.INSTANCE.toPinyin(index.getName()) : index.getName();
+                String displayName = setting.getDisplayName(index.getCode(), index.getName());
                 if (displayName.equals(selectedDisplayName)) {
                     lbIndexValue.setText(Double.toString(index.getCurrent()));
                     lbIndexExtent.setText(Double.toString(index.getChange()));

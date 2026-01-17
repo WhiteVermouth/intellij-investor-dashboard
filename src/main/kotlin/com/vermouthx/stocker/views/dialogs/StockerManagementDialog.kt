@@ -63,7 +63,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             row {
                 cell(tabbedPane).align(AlignX.FILL)
             }
-        }.withPreferredWidth(300)
+        }.withPreferredWidth(600).withPreferredHeight(400)
     }
     
     private fun loadMarketData(marketType: StockerMarketType, codes: List<String>) {
@@ -143,35 +143,104 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         // Clear existing components to prevent stacking
         pane.removeAll()
         
-        val usePinyin = setting.displayNameWithPinyin
-        
         val list = JBList(listModel)
         list.installCellRenderer { symbol ->
-            val displayName = if (usePinyin) {
+            // Get original name with Pinyin if enabled
+            val originalName = if (setting.displayNameWithPinyin) {
                 StockerPinyinUtil.toPinyin(symbol.name)
             } else {
                 symbol.name
             }
             
+            // Get custom name if exists
+            val customName = setting.getCustomName(symbol.code)
+            
             panel {
                 row {
-                    label(symbol.code).align(AlignX.LEFT)
-                    label(
-                        if (displayName.length <= 20) {
-                            displayName
-                        } else {
-                            "${displayName.substring(0, 20)}..."
+                    label(symbol.code)
+                        .applyToComponent { 
+                            minimumSize = java.awt.Dimension(80, 0)
+                            preferredSize = java.awt.Dimension(80, preferredSize.height)
                         }
-                    ).align(AlignX.CENTER)
+                    label(
+                        if (originalName.length <= 25) {
+                            originalName
+                        } else {
+                            "${originalName.substring(0, 25)}..."
+                        }
+                    ).applyToComponent {
+                        minimumSize = java.awt.Dimension(200, 0)
+                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                    }
+                    label(
+                        customName?.let {
+                            if (it.length <= 25) {
+                                it
+                            } else {
+                                "${it.substring(0, 25)}..."
+                            }
+                        } ?: "-"
+                    ).applyToComponent {
+                        minimumSize = java.awt.Dimension(200, 0)
+                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                    }
                 }
-            }.withBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16))
+            }.withBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8))
         }
+        
+        // Create header panel
+        val headerPanel = panel {
+            row {
+                label("Code").bold()
+                    .applyToComponent {
+                        minimumSize = java.awt.Dimension(80, 0)
+                        preferredSize = java.awt.Dimension(80, preferredSize.height)
+                    }
+                label("Original Name").bold()
+                    .applyToComponent {
+                        minimumSize = java.awt.Dimension(200, 0)
+                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                    }
+                label("Custom Name").bold()
+                    .applyToComponent {
+                        minimumSize = java.awt.Dimension(200, 0)
+                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                    }
+            }
+        }.withBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, javax.swing.UIManager.getColor("Separator.foreground")),
+            BorderFactory.createEmptyBorder(8, 8, 8, 8)
+        ))
         
         // ToolbarDecorator.createPanel() already includes the list with scrolling
         val decorator = ToolbarDecorator.createDecorator(list)
+            .setEditAction { button ->
+                val selectedIndex = list.selectedIndex
+                if (selectedIndex >= 0) {
+                    val selectedQuote = listModel.getElementAt(selectedIndex)
+                    val currentCustomName = setting.getCustomName(selectedQuote.code)
+                    val newName = JOptionPane.showInputDialog(
+                        pane,
+                        "Enter custom name for ${selectedQuote.code}:",
+                        currentCustomName ?: selectedQuote.name
+                    )
+                    if (newName != null && newName.isNotBlank()) {
+                        setting.setCustomName(selectedQuote.code, newName.trim())
+                        // Trigger list repaint to show new name
+                        list.repaint()
+                    } else if (newName != null && newName.isBlank() && currentCustomName != null) {
+                        // If user clears the name, remove custom name
+                        setting.removeCustomName(selectedQuote.code)
+                        list.repaint()
+                    }
+                }
+            }
+            .setEditActionUpdater { list.selectedIndex >= 0 }
+        
         val decoratedPanel = decorator.createPanel()
         
-        // Add only the decorated panel (which contains toolbar + list + scrollpane)
+        // Add header at top and decorated panel (which contains toolbar + list + scrollpane) below
+        pane.add(headerPanel, BorderLayout.NORTH)
         pane.add(decoratedPanel, BorderLayout.CENTER)
         
         // Refresh the UI to show new components

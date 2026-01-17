@@ -92,7 +92,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         searchTextField.border = BorderFactory.createEmptyBorder(0, 0, 8, 0)
         dialogPanel.add(searchTextField, BorderLayout.NORTH)
         dialogPanel.add(scrollPane, BorderLayout.CENTER)
-        dialogPanel.preferredSize = Dimension(300, 500)
+        dialogPanel.preferredSize = Dimension(550, 500)
         return dialogPanel
     }
 
@@ -115,8 +115,6 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
     }
 
     private fun refreshScrollPane(scrollPane: JBScrollPane) {
-        val usePinyin = setting.displayNameWithPinyin
-        
         val contentPanel = if (isLoading) {
             panel {
                 row {
@@ -131,23 +129,48 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
             }.withBorder(BorderFactory.createEmptyBorder(16, 8, 8, 8))
         } else {
             panel {
+                // Add header row
+                row {
+                    label("Code").bold()
+                        .applyToComponent {
+                            minimumSize = java.awt.Dimension(100, 0)
+                            preferredSize = java.awt.Dimension(100, preferredSize.height)
+                        }
+                    label("Name").bold()
+                        .applyToComponent {
+                            minimumSize = java.awt.Dimension(300, 0)
+                            preferredSize = java.awt.Dimension(300, preferredSize.height)
+                        }
+                    label("Action").bold()
+                        .applyToComponent {
+                            minimumSize = java.awt.Dimension(100, 0)
+                            preferredSize = java.awt.Dimension(100, preferredSize.height)
+                        }
+                }.bottomGap(com.intellij.ui.dsl.builder.BottomGap.SMALL)
+                
+                separator()
+                
+                // Add suggestion rows
                 suggestions.forEach { suggestion ->
                     val actionButton = JButton()
-                    val displayName = if (usePinyin) {
-                        StockerPinyinUtil.toPinyin(suggestion.name)
-                    } else {
-                        suggestion.name
-                    }
+                    val displayName = setting.getDisplayName(suggestion.code, suggestion.name)
                     
                     row {
                         label(suggestion.code)
+                            .applyToComponent {
+                                minimumSize = java.awt.Dimension(100, 0)
+                                preferredSize = java.awt.Dimension(100, preferredSize.height)
+                            }
                         label(
-                            if (displayName.length <= 20) {
+                            if (displayName.length <= 30) {
                                 displayName
                             } else {
-                                "${displayName.substring(0, 20)}..."
+                                "${displayName.substring(0, 30)}..."
                             }
-                        )
+                        ).applyToComponent {
+                            minimumSize = java.awt.Dimension(300, 0)
+                            preferredSize = java.awt.Dimension(300, preferredSize.height)
+                        }
                         if (StockerSetting.instance.containsCode(suggestion.code)) {
                             actionButton.text = StockerStockOperation.STOCK_DELETE.operation
                         } else {
@@ -176,9 +199,12 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                                 myApplication.schedule()
                             }
                         }
-                        cell(actionButton).align(AlignX.RIGHT)
-                    }
-                    separator()
+                        cell(actionButton)
+                            .applyToComponent {
+                                minimumSize = java.awt.Dimension(100, 0)
+                                preferredSize = java.awt.Dimension(100, preferredSize.height)
+                            }
+                    }.bottomGap(com.intellij.ui.dsl.builder.BottomGap.SMALL)
                 }
             }.withBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8))
         }

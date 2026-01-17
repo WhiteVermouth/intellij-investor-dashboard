@@ -2,7 +2,6 @@ package com.vermouthx.stocker.listeners;
 
 import com.vermouthx.stocker.entities.StockerQuote;
 import com.vermouthx.stocker.settings.StockerSetting;
-import com.vermouthx.stocker.utils.StockerPinyinUtil;
 import com.vermouthx.stocker.utils.StockerTableModelUtil;
 import com.vermouthx.stocker.views.StockerTableView;
 
@@ -20,11 +19,10 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     public void syncQuotes(List<StockerQuote> quotes, int size) {
         DefaultTableModel tableModel = myTableView.getTableModel();
         StockerSetting setting = StockerSetting.Companion.getInstance();
-        boolean usePinyin = setting.getDisplayNameWithPinyin();
         
         quotes.forEach(quote -> {
             synchronized (myTableView.getTableModel()) {
-                String displayName = usePinyin ? StockerPinyinUtil.INSTANCE.toPinyin(quote.getName()) : quote.getName();
+                String displayName = setting.getDisplayName(quote.getCode(), quote.getName());
                 int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
                 if (rowIndex != -1) {
                     if (!tableModel.getValueAt(rowIndex, 1).equals(displayName)) {

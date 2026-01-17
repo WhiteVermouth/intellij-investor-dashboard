@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import com.vermouthx.stocker.utils.StockerPinyinUtil
 
 @State(name = "Stocker", storages = [Storage("stocker-config.xml")])
 class StockerSetting : PersistentStateComponent<StockerSettingState> {
@@ -79,8 +80,37 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             myState.cryptoList = value
         }
 
+    var customStockNames: MutableMap<String, String>
+        get() = myState.customStockNames
+        set(value) {
+            myState.customStockNames = value
+        }
+
     val allStockListSize: Int
         get() = aShareList.size + hkStocksList.size + usStocksList.size + cryptoList.size
+
+    fun setCustomName(code: String, customName: String) {
+        customStockNames[code] = customName
+        log.info("Custom name set for $code: $customName")
+    }
+
+    fun getCustomName(code: String): String? {
+        return customStockNames[code]
+    }
+
+    fun removeCustomName(code: String) {
+        customStockNames.remove(code)
+        log.info("Custom name removed for $code")
+    }
+
+    fun getDisplayName(code: String, originalName: String): String {
+        // Priority: Custom name > Pinyin mode > Original name
+        customStockNames[code]?.let { return it }
+        if (displayNameWithPinyin) {
+            return StockerPinyinUtil.toPinyin(originalName)
+        }
+        return originalName
+    }
 
     fun containsCode(code: String): Boolean {
         return aShareList.contains(code) ||
