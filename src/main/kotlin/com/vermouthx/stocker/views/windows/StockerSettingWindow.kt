@@ -2,11 +2,16 @@ package com.vermouthx.stocker.views.windows
 
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.*
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import com.vermouthx.stocker.enums.StockerTableColumn
 import com.vermouthx.stocker.settings.StockerSetting
+import com.vermouthx.stocker.views.StockerTableView
+import javax.swing.JCheckBox
+import javax.swing.JLabel
 
 class StockerSettingWindow : BoundConfigurable("Stocker") {
 
@@ -15,6 +20,16 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
     private var colorPattern: StockerQuoteColorPattern = setting.quoteColorPattern
     private var quoteProviderTitle: String = setting.quoteProvider.title
     private var displayNameWithPinyin: Boolean = setting.displayNameWithPinyin
+    private var showSymbol: Boolean = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
+    private var showName: Boolean = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
+    private var showCurrent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
+    private var showChangePercent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
+    
+    private var symbolCheckBox: JCheckBox? = null
+    private var nameCheckBox: JCheckBox? = null
+    private var currentCheckBox: JCheckBox? = null
+    private var changePercentCheckBox: JCheckBox? = null
+    private var columnWarningLabel: JLabel? = null
 
     override fun createPanel(): DialogPanel {
         return panel {
@@ -63,32 +78,112 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                             .bindSelected(::displayNameWithPinyin.toMutableProperty())
                     }.rowComment("Example: 平安银行 → PingAnYinHang")
                 }
+
+                separator()
+
+                row {
+                    label("Table columns:")
+                        .widthGroup("labels")
+                }.layout(RowLayout.LABEL_ALIGNED)
+
+                indent {
+                    row {
+                        symbolCheckBox = checkBox(StockerTableColumn.SYMBOL.title)
+                            .bindSelected(::showSymbol.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                        nameCheckBox = checkBox(StockerTableColumn.NAME.title)
+                            .bindSelected(::showName.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                    }
+                    row {
+                        currentCheckBox = checkBox(StockerTableColumn.CURRENT.title)
+                            .bindSelected(::showCurrent.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                        changePercentCheckBox = checkBox(StockerTableColumn.CHANGE_PERCENT.title)
+                            .bindSelected(::showChangePercent.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                    }
+                    row {
+                        columnWarningLabel = label("Please keep at least one visible column.")
+                            .applyToComponent { 
+                                foreground = JBColor.RED
+                                isVisible = false
+                            }
+                            .component
+                    }
+                }
             }
 
             onApply {
-                val wasModified = quoteProviderTitle != setting.quoteProvider.title ||
+                val visibleColumns = buildVisibleColumns()
+                val columnsModified = visibleColumns != setting.visibleTableColumns
+                val otherModified = quoteProviderTitle != setting.quoteProvider.title ||
                         colorPattern != setting.quoteColorPattern ||
                         displayNameWithPinyin != setting.displayNameWithPinyin
-                
+
                 setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
                 setting.quoteColorPattern = colorPattern
                 setting.displayNameWithPinyin = displayNameWithPinyin
-                
+                setting.visibleTableColumns = visibleColumns
+
+                if (columnsModified) {
+                    StockerTableView.refreshAllColumnVisibility()
+                }
                 // Refresh all active projects when settings change
-                if (wasModified) {
+                if (otherModified) {
                     refreshAllWindows()
                 }
             }
             onIsModified {
                 quoteProviderTitle != setting.quoteProvider.title ||
                         colorPattern != setting.quoteColorPattern ||
-                        displayNameWithPinyin != setting.displayNameWithPinyin
+                        displayNameWithPinyin != setting.displayNameWithPinyin ||
+                        buildVisibleColumns() != setting.visibleTableColumns
             }
             onReset {
                 quoteProviderTitle = setting.quoteProvider.title
                 colorPattern = setting.quoteColorPattern
                 displayNameWithPinyin = setting.displayNameWithPinyin
+                showSymbol = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
+                showName = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
+                showCurrent = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
+                showChangePercent = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
+                columnWarningLabel?.isVisible = false
             }
+        }
+    }
+
+    private fun buildVisibleColumns(): MutableList<String> {
+        val visibleColumns = mutableListOf<String>()
+        if (showSymbol) visibleColumns.add(StockerTableColumn.SYMBOL.title)
+        if (showName) visibleColumns.add(StockerTableColumn.NAME.title)
+        if (showCurrent) visibleColumns.add(StockerTableColumn.CURRENT.title)
+        if (showChangePercent) visibleColumns.add(StockerTableColumn.CHANGE_PERCENT.title)
+        return visibleColumns
+    }
+
+    private fun handleColumnToggle(changed: JCheckBox) {
+        val allCheckboxes = listOfNotNull(symbolCheckBox, nameCheckBox, currentCheckBox, changePercentCheckBox)
+        val selectedCount = allCheckboxes.count { it.isSelected }
+        
+        if (selectedCount == 0) {
+            // Prevent unchecking the last checkbox
+            changed.isSelected = true
+            columnWarningLabel?.isVisible = true
+        } else {
+            columnWarningLabel?.isVisible = false
         }
     }
 

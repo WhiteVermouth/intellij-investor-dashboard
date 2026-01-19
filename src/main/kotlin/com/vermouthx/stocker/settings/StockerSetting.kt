@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
+import com.vermouthx.stocker.enums.StockerTableColumn
 import com.vermouthx.stocker.utils.StockerPinyinUtil
 
 @State(name = "Stocker", storages = [Storage("stocker-config.xml")])
@@ -47,6 +48,17 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
         set(value) {
             myState.displayNameWithPinyin = value
             log.info("Stocker display name with pinyin set to $value")
+        }
+
+    var visibleTableColumns: List<String>
+        get() = if (myState.visibleTableColumns.isEmpty()) {
+            StockerTableColumn.defaultTitles()
+        } else {
+            myState.visibleTableColumns
+        }
+        set(value) {
+            myState.visibleTableColumns = value.toMutableList()
+            log.info("Stocker visible table columns updated: $value")
         }
 
     var refreshInterval: Long
@@ -110,6 +122,10 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             return StockerPinyinUtil.toPinyin(originalName)
         }
         return originalName
+    }
+
+    fun isTableColumnVisible(columnTitle: String): Boolean {
+        return visibleTableColumns.contains(columnTitle)
     }
 
     fun containsCode(code: String): Boolean {
