@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12.3
+
+- Improve table selection clearing behavior
+
 ## 1.12.2
 
 - Fix index names not obeying Pinyin display mode
