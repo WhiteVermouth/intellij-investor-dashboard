@@ -45,6 +45,11 @@ public class StockerTableView {
     private final JBLabel lbIndexPercent = new JBLabel("", SwingConstants.CENTER);
     private List<StockerQuote> indices = new ArrayList<>();
 
+    // Cache renderers to avoid creating new instances on every refresh
+    private final StockerDefaultTableCellRender defaultRenderer = new StockerDefaultTableCellRender();
+    private final StockerDefaultTableCellRender currentRenderer = new CurrentCellRenderer();
+    private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
+
     public StockerTableView() {
         tableViews.add(this);
         syncColorPatternSetting();
@@ -52,43 +57,54 @@ public class StockerTableView {
         initTable();
     }
 
+    /**
+     * Clean up resources and remove this instance from the registry.
+     * Should be called when the tool window is closed or the project is disposed.
+     * Note: Currently not called automatically - consider implementing Disposable in parent components.
+     */
+    public void dispose() {
+        tableViews.remove(this);
+    }
+
     public void syncIndices(List<StockerQuote> indices) {
-        this.indices = indices;
-        StockerSetting setting = StockerSetting.Companion.getInstance();
+        SwingUtilities.invokeLater(() -> {
+            this.indices = indices;
+            StockerSetting setting = StockerSetting.Companion.getInstance();
 
-        boolean shouldRefresh = cbIndex.getItemCount() != indices.size();
-        if (!shouldRefresh) {
-            for (int i = 0; i < indices.size(); i++) {
-                StockerQuote index = indices.get(i);
-                String displayName = setting.getDisplayName(index.getCode(), index.getName());
-                if (!Objects.equals(displayName, cbIndex.getItemAt(i))) {
-                    shouldRefresh = true;
-                    break;
-                }
-            }
-        }
-
-        if (shouldRefresh && !indices.isEmpty()) {
-            String selectedDisplayName = cbIndex.getSelectedItem() == null ? null : cbIndex.getSelectedItem().toString();
-            String selectedCode = findIndexCodeByDisplayName(selectedDisplayName, setting);
-            cbIndex.removeAllItems();
-            indices.forEach(i -> {
-                String displayName = setting.getDisplayName(i.getCode(), i.getName());
-                cbIndex.addItem(displayName);
-            });
-            if (selectedCode != null) {
+            boolean shouldRefresh = cbIndex.getItemCount() != indices.size();
+            if (!shouldRefresh) {
                 for (int i = 0; i < indices.size(); i++) {
-                    if (indices.get(i).getCode().equals(selectedCode)) {
-                        cbIndex.setSelectedIndex(i);
+                    StockerQuote index = indices.get(i);
+                    String displayName = setting.getDisplayName(index.getCode(), index.getName());
+                    if (!Objects.equals(displayName, cbIndex.getItemAt(i))) {
+                        shouldRefresh = true;
                         break;
                     }
                 }
-            } else {
-                cbIndex.setSelectedIndex(0);
             }
-        }
-        syncColorPatternSetting();
-        updateIndex();
+
+            if (shouldRefresh && !indices.isEmpty()) {
+                String selectedDisplayName = cbIndex.getSelectedItem() == null ? null : cbIndex.getSelectedItem().toString();
+                String selectedCode = findIndexCodeByDisplayName(selectedDisplayName, setting);
+                cbIndex.removeAllItems();
+                indices.forEach(i -> {
+                    String displayName = setting.getDisplayName(i.getCode(), i.getName());
+                    cbIndex.addItem(displayName);
+                });
+                if (selectedCode != null) {
+                    for (int i = 0; i < indices.size(); i++) {
+                        if (indices.get(i).getCode().equals(selectedCode)) {
+                            cbIndex.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                } else if (!indices.isEmpty()) {
+                    cbIndex.setSelectedIndex(0);
+                }
+            }
+            syncColorPatternSetting();
+            updateIndex();
+        });
     }
 
     private void syncColorPatternSetting() {
@@ -225,8 +241,6 @@ public class StockerTableView {
         List<String> visibleColumns = setting.getVisibleTableColumns();
 
         tbBody.createDefaultColumnsFromModel();
-        tbBody.getTableHeader().setReorderingAllowed(false);
-        tbBody.getTableHeader().setDefaultRenderer(new StockerTableHeaderRender(tbBody));
 
         for (String column : allColumns) {
             if (!visibleColumns.contains(column)) {
@@ -259,59 +273,19 @@ public class StockerTableView {
     private void applyColumnRenderers() {
         TableColumn code = getColumnIfPresent(codeColumn);
         if (code != null) {
-            code.setCellRenderer(new StockerDefaultTableCellRender());
+            code.setCellRenderer(defaultRenderer);
         }
         TableColumn name = getColumnIfPresent(nameColumn);
         if (name != null) {
-            name.setCellRenderer(new StockerDefaultTableCellRender());
+            name.setCellRenderer(defaultRenderer);
         }
         TableColumn current = getColumnIfPresent(currentColumn);
         if (current != null) {
-            current.setCellRenderer(new StockerDefaultTableCellRender() {
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                    setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                    try {
-                        int percentModelIndex = -1;
-                        if (table.getModel() instanceof DefaultTableModel) {
-                            percentModelIndex = ((DefaultTableModel) table.getModel()).findColumn(percentColumn);
-                        }
-                        if (percentModelIndex != -1) {
-                            Object percentValue = table.getModel().getValueAt(row, percentModelIndex);
-                            if (percentValue != null) {
-                                Double v = parsePercentage(percentValue.toString());
-                                if (v != null) {
-                                    applyColorPatternToTable(v, this);
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        // Fallback to default foreground color on parsing error
-                        setForeground(JBColor.foreground());
-                    }
-                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                }
-            });
+            current.setCellRenderer(currentRenderer);
         }
         TableColumn percent = getColumnIfPresent(percentColumn);
         if (percent != null) {
-            percent.setCellRenderer(new StockerDefaultTableCellRender() {
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                    setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                    try {
-                        String percentValue = value.toString();
-                        Double v = parsePercentage(percentValue);
-                        if (v != null) {
-                            applyColorPatternToTable(v, this);
-                        }
-                    } catch (Exception e) {
-                        // Fallback to default foreground color on parsing error
-                        setForeground(JBColor.foreground());
-                    }
-                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                }
-            });
+            percent.setCellRenderer(percentRenderer);
         }
     }
 
@@ -358,6 +332,55 @@ public class StockerTableView {
 
     public DefaultTableModel getTableModel() {
         return tbModel;
+    }
+
+    // Inner class for Current column renderer with color coding
+    private class CurrentCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            try {
+                int percentModelIndex = -1;
+                if (table.getModel() instanceof DefaultTableModel) {
+                    percentModelIndex = ((DefaultTableModel) table.getModel()).findColumn(percentColumn);
+                }
+                if (percentModelIndex != -1 && row >= 0 && row < table.getModel().getRowCount()) {
+                    Object percentValue = table.getModel().getValueAt(row, percentModelIndex);
+                    if (percentValue != null) {
+                        Double v = parsePercentage(percentValue.toString());
+                        if (v != null) {
+                            applyColorPatternToTable(v, this);
+                        }
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                // Fallback to default foreground color on parsing error
+                setForeground(JBColor.foreground());
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
+    }
+
+    // Inner class for Change% column renderer with color coding
+    private class PercentCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (value == null) {
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            }
+            try {
+                String percentValue = value.toString();
+                Double v = parsePercentage(percentValue);
+                if (v != null) {
+                    applyColorPatternToTable(v, this);
+                }
+            } catch (NumberFormatException e) {
+                // Fallback to default foreground color on parsing error
+                setForeground(JBColor.foreground());
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
     }
 
 }
