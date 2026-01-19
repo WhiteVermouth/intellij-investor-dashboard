@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.0
+
+- Add customizable table column display settings / 添加可自定义的表格列显示设置
+
 ## 1.12.3
 
 - Improve table selection clearing behavior

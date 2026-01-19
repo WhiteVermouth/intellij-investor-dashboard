@@ -35,9 +35,9 @@ object StockerNotification {
     @Language("HTML")
     private val whatsNew = """
         <div style="${Styles.CONTAINER}">
-            <h4 style="${Styles.HEADING}">✨ What's New</h4>
+            <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🧹 Improve table selection clearing behavior</li>
+                <li style="${Styles.LIST_ITEM}">🎨 Customizable table column display settings<br/>可自定义的表格列显示设置</li>
             </ul>
         </div>
     """.trimIndent()
@@ -46,16 +46,19 @@ object StockerNotification {
     private val releaseNote = """
         <div style="${Styles.CONTAINER}">
             <p style="${Styles.PARAGRAPH}">
-                🎉 <strong>Welcome to Stocker v${StockerMeta.currentVersion}!</strong> Here's what's new in this release:
+                🎉 <strong>Welcome to Stocker v${StockerMeta.currentVersion}!</strong> Here's what's new in this release:<br/>
+                欢迎使用 Stocker v${StockerMeta.currentVersion}！本次更新内容：
             </p>
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip:</strong> Edit stock names in <span style="${Styles.HIGHLIGHT}">Tools → Manage Favorite Stocks</span>
+                    💡 <strong>Pro tip / 小贴士：</strong> Customize table columns in <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span> to show only the data you need<br/>
+                    在 <span style="${Styles.HIGHLIGHT}">设置 → 工具 → Stocker</span> 中自定义表格列，只显示您需要的数据
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
-                💖 Your support helps me continue creating and improving the plugin. Thank you! 📈
+                💖 Your support helps me continue creating and improving the plugin. Thank you! 📈<br/>
+                您的支持帮助我继续创建和改进插件。谢谢！
             </p>
         </div>
     """.trimIndent()
@@ -64,21 +67,23 @@ object StockerNotification {
     private val welcomeMessage = """
         <div style="${Styles.CONTAINER}">
             <p style="${Styles.PARAGRAPH}">
-                🎉 <strong>Welcome to Stocker!</strong> Your investment dashboard is now installed and ready to track your favorite stocks.
+                🎉 <strong>Welcome to Stocker!</strong> Your investment dashboard is now installed and ready to track your favorite stocks.<br/>
+                欢迎使用 Stocker！您的投资仪表板已安装完成，可以开始跟踪您喜爱的股票了。
             </p>
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0 0 8px 0; font-size: 12px;">
-                    💡 <strong>Quick Setup:</strong>
+                    💡 <strong>Quick Setup / 快速设置：</strong>
                 </p>
                 <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
-                    <li style="margin: 4px 0;">Open the <span style="${Styles.HIGHLIGHT}">Stocker</span> tool window from the left panel</li>
-                    <li style="margin: 4px 0;">Click <span style="${Styles.HIGHLIGHT}">Add Favorite Stocks</span> to search and add stocks</li>
-                    <li style="margin: 4px 0;">Configure settings at <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span></li>
-                    <li style="margin: 4px 0;">Start tracking your investments in real-time!</li>
+                    <li style="margin: 4px 0;">Open the <span style="${Styles.HIGHLIGHT}">Stocker</span> tool window from the left panel<br/>从左侧面板打开 <span style="${Styles.HIGHLIGHT}">Stocker</span> 工具窗口</li>
+                    <li style="margin: 4px 0;">Click <span style="${Styles.HIGHLIGHT}">Add Favorite Stocks</span> to search and add stocks<br/>点击<span style="${Styles.HIGHLIGHT}">添加自选股票</span>来搜索和添加股票</li>
+                    <li style="margin: 4px 0;">Configure settings at <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span><br/>在<span style="${Styles.HIGHLIGHT}">设置 → 工具 → Stocker</span>中配置选项</li>
+                    <li style="margin: 4px 0;">Start tracking your investments in real-time!<br/>开始实时跟踪您的投资！</li>
                 </ul>
             </div>
             <p style="${Styles.SMALL_TEXT}">
-                💖 Your support helps me continue creating and improving the plugin. Thank you! 📊
+                💖 Your support helps me continue creating and improving the plugin. Thank you! 📊<br/>
+                您的支持帮助我继续创建和改进插件。谢谢！
             </p>
         </div>
     """.trimIndent()
@@ -92,7 +97,7 @@ object StockerNotification {
     private const val DONATE_LINK = "https://www.buymeacoffee.com/nszihan"
 
     fun notifyReleaseNote(project: Project) {
-        val title = "Stocker v${StockerMeta.currentVersion} - Release Notes"
+        val title = "Stocker v${StockerMeta.currentVersion} - Release Notes / 版本说明"
         val notification = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
             .createNotification(title, releaseNote, NotificationType.INFORMATION)
         addNotificationActions(notification)
@@ -101,7 +106,7 @@ object StockerNotification {
     }
 
     fun notifyWelcome(project: Project) {
-        val title = "Stocker Successfully Installed"
+        val title = "Stocker Successfully Installed / 安装成功"
         val notification = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
             .createNotification(title, welcomeMessage, NotificationType.INFORMATION)
         addNotificationActions(notification)
