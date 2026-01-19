@@ -16,10 +16,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -113,9 +114,7 @@ public class StockerTableView {
 
             for (StockerQuote index : indices) {
                 String displayName = setting.getDisplayName(index.getCode(), index.getName());
-                boolean isSelected = selectedCode != null
-                        ? index.getCode().equals(selectedCode)
-                        : displayName.equals(selectedDisplayName);
+                boolean isSelected = selectedCode != null ? index.getCode().equals(selectedCode) : displayName.equals(selectedDisplayName);
                 if (isSelected) {
                     lbIndexValue.setText(Double.toString(index.getCurrent()));
                     lbIndexExtent.setText(Double.toString(index.getChange()));
@@ -164,15 +163,7 @@ public class StockerTableView {
     private void initPane() {
         tbPane = new JBScrollPane();
         tbPane.setBorder(BorderFactory.createEmptyBorder());
-        
-        // Clear table selection when clicking in scroll pane empty area
-        tbPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                clearTableSelection();
-            }
-        });
-        
+
         JPanel iPane = new JPanel(new GridLayout(1, 4));
         iPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()));
         iPane.add(cbIndex);
@@ -183,20 +174,6 @@ public class StockerTableView {
         mPane = new JPanel(new BorderLayout());
         mPane.add(tbPane, BorderLayout.CENTER);
         mPane.add(iPane, BorderLayout.SOUTH);
-        
-        // Clear table selection when clicking anywhere in main panel
-        mPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                clearTableSelection();
-            }
-        });
-    }
-    
-    private void clearTableSelection() {
-        if (tbBody != null) {
-            tbBody.clearSelection();
-        }
     }
 
     private static final String codeColumn = "Symbol";
@@ -207,28 +184,22 @@ public class StockerTableView {
     private void initTable() {
         tbModel = new StockerTableModel();
         tbBody = new JBTable();
-        
-        // Configure table to only allow row selection, not cell selection
-        tbBody.setRowSelectionAllowed(true);
-        tbBody.setColumnSelectionAllowed(false);
-        tbBody.setCellSelectionEnabled(false);
-        
-        // Disable cell focus border
-        tbBody.setFocusable(false);
-        
+
+        tbBody.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                tbBody.clearSelection();
+            }
+        });
         tbBody.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseReleased(MouseEvent e) {
-                int row = tbBody.rowAtPoint(e.getPoint());
-                if (row >= 0 && row < tbBody.getRowCount()) {
-                    if (tbBody.getSelectedRows().length == 0 || Arrays.stream(tbBody.getSelectedRows()).noneMatch(p -> p == row)) {
-                        tbBody.setRowSelectionInterval(row, row);
-                    }
-                } else {
-                    clearTableSelection();
+            public void mousePressed(MouseEvent e) {
+                if (tbBody.isFocusOwner() && tbBody.rowAtPoint(e.getPoint()) == -1) {
+                    tbBody.clearSelection();
                 }
             }
         });
+
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
 
         tbBody.setShowVerticalLines(false);
@@ -253,8 +224,7 @@ public class StockerTableView {
                     // Fallback to default foreground color on parsing error
                     setForeground(JBColor.foreground());
                 }
-                // Always pass false for hasFocus to prevent cell focus border
-                return super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         });
         tbBody.getColumn(percentColumn).setCellRenderer(new StockerDefaultTableCellRender() {
@@ -271,8 +241,7 @@ public class StockerTableView {
                     // Fallback to default foreground color on parsing error
                     setForeground(JBColor.foreground());
                 }
-                // Always pass false for hasFocus to prevent cell focus border
-                return super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }
         });
         tbPane.setViewportView(tbBody);
@@ -313,13 +282,6 @@ public class StockerTableView {
 
     public DefaultTableModel getTableModel() {
         return tbModel;
-    }
-
-    public void refreshDisplay() {
-        syncColorPatternSetting();
-        updateIndex();
-        // Trigger table repaint to update cell colors
-        tbBody.repaint();
     }
 
 }
