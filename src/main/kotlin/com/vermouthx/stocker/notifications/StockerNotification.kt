@@ -37,7 +37,7 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🎨 Customizable table column display settings<br/>可自定义的表格列显示设置</li>
+                <li style="${Styles.LIST_ITEM}">⬆️⬇️ Sortable table columns with three-state sorting<br/>可排序的表格列，支持三态排序（升序、降序、不排序）</li>
             </ul>
         </div>
     """.trimIndent()
@@ -52,8 +52,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> Customize table columns in <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span> to show only the data you need<br/>
-                    在 <span style="${Styles.HIGHLIGHT}">设置 → 工具 → Stocker</span> 中自定义表格列，只显示您需要的数据
+                    💡 <strong>Pro tip / 小贴士：</strong> Click on any table header to sort by that column. Click again to toggle between ascending, descending, and unsorted states<br/>
+                    点击任何表格标题即可按该列排序。再次点击可在升序、降序和不排序之间切换
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">

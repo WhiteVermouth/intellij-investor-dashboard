@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.1
+
+- Add sortable table columns with three-state sorting (ascending, descending, unsorted) / 添加可排序的表格列，支持三态排序（升序、降序、不排序）
+
 ## 1.13.0
 
 - Add customizable table column display settings / 添加可自定义的表格列显示设置
