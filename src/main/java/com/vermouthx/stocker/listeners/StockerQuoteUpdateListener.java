@@ -40,6 +40,8 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                 } else {
                     if (quotes.size() == size) {
                         tableModel.addRow(new Object[]{quote.getCode(), displayName, quote.getCurrent(), quote.getPercentage() + "%"});
+                        // Clear sort state when new rows are added
+                        myTableView.clearSortState();
                     }
                 }
             }

@@ -17,6 +17,7 @@ public class StockerQuoteReloadListener implements StockerQuoteReloadNotifier {
         synchronized (myTableView.getTableModel()) {
             // clear all table rows
             tableModel.setRowCount(0);
+            myTableView.clearSortState();
         }
     }
 }

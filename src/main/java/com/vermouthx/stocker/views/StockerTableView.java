@@ -9,6 +9,7 @@ import com.vermouthx.stocker.components.StockerDefaultTableCellRender;
 import com.vermouthx.stocker.components.StockerTableHeaderRender;
 import com.vermouthx.stocker.components.StockerTableModel;
 import com.vermouthx.stocker.entities.StockerQuote;
+import com.vermouthx.stocker.enums.StockerSortState;
 import com.vermouthx.stocker.enums.StockerTableColumn;
 import com.vermouthx.stocker.settings.StockerSetting;
 import com.vermouthx.stocker.utils.StockerPinyinUtil;
@@ -49,6 +50,12 @@ public class StockerTableView {
     private final StockerDefaultTableCellRender defaultRenderer = new StockerDefaultTableCellRender();
     private final StockerDefaultTableCellRender currentRenderer = new CurrentCellRenderer();
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
+    
+    // Sorting state
+    private StockerTableHeaderRender headerRenderer;
+    private int lastSortColumn = -1;
+    private StockerSortState currentSortState = StockerSortState.NONE;
+    private List<Object[]> originalTableData = new ArrayList<>();
 
     public StockerTableView() {
         tableViews.add(this);
@@ -230,7 +237,19 @@ public class StockerTableView {
         tbBody.setAutoCreateColumnsFromModel(false);
 
         tbBody.getTableHeader().setReorderingAllowed(false);
-        tbBody.getTableHeader().setDefaultRenderer(new StockerTableHeaderRender(tbBody));
+        headerRenderer = new StockerTableHeaderRender(tbBody);
+        tbBody.getTableHeader().setDefaultRenderer(headerRenderer);
+        
+        // Add header click listener for sorting
+        tbBody.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int column = tbBody.getTableHeader().columnAtPoint(e.getPoint());
+                if (column != -1) {
+                    sortByColumn(column);
+                }
+            }
+        });
 
         applyColumnVisibility();
         tbPane.setViewportView(tbBody);
@@ -332,6 +351,173 @@ public class StockerTableView {
 
     public DefaultTableModel getTableModel() {
         return tbModel;
+    }
+
+    /**
+     * Clears the sort state and resets to unsorted view.
+     * Should be called when table data is externally modified.
+     */
+    public void clearSortState() {
+        originalTableData.clear();
+        currentSortState = StockerSortState.NONE;
+        lastSortColumn = -1;
+        if (headerRenderer != null) {
+            headerRenderer.setSortState(-1, StockerSortState.NONE);
+            if (tbBody != null && tbBody.getTableHeader() != null) {
+                tbBody.getTableHeader().repaint();
+            }
+        }
+    }
+
+    private void sortByColumn(int column) {
+        String columnName = tbBody.getColumnName(column);
+        
+        // Cycle through sort states: NONE -> ASCENDING -> DESCENDING -> NONE
+        if (column == lastSortColumn) {
+            // Same column clicked, cycle to next state
+            switch (currentSortState) {
+                case NONE:
+                    currentSortState = StockerSortState.ASCENDING;
+                    break;
+                case ASCENDING:
+                    currentSortState = StockerSortState.DESCENDING;
+                    break;
+                case DESCENDING:
+                    currentSortState = StockerSortState.NONE;
+                    break;
+            }
+        } else {
+            // Different column clicked, start with ASCENDING
+            lastSortColumn = column;
+            currentSortState = StockerSortState.ASCENDING;
+        }
+        
+        // Update header renderer
+        headerRenderer.setSortState(column, currentSortState);
+        tbBody.getTableHeader().repaint();
+        
+        // Sort the table data or restore original
+        if (currentSortState == StockerSortState.NONE) {
+            restoreOriginalTableData();
+        } else {
+            sortTableData(columnName, currentSortState == StockerSortState.ASCENDING);
+        }
+    }
+    
+    private void captureOriginalTableData() {
+        originalTableData.clear();
+        int rowCount = tbModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            Object[] row = new Object[tbModel.getColumnCount()];
+            for (int j = 0; j < tbModel.getColumnCount(); j++) {
+                row[j] = tbModel.getValueAt(i, j);
+            }
+            originalTableData.add(row);
+        }
+    }
+    
+    private void restoreOriginalTableData() {
+        if (originalTableData.isEmpty()) {
+            return;
+        }
+        
+        tbModel.setRowCount(0);
+        for (Object[] row : originalTableData) {
+            tbModel.addRow(row);
+        }
+    }
+    
+    private void sortTableData(String columnName, boolean ascending) {
+        int rowCount = tbModel.getRowCount();
+        if (rowCount == 0) {
+            return;
+        }
+        
+        // Capture original data if not already captured or if data changed
+        if (originalTableData.isEmpty() || originalTableData.size() != rowCount) {
+            captureOriginalTableData();
+        }
+        
+        // Convert table data to a list of rows
+        java.util.List<Object[]> rows = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            Object[] row = new Object[tbModel.getColumnCount()];
+            for (int j = 0; j < tbModel.getColumnCount(); j++) {
+                row[j] = tbModel.getValueAt(i, j);
+            }
+            rows.add(row);
+        }
+        
+        // Get the column index in the model
+        int columnIndex = -1;
+        for (int i = 0; i < tbModel.getColumnCount(); i++) {
+            if (tbModel.getColumnName(i).equals(columnName)) {
+                columnIndex = i;
+                break;
+            }
+        }
+        
+        if (columnIndex == -1) {
+            return;
+        }
+        
+        final int sortColumnIndex = columnIndex;
+        
+        // Sort based on column type
+        rows.sort((row1, row2) -> {
+            Object val1 = row1[sortColumnIndex];
+            Object val2 = row2[sortColumnIndex];
+            
+            int result = 0;
+            
+            if (columnName.equals(codeColumn) || columnName.equals(nameColumn)) {
+                // Alphabetical sorting
+                String str1 = val1 != null ? val1.toString() : "";
+                String str2 = val2 != null ? val2.toString() : "";
+                result = str1.compareToIgnoreCase(str2);
+            } else if (columnName.equals(currentColumn)) {
+                // Numeric sorting for Current column
+                Double num1 = parseDouble(val1);
+                Double num2 = parseDouble(val2);
+                if (num1 != null && num2 != null) {
+                    result = Double.compare(num1, num2);
+                } else if (num1 != null) {
+                    result = 1;
+                } else if (num2 != null) {
+                    result = -1;
+                }
+            } else if (columnName.equals(percentColumn)) {
+                // Numeric sorting for Change% column (parse percentage values)
+                Double percent1 = parsePercentage(val1 != null ? val1.toString() : "");
+                Double percent2 = parsePercentage(val2 != null ? val2.toString() : "");
+                if (percent1 != null && percent2 != null) {
+                    result = Double.compare(percent1, percent2);
+                } else if (percent1 != null) {
+                    result = 1;
+                } else if (percent2 != null) {
+                    result = -1;
+                }
+            }
+            
+            return ascending ? result : -result;
+        });
+        
+        // Clear the table and repopulate with sorted data
+        tbModel.setRowCount(0);
+        for (Object[] row : rows) {
+            tbModel.addRow(row);
+        }
+    }
+    
+    private Double parseDouble(Object value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(value.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     // Inner class for Current column renderer with color coding

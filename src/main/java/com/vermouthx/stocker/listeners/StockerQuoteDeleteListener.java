@@ -21,6 +21,8 @@ public class StockerQuoteDeleteListener implements StockerQuoteDeleteNotifier {
             if (rowIndex != -1) {
                 tableModel.removeRow(rowIndex);
                 tableModel.fireTableRowsDeleted(rowIndex, rowIndex);
+                // Clear sort state when rows are deleted
+                myTableView.clearSortState();
             }
         }
     }
