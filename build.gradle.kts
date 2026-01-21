@@ -46,7 +46,7 @@ val pluginDescription = """
       <h2>Tutorial</h2>
       <p>
         All instructions can be found at
-        <a href="https://nszihan.com/2021/04/11/stocker">here</a>.
+        <a href="https://www.vermouthx.com/posts/2021/stocker">here</a>.
       </p>
       <h2>Licence</h2>
       <a href="https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/LICENSE">Apache 2.0 License</a>
