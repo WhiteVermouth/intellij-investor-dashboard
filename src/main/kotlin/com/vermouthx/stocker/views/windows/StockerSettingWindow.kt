@@ -190,7 +190,7 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
     private fun refreshAllWindows() {
         // Restart all active applications to reload with new settings
         // This will clear tables and reload data with updated settings
-        StockerAppManager.myApplicationMap.values.forEach { app ->
+        StockerAppManager.getAllApplications().forEach { app ->
             app.shutdownThenClear()
             app.schedule()
         }

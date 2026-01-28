@@ -18,9 +18,18 @@ object StockerSuggestHttpUtil {
     private val httpClientPool = run {
         val connectionManager = PoolingHttpClientConnectionManager()
         connectionManager.maxTotal = 20
-        val requestConfig = RequestConfig.custom().build()
-        HttpClients.custom().setConnectionManager(connectionManager).setDefaultRequestConfig(requestConfig)
-            .useSystemProperties().build()
+        connectionManager.defaultMaxPerRoute = 10
+        // Configure timeouts to prevent hanging requests
+        val requestConfig = RequestConfig.custom()
+            .setConnectTimeout(10000) // 10 seconds to establish connection
+            .setSocketTimeout(15000) // 15 seconds to read data
+            .setConnectionRequestTimeout(5000) // 5 seconds to get connection from pool
+            .build()
+        HttpClients.custom()
+            .setConnectionManager(connectionManager)
+            .setDefaultRequestConfig(requestConfig)
+            .useSystemProperties()
+            .build()
     }
 
     fun suggest(key: String, provider: StockerQuoteProvider): List<StockerSuggestion> {
@@ -30,18 +39,18 @@ object StockerSuggestHttpUtil {
             httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
         }
         return try {
-            val response = httpClientPool.execute(httpGet)
-            when (provider) {
-                StockerQuoteProvider.SINA -> {
-                    val responseText = EntityUtils.toString(response.entity, "UTF-8")
-                    parseSinaSuggestion(responseText)
-                }
+            httpClientPool.execute(httpGet).use { response ->
+                when (provider) {
+                    StockerQuoteProvider.SINA -> {
+                        val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                        parseSinaSuggestion(responseText)
+                    }
 
-                StockerQuoteProvider.TENCENT -> {
-                    val responseText = EntityUtils.toString(response.entity, "UTF-8")
-                    parseTencentSuggestion(responseText)
+                    StockerQuoteProvider.TENCENT -> {
+                        val responseText = EntityUtils.toString(response.entity, "UTF-8")
+                        parseTencentSuggestion(responseText)
+                    }
                 }
-
             }
         } catch (e: Exception) {
             log.warn(e)

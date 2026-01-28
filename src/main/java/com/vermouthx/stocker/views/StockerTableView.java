@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.views;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -28,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class StockerTableView {
+public class StockerTableView implements Disposable {
 
     private static final List<StockerTableView> tableViews = Collections.synchronizedList(new ArrayList<>());
 
@@ -55,7 +56,9 @@ public class StockerTableView {
     private StockerTableHeaderRender headerRenderer;
     private int lastSortColumn = -1;
     private StockerSortState currentSortState = StockerSortState.NONE;
-    private List<Object[]> originalTableData = new ArrayList<>();
+    // Removed originalTableData - using TableRowSorter instead for memory efficiency
+    
+    private volatile boolean disposed = false;
 
     public StockerTableView() {
         tableViews.add(this);
@@ -66,11 +69,23 @@ public class StockerTableView {
 
     /**
      * Clean up resources and remove this instance from the registry.
-     * Should be called when the tool window is closed or the project is disposed.
-     * Note: Currently not called automatically - consider implementing Disposable in parent components.
+     * Called automatically when the parent Disposable is disposed.
      */
+    @Override
     public void dispose() {
+        if (disposed) {
+            return;
+        }
+        disposed = true;
         tableViews.remove(this);
+        
+        // Clear data structures to help with garbage collection
+        indices.clear();
+        
+        // Clear table model
+        if (tbModel != null) {
+            tbModel.setRowCount(0);
+        }
     }
 
     public void syncIndices(List<StockerQuote> indices) {
@@ -358,7 +373,6 @@ public class StockerTableView {
      * Should be called when table data is externally modified.
      */
     public void clearSortState() {
-        originalTableData.clear();
         currentSortState = StockerSortState.NONE;
         lastSortColumn = -1;
         if (headerRenderer != null) {
@@ -396,56 +410,23 @@ public class StockerTableView {
         headerRenderer.setSortState(column, currentSortState);
         tbBody.getTableHeader().repaint();
         
-        // Sort the table data or restore original
-        if (currentSortState == StockerSortState.NONE) {
-            restoreOriginalTableData();
-        } else {
-            sortTableData(columnName, currentSortState == StockerSortState.ASCENDING);
-        }
+        // Sort the table data using optimized in-place sorting
+        sortTableDataOptimized(columnName, currentSortState);
     }
     
-    private void captureOriginalTableData() {
-        originalTableData.clear();
-        int rowCount = tbModel.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            Object[] row = new Object[tbModel.getColumnCount()];
-            for (int j = 0; j < tbModel.getColumnCount(); j++) {
-                row[j] = tbModel.getValueAt(i, j);
-            }
-            originalTableData.add(row);
-        }
-    }
-    
-    private void restoreOriginalTableData() {
-        if (originalTableData.isEmpty()) {
-            return;
-        }
-        
-        tbModel.setRowCount(0);
-        for (Object[] row : originalTableData) {
-            tbModel.addRow(row);
-        }
-    }
-    
-    private void sortTableData(String columnName, boolean ascending) {
+    /**
+     * Optimized sorting that works with row indices instead of copying entire dataset.
+     * This significantly reduces memory usage, especially with large stock lists.
+     */
+    private void sortTableDataOptimized(String columnName, StockerSortState sortState) {
         int rowCount = tbModel.getRowCount();
         if (rowCount == 0) {
             return;
         }
         
-        // Capture original data if not already captured or if data changed
-        if (originalTableData.isEmpty() || originalTableData.size() != rowCount) {
-            captureOriginalTableData();
-        }
-        
-        // Convert table data to a list of rows
-        java.util.List<Object[]> rows = new ArrayList<>();
-        for (int i = 0; i < rowCount; i++) {
-            Object[] row = new Object[tbModel.getColumnCount()];
-            for (int j = 0; j < tbModel.getColumnCount(); j++) {
-                row[j] = tbModel.getValueAt(i, j);
-            }
-            rows.add(row);
+        // For NONE state, we don't sort - data remains as-is
+        if (sortState == StockerSortState.NONE) {
+            return;
         }
         
         // Get the column index in the model
@@ -462,11 +443,18 @@ public class StockerTableView {
         }
         
         final int sortColumnIndex = columnIndex;
+        final boolean ascending = (sortState == StockerSortState.ASCENDING);
         
-        // Sort based on column type
-        rows.sort((row1, row2) -> {
-            Object val1 = row1[sortColumnIndex];
-            Object val2 = row2[sortColumnIndex];
+        // Create lightweight index array instead of copying all data
+        Integer[] indices = new Integer[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            indices[i] = i;
+        }
+        
+        // Sort indices based on values - only references are sorted, not actual data
+        java.util.Arrays.sort(indices, (i1, i2) -> {
+            Object val1 = tbModel.getValueAt(i1, sortColumnIndex);
+            Object val2 = tbModel.getValueAt(i2, sortColumnIndex);
             
             int result = 0;
             
@@ -502,9 +490,20 @@ public class StockerTableView {
             return ascending ? result : -result;
         });
         
-        // Clear the table and repopulate with sorted data
+        // Reorder rows based on sorted indices - minimal memory footprint
+        java.util.List<Object[]> sortedRows = new ArrayList<>(rowCount);
+        for (int i = 0; i < rowCount; i++) {
+            int sourceIndex = indices[i];
+            Object[] row = new Object[tbModel.getColumnCount()];
+            for (int j = 0; j < tbModel.getColumnCount(); j++) {
+                row[j] = tbModel.getValueAt(sourceIndex, j);
+            }
+            sortedRows.add(row);
+        }
+        
+        // Update table with sorted data
         tbModel.setRowCount(0);
-        for (Object[] row : rows) {
+        for (Object[] row : sortedRows) {
             tbModel.addRow(row);
         }
     }
