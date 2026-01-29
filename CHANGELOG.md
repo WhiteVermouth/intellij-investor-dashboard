@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.14.1
+
+### 🐛 Bug Fixes / 错误修复
+
+- Fixed table sorting not restoring original order when switching back to unsorted state / 修复表格排序在切换回未排序状态时无法恢复原始顺序的问题
+- Fixed color pattern not immediately reflecting in tables when clicking Apply in settings (now updates instantly without data refetch) / 修复在设置中点击应用时颜色模式未立即在表格中反映的问题（现在无需重新获取数据即可立即更新）
+- Improved settings granularity: color pattern changes no longer trigger unnecessary data refetching / 改进设置粒度：颜色模式更改不再触发不必要的数据重新获取
+
 ## 1.14.0
 
 ### 🚀 Performance & Memory Optimizations / 性能和内存优化

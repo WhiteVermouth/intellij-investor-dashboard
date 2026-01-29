@@ -37,16 +37,13 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🚀 <strong>Major Performance Improvements</strong> / 重大性能改进
+                <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong> / 错误修复
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Fixed critical memory leaks (message bus, HTTP connections, project cleanup) / 修复关键内存泄漏（消息总线、HTTP连接、项目清理）</li>
-                        <li>50% reduction in HTTP requests through task consolidation / 通过任务合并减少50%的HTTP请求</li>
-                        <li>50% memory reduction in table sorting operations / 表格排序操作内存减少50%</li>
-                        <li>Added connection timeouts to prevent hanging threads / 添加连接超时防止线程挂起</li>
+                        <li>Fixed table sorting not restoring original order when unsorted / 修复表格取消排序时不恢复原始顺序</li>
+                        <li>Fixed color pattern not updating immediately when clicking Apply / 修复点击应用时颜色模式未立即更新</li>
+                        <li>Improved settings responsiveness with granular refresh logic / 通过精细刷新逻辑改善设置响应速度</li>
                     </ul>
                 </li>
-                <li style="${Styles.LIST_ITEM}">🔧 Enhanced resource management and lifecycle cleanup / 增强资源管理和生命周期清理</li>
-                <li style="${Styles.LIST_ITEM}">⚡ 75% reduction in thread pool size for better efficiency / 线程池大小减少75%以提高效率</li>
             </ul>
         </div>
     """.trimIndent()
@@ -61,8 +58,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> This version significantly reduces memory usage and improves responsiveness, especially in long IDE sessions. Your plugin will now run faster and consume less resources!<br/>
-                    此版本大幅减少内存使用并提高响应速度，特别是在长时间IDE会话中。插件现在运行更快且占用更少资源！
+                    💡 <strong>Pro tip / 小贴士：</strong> This patch release fixes sorting behavior and settings responsiveness. Color pattern changes now apply instantly without restarting data refresh!<br/>
+                    此补丁版本修复了排序行为和设置响应速度。颜色模式更改现在无需重启数据刷新即可立即应用！
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
