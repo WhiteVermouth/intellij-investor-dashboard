@@ -129,9 +129,9 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
             onApply {
                 val visibleColumns = buildVisibleColumns()
                 val columnsModified = visibleColumns != setting.visibleTableColumns
-                val otherModified = quoteProviderTitle != setting.quoteProvider.title ||
-                        colorPattern != setting.quoteColorPattern ||
-                        displayNameWithPinyin != setting.displayNameWithPinyin
+                val colorPatternModified = colorPattern != setting.quoteColorPattern
+                val providerModified = quoteProviderTitle != setting.quoteProvider.title
+                val pinyinModified = displayNameWithPinyin != setting.displayNameWithPinyin
 
                 setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
                 setting.quoteColorPattern = colorPattern
@@ -141,8 +141,11 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                 if (columnsModified) {
                     StockerTableView.refreshAllColumnVisibility()
                 }
-                // Refresh all active projects when settings change
-                if (otherModified) {
+                if (colorPatternModified) {
+                    StockerTableView.refreshAllColorPatterns()
+                }
+                // Refresh all active projects when quote provider or pinyin setting changes
+                if (providerModified || pinyinModified) {
                     refreshAllWindows()
                 }
             }

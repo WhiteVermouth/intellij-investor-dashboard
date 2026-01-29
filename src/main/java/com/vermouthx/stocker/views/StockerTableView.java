@@ -56,7 +56,8 @@ public class StockerTableView implements Disposable {
     private StockerTableHeaderRender headerRenderer;
     private int lastSortColumn = -1;
     private StockerSortState currentSortState = StockerSortState.NONE;
-    // Removed originalTableData - using TableRowSorter instead for memory efficiency
+    // Backup data only when sorting is active (cleared when returning to NONE state)
+    private List<Object[]> sortBackupData = null;
     
     private volatile boolean disposed = false;
 
@@ -81,6 +82,10 @@ public class StockerTableView implements Disposable {
         
         // Clear data structures to help with garbage collection
         indices.clear();
+        if (sortBackupData != null) {
+            sortBackupData.clear();
+            sortBackupData = null;
+        }
         
         // Clear table model
         if (tbModel != null) {
@@ -304,6 +309,23 @@ public class StockerTableView implements Disposable {
         });
     }
 
+    public void refreshColorPattern() {
+        syncColorPatternSetting();
+        updateIndex();
+        tbBody.revalidate();
+        tbBody.repaint();
+    }
+
+    public static void refreshAllColorPatterns() {
+        SwingUtilities.invokeLater(() -> {
+            synchronized (tableViews) {
+                for (StockerTableView view : tableViews) {
+                    view.refreshColorPattern();
+                }
+            }
+        });
+    }
+
     private void applyColumnRenderers() {
         TableColumn code = getColumnIfPresent(codeColumn);
         if (code != null) {
@@ -375,6 +397,11 @@ public class StockerTableView implements Disposable {
     public void clearSortState() {
         currentSortState = StockerSortState.NONE;
         lastSortColumn = -1;
+        // Clear backup data when sort is cleared externally
+        if (sortBackupData != null) {
+            sortBackupData.clear();
+            sortBackupData = null;
+        }
         if (headerRenderer != null) {
             headerRenderer.setSortState(-1, StockerSortState.NONE);
             if (tbBody != null && tbBody.getTableHeader() != null) {
@@ -416,7 +443,7 @@ public class StockerTableView implements Disposable {
     
     /**
      * Optimized sorting that works with row indices instead of copying entire dataset.
-     * This significantly reduces memory usage, especially with large stock lists.
+     * Backup data is only stored when sorting is active and cleared when returning to NONE state.
      */
     private void sortTableDataOptimized(String columnName, StockerSortState sortState) {
         int rowCount = tbModel.getRowCount();
@@ -424,9 +451,29 @@ public class StockerTableView implements Disposable {
             return;
         }
         
-        // For NONE state, we don't sort - data remains as-is
+        // For NONE state, restore original data and clear backup
         if (sortState == StockerSortState.NONE) {
+            if (sortBackupData != null && !sortBackupData.isEmpty()) {
+                tbModel.setRowCount(0);
+                for (Object[] row : sortBackupData) {
+                    tbModel.addRow(row);
+                }
+                sortBackupData.clear();
+                sortBackupData = null;
+            }
             return;
+        }
+        
+        // Capture original data before first sort (only once)
+        if (sortBackupData == null) {
+            sortBackupData = new ArrayList<>(rowCount);
+            for (int i = 0; i < rowCount; i++) {
+                Object[] row = new Object[tbModel.getColumnCount()];
+                for (int j = 0; j < tbModel.getColumnCount(); j++) {
+                    row[j] = tbModel.getValueAt(i, j);
+                }
+                sortBackupData.add(row);
+            }
         }
         
         // Get the column index in the model
