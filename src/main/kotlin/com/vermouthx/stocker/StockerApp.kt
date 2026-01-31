@@ -78,29 +78,30 @@ class StockerApp {
             val cryptoIndices = StockerQuoteHttpUtil.get(StockerMarketType.Crypto, cryptoQuoteProvider, StockerMarketIndex.Crypto.codes)
             
             // Publish to individual market topics
+            // Always publish indices, but only publish quotes when there are favorites
+            val cnPublisher = messageBus.syncPublisher(STOCK_CN_QUOTE_UPDATE_TOPIC)
             if (setting.aShareList.isNotEmpty()) {
-                val publisher = messageBus.syncPublisher(STOCK_CN_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(aShareQuotes, setting.aShareList.size)
-                publisher.syncIndices(aShareIndices)
+                cnPublisher.syncQuotes(aShareQuotes, setting.aShareList.size)
             }
+            cnPublisher.syncIndices(aShareIndices)
             
+            val hkPublisher = messageBus.syncPublisher(STOCK_HK_QUOTE_UPDATE_TOPIC)
             if (setting.hkStocksList.isNotEmpty()) {
-                val publisher = messageBus.syncPublisher(STOCK_HK_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(hkStocksQuotes, setting.hkStocksList.size)
-                publisher.syncIndices(hkStocksIndices)
+                hkPublisher.syncQuotes(hkStocksQuotes, setting.hkStocksList.size)
             }
+            hkPublisher.syncIndices(hkStocksIndices)
             
+            val usPublisher = messageBus.syncPublisher(STOCK_US_QUOTE_UPDATE_TOPIC)
             if (setting.usStocksList.isNotEmpty()) {
-                val publisher = messageBus.syncPublisher(STOCK_US_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(usStocksQuotes, setting.usStocksList.size)
-                publisher.syncIndices(usStocksIndices)
+                usPublisher.syncQuotes(usStocksQuotes, setting.usStocksList.size)
             }
+            usPublisher.syncIndices(usStocksIndices)
             
+            val cryptoPublisher = messageBus.syncPublisher(CRYPTO_QUOTE_UPDATE_TOPIC)
             if (setting.cryptoList.isNotEmpty()) {
-                val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_UPDATE_TOPIC)
-                publisher.syncQuotes(cryptoQuotes, setting.cryptoList.size)
-                publisher.syncIndices(cryptoIndices)
+                cryptoPublisher.syncQuotes(cryptoQuotes, setting.cryptoList.size)
             }
+            cryptoPublisher.syncIndices(cryptoIndices)
             
             // Publish to "all" topic
             val allStockQuotes = listOf(aShareQuotes, hkStocksQuotes, usStocksQuotes, cryptoQuotes).flatten()
