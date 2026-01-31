@@ -37,11 +37,10 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong> / 错误修复
+                <li style="${Styles.LIST_ITEM}">🚀 <strong>New Features</strong> / 新功能
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Fixed table sorting not restoring original order when unsorted / 修复表格取消排序时不恢复原始顺序</li>
-                        <li>Fixed color pattern not updating immediately when clicking Apply / 修复点击应用时颜色模式未立即更新</li>
-                        <li>Improved settings responsiveness with granular refresh logic / 通过精细刷新逻辑改善设置响应速度</li>
+                        <li>Added cryptocurrency support / 添加加密货币支持</li>
+                        <li>Added more table columns for enhanced data display / 添加更多表格列以增强数据显示</li>
                     </ul>
                 </li>
             </ul>
@@ -58,8 +57,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> This patch release fixes sorting behavior and settings responsiveness. Color pattern changes now apply instantly without restarting data refresh!<br/>
-                    此补丁版本修复了排序行为和设置响应速度。颜色模式更改现在无需重启数据刷新即可立即应用！
+                    💡 <strong>Pro tip / 小贴士：</strong> This release brings cryptocurrency support back and adds more columns for better data visualization. Customize your view in Settings!<br/>
+                    此版本重新支持加密货币，并添加了更多列以更好地展示数据。在设置中自定义您的视图！
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">

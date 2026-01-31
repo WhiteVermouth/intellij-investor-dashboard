@@ -41,14 +41,32 @@ val pluginDescription = """
     <div>
       <p>
         Stocker is a JetBrains IDE extension dashboard for investors to track
-        realtime stock market conditions.
+        real-time stock market conditions.
       </p>
-      <h2>Tutorial</h2>
-      <p>
-        All instructions can be found at
-        <a href="https://www.vermouthx.com/posts/2021/stocker">here</a>.
-      </p>
-      <h2>Licence</h2>
+      <h2>Features</h2>
+      <ul>
+        <li>📊 Real-time market data for stocks and cryptocurrencies</li>
+        <li>🌐 Support for A-Shares, Hong Kong stocks, US stocks, and cryptocurrencies</li>
+        <li>🎨 Customizable display with multiple color patterns and table columns</li>
+        <li>🔤 Pinyin support for stock names</li>
+        <li>📈 Sortable columns with three-state sorting</li>
+        <li>🎯 Custom stock names and smart search</li>
+        <li>📋 Batch operations for stock management</li>
+      </ul>
+      <h2>Quick Start</h2>
+      <ol>
+        <li>Open the Stocker tool window from the sidebar</li>
+        <li>Click "Add Favorite Stocks" to search and add stocks</li>
+        <li>Customize settings at Settings → Tools → Stocker</li>
+        <li>Track your investments in real-time!</li>
+      </ol>
+      <h2>Documentation</h2>
+      <ul>
+        <li><a href="https://www.vermouthx.com/posts/2021/stocker">Getting Started Guide</a></li>
+        <li><a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/blob/master/CHANGELOG.md">Changelog</a></li>
+        <li><a href="https://github.com/WhiteVermouth/intellij-investor-dashboard/issues">Report Issues</a></li>
+      </ul>
+      <h2>License</h2>
       <a href="https://raw.githubusercontent.com/WhiteVermouth/intellij-investor-dashboard/master/LICENSE">Apache 2.0 License</a>
       <h2>Donation</h2>
       <p>If you like this plugin, you can <a href="https://www.buymeacoffee.com/nszihan">buy me a cup of coffee</a>. Thank you!</p>

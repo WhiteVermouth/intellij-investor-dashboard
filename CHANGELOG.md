@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.15.0
+
+### ✨ New Features / 新功能
+
+- Added cryptocurrency support (crypt support) / 添加加密货币支持
+- Added more table columns for enhanced data display / 添加更多表格列以增强数据显示
+
 ## 1.14.1
 
 ### 🐛 Bug Fixes / 错误修复
