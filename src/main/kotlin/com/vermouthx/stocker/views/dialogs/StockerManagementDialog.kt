@@ -43,12 +43,14 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabbedPane.add("CN", createTabContent(StockerMarketType.AShare))
         tabbedPane.add("HK", createTabContent(StockerMarketType.HKStocks))
         tabbedPane.add("US", createTabContent(StockerMarketType.USStocks))
+        tabbedPane.add("Crypto", createTabContent(StockerMarketType.Crypto))
         
         tabbedPane.addChangeListener {
             currentMarketSelection = when (tabbedPane.selectedIndex) {
                 0 -> StockerMarketType.AShare
                 1 -> StockerMarketType.HKStocks
                 2 -> StockerMarketType.USStocks
+                3 -> StockerMarketType.Crypto
                 else -> return@addChangeListener
             }
         }
@@ -57,6 +59,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         loadMarketData(StockerMarketType.AShare, setting.aShareList)
         loadMarketData(StockerMarketType.HKStocks, setting.hkStocksList)
         loadMarketData(StockerMarketType.USStocks, setting.usStocksList)
+        loadMarketData(StockerMarketType.Crypto, setting.cryptoList)
 
         tabbedPane.selectedIndex = 0
         return panel {
@@ -77,7 +80,13 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         
         CompletableFuture.supplyAsync {
             try {
-                StockerQuoteHttpUtil.get(marketType, setting.quoteProvider, codes)
+                // Use cryptoQuoteProvider for crypto, quoteProvider for stocks
+                val provider = if (marketType == StockerMarketType.Crypto) {
+                    setting.cryptoQuoteProvider
+                } else {
+                    setting.quoteProvider
+                }
+                StockerQuoteHttpUtil.get(marketType, provider, codes)
             } catch (e: Exception) {
                 log.warn("Failed to load quotes for market type $marketType", e)
                 emptyList()
@@ -120,6 +129,9 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         }
                         currentSymbols[StockerMarketType.USStocks]?.let { symbols ->
                             setting.usStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
+                        }
+                        currentSymbols[StockerMarketType.Crypto]?.let { symbols ->
+                            setting.cryptoList = symbols.elements().asSequence().map { it.code }.toMutableList()
                         }
                         myApplication.schedule()
                     }

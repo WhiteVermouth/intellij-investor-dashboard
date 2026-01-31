@@ -19,6 +19,7 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
 
     private var colorPattern: StockerQuoteColorPattern = setting.quoteColorPattern
     private var quoteProviderTitle: String = setting.quoteProvider.title
+    private var cryptoQuoteProviderTitle: String = setting.cryptoQuoteProvider.title
     private var displayNameWithPinyin: Boolean = setting.displayNameWithPinyin
     private var showSymbol: Boolean = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
     private var showName: Boolean = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
@@ -35,11 +36,21 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
         return panel {
             group("Data Provider") {
                 row {
-                    label("Quote source:")
+                    label("Stock quote source:")
                         .widthGroup("labels")
                     comboBox(StockerQuoteProvider.values().map { it.title })
                         .bindItem(::quoteProviderTitle.toNullableProperty())
-                        .comment("Select the data source for stock quotes")
+                        .widthGroup("comboboxes")
+                        .comment("Select the data source for stock quotes (A-Share, HK, US)")
+                }.layout(RowLayout.LABEL_ALIGNED)
+                
+                row {
+                    label("Crypto quote source:")
+                        .widthGroup("labels")
+                    comboBox(listOf(StockerQuoteProvider.SINA.title))
+                        .bindItem(::cryptoQuoteProviderTitle.toNullableProperty())
+                        .widthGroup("comboboxes")
+                        .comment("Crypto quotes are only available from Sina")
                 }.layout(RowLayout.LABEL_ALIGNED)
             }
 
@@ -131,9 +142,11 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                 val columnsModified = visibleColumns != setting.visibleTableColumns
                 val colorPatternModified = colorPattern != setting.quoteColorPattern
                 val providerModified = quoteProviderTitle != setting.quoteProvider.title
+                val cryptoProviderModified = cryptoQuoteProviderTitle != setting.cryptoQuoteProvider.title
                 val pinyinModified = displayNameWithPinyin != setting.displayNameWithPinyin
 
-                setting.quoteProvider = setting.quoteProvider.fromTitle(quoteProviderTitle)
+                setting.quoteProvider = StockerQuoteProvider.fromTitle(quoteProviderTitle)
+                setting.cryptoQuoteProvider = StockerQuoteProvider.fromTitle(cryptoQuoteProviderTitle)
                 setting.quoteColorPattern = colorPattern
                 setting.displayNameWithPinyin = displayNameWithPinyin
                 setting.visibleTableColumns = visibleColumns
@@ -145,18 +158,20 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                     StockerTableView.refreshAllColorPatterns()
                 }
                 // Refresh all active projects when quote provider or pinyin setting changes
-                if (providerModified || pinyinModified) {
+                if (providerModified || cryptoProviderModified || pinyinModified) {
                     refreshAllWindows()
                 }
             }
             onIsModified {
                 quoteProviderTitle != setting.quoteProvider.title ||
+                        cryptoQuoteProviderTitle != setting.cryptoQuoteProvider.title ||
                         colorPattern != setting.quoteColorPattern ||
                         displayNameWithPinyin != setting.displayNameWithPinyin ||
                         buildVisibleColumns() != setting.visibleTableColumns
             }
             onReset {
                 quoteProviderTitle = setting.quoteProvider.title
+                cryptoQuoteProviderTitle = setting.cryptoQuoteProvider.title
                 colorPattern = setting.quoteColorPattern
                 displayNameWithPinyin = setting.displayNameWithPinyin
                 showSymbol = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)

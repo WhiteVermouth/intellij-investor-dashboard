@@ -49,6 +49,7 @@ class StockerApp {
         messageBus.syncPublisher(STOCK_CN_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_HK_QUOTE_RELOAD_TOPIC).clear()
         messageBus.syncPublisher(STOCK_US_QUOTE_RELOAD_TOPIC).clear()
+        messageBus.syncPublisher(STOCK_CRYPTO_QUOTE_RELOAD_TOPIC).clear()
     }
 
     fun shutdownThenClear() {
@@ -63,17 +64,18 @@ class StockerApp {
     private fun createConsolidatedUpdateThread(): Runnable {
         return Runnable {
             val quoteProvider = setting.quoteProvider
+            val cryptoQuoteProvider = setting.cryptoQuoteProvider
             
             // Fetch all market data once
             val aShareQuotes = StockerQuoteHttpUtil.get(StockerMarketType.AShare, quoteProvider, setting.aShareList)
             val hkStocksQuotes = StockerQuoteHttpUtil.get(StockerMarketType.HKStocks, quoteProvider, setting.hkStocksList)
             val usStocksQuotes = StockerQuoteHttpUtil.get(StockerMarketType.USStocks, quoteProvider, setting.usStocksList)
-//            val cryptoQuotes = StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, setting.cryptoList)
+            val cryptoQuotes = StockerQuoteHttpUtil.get(StockerMarketType.Crypto, cryptoQuoteProvider, setting.cryptoList)
             
             val aShareIndices = StockerQuoteHttpUtil.get(StockerMarketType.AShare, quoteProvider, StockerMarketIndex.CN.codes)
             val hkStocksIndices = StockerQuoteHttpUtil.get(StockerMarketType.HKStocks, quoteProvider, StockerMarketIndex.HK.codes)
             val usStocksIndices = StockerQuoteHttpUtil.get(StockerMarketType.USStocks, quoteProvider, StockerMarketIndex.US.codes)
-//            val cryptoIndices = StockerQuoteHttpUtil.get(StockerMarketType.Crypto, quoteProvider, StockerMarketIndex.Crypto.codes)
+            val cryptoIndices = StockerQuoteHttpUtil.get(StockerMarketType.Crypto, cryptoQuoteProvider, StockerMarketIndex.Crypto.codes)
             
             // Publish to individual market topics
             if (setting.aShareList.isNotEmpty()) {
@@ -94,15 +96,15 @@ class StockerApp {
                 publisher.syncIndices(usStocksIndices)
             }
             
-//            if (setting.cryptoList.isNotEmpty()) {
-//                val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_UPDATE_TOPIC)
-//                publisher.syncQuotes(cryptoQuotes, setting.cryptoList.size)
-//                publisher.syncIndices(cryptoIndices)
-//            }
+            if (setting.cryptoList.isNotEmpty()) {
+                val publisher = messageBus.syncPublisher(CRYPTO_QUOTE_UPDATE_TOPIC)
+                publisher.syncQuotes(cryptoQuotes, setting.cryptoList.size)
+                publisher.syncIndices(cryptoIndices)
+            }
             
             // Publish to "all" topic
-            val allStockQuotes = listOf(aShareQuotes, hkStocksQuotes, usStocksQuotes).flatten()
-            val allStockIndices = listOf(aShareIndices, hkStocksIndices, usStocksIndices).flatten()
+            val allStockQuotes = listOf(aShareQuotes, hkStocksQuotes, usStocksQuotes, cryptoQuotes).flatten()
+            val allStockIndices = listOf(aShareIndices, hkStocksIndices, usStocksIndices, cryptoIndices).flatten()
             val allPublisher = messageBus.syncPublisher(STOCK_ALL_QUOTE_UPDATE_TOPIC)
             allPublisher.syncQuotes(allStockQuotes, setting.allStockListSize)
             allPublisher.syncIndices(allStockIndices)

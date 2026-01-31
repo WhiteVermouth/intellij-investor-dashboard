@@ -49,6 +49,7 @@ public class StockerTableView implements Disposable {
 
     // Cache renderers to avoid creating new instances on every refresh
     private final StockerDefaultTableCellRender defaultRenderer = new StockerDefaultTableCellRender();
+    private final StockerDefaultTableCellRender codeRenderer = new CodeCellRenderer();
     private final StockerDefaultTableCellRender currentRenderer = new CurrentCellRenderer();
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
     
@@ -329,7 +330,7 @@ public class StockerTableView implements Disposable {
     private void applyColumnRenderers() {
         TableColumn code = getColumnIfPresent(codeColumn);
         if (code != null) {
-            code.setCellRenderer(defaultRenderer);
+            code.setCellRenderer(codeRenderer);
         }
         TableColumn name = getColumnIfPresent(nameColumn);
         if (name != null) {
@@ -563,6 +564,25 @@ public class StockerTableView implements Disposable {
             return Double.parseDouble(value.toString());
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    // Inner class for Code column renderer that strips BTC prefix from crypto codes
+    private class CodeCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            
+            // Strip BTC prefix from crypto codes for display
+            if (value != null) {
+                String code = value.toString();
+                if (code.startsWith("BTC") && code.length() > 3) {
+                    // Remove the "BTC" prefix for display
+                    value = code.substring(3);
+                }
+            }
+            
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
 

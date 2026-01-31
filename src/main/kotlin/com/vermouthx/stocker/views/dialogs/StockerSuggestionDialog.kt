@@ -2,6 +2,7 @@ package com.vermouthx.stocker.views.dialogs
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.DocumentAdapter
@@ -11,6 +12,7 @@ import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerSuggestion
+import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerStockOperation
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerActionUtil
@@ -18,6 +20,7 @@ import com.vermouthx.stocker.utils.StockerPinyinUtil
 import com.vermouthx.stocker.utils.StockerSuggestHttpUtil
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.FlowLayout
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
@@ -25,6 +28,8 @@ import java.util.concurrent.TimeUnit
 import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 
@@ -37,9 +42,15 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
     private var suggestions: List<StockerSuggestion> = emptyList()
     private var searchTask: ScheduledFuture<*>? = null
     private var isLoading: Boolean = false
+    private var searchMode: SearchMode = SearchMode.STOCKS
+
+    private enum class SearchMode(val displayName: String) {
+        STOCKS("Stocks (CN/HK/US)"),
+        CRYPTO("Crypto")
+    }
 
     init {
-        title = "Search Stocks"
+        title = "Search Assets"
         init()
     }
 
@@ -47,20 +58,17 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         val dialogPanel = DialogPanel(BorderLayout())
         val searchTextField = SearchTextField(true)
         val scrollPane = JBScrollPane()
-
-        searchTextField.addDocumentListener(object : DocumentAdapter() {
-            override fun textChanged(e: DocumentEvent) {
-                // Cancel any pending search task
-                searchTask?.cancel(false)
-                
-                val text = searchTextField.text.trim()
-                if (text.isEmpty()) {
-                    isLoading = false
-                    suggestions = emptyList()
-                    SwingUtilities.invokeLater { refreshScrollPane(scrollPane) }
-                    return
-                }
-                
+        
+        // Function to perform search
+        val performSearch = { text: String ->
+            // Cancel any pending search task
+            searchTask?.cancel(false)
+            
+            if (text.isEmpty()) {
+                isLoading = false
+                suggestions = emptyList()
+                SwingUtilities.invokeLater { refreshScrollPane(scrollPane) }
+            } else {
                 // Show loading state immediately
                 isLoading = true
                 SwingUtilities.invokeLater { refreshScrollPane(scrollPane) }
@@ -68,15 +76,28 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                 // Debounce: schedule search after 300ms delay
                 searchTask = service.schedule({
                     try {
-                        val newSuggestions = StockerSuggestHttpUtil.suggest(text, setting.quoteProvider)
+                        // Use appropriate provider and filter based on search mode
+                        val (provider, marketTypeFilter) = if (searchMode == SearchMode.CRYPTO) {
+                            setting.cryptoQuoteProvider to setOf(StockerMarketType.Crypto)
+                        } else {
+                            setting.quoteProvider to setOf(
+                                StockerMarketType.AShare,
+                                StockerMarketType.HKStocks,
+                                StockerMarketType.USStocks
+                            )
+                        }
+                        
+                        // Fetch filtered suggestions
+                        val filteredSuggestions = StockerSuggestHttpUtil.suggest(text, provider, marketTypeFilter)
+                        
                         // Update UI on EDT
                         SwingUtilities.invokeLater {
                             isLoading = false
-                            suggestions = newSuggestions
+                            suggestions = filteredSuggestions
                             refreshScrollPane(scrollPane)
                         }
                     } catch (e: Exception) {
-                        log.warn("Failed to fetch stock suggestions", e)
+                        log.warn("Failed to fetch suggestions", e)
                         SwingUtilities.invokeLater {
                             isLoading = false
                             refreshScrollPane(scrollPane)
@@ -84,13 +105,44 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                     }
                 }, 300, TimeUnit.MILLISECONDS)
             }
+        }
+        
+        // Create mode selector panel
+        val modePanel = JPanel(FlowLayout(FlowLayout.LEFT))
+        modePanel.add(JLabel("Search for:"))
+        val modeComboBox = ComboBox(arrayOf(SearchMode.STOCKS.displayName, SearchMode.CRYPTO.displayName))
+        modeComboBox.selectedIndex = 0
+        modeComboBox.addActionListener {
+            searchMode = when (modeComboBox.selectedIndex) {
+                0 -> SearchMode.STOCKS
+                1 -> SearchMode.CRYPTO
+                else -> SearchMode.STOCKS
+            }
+            // Trigger search again with new mode if there's text
+            val text = searchTextField.text.trim()
+            if (text.isNotEmpty()) {
+                performSearch(text)
+            }
+        }
+        modePanel.add(modeComboBox)
+
+        searchTextField.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent) {
+                val text = searchTextField.text.trim()
+                performSearch(text)
+            }
         })
 
         // Initialize with empty state instead of hardcoded search
         refreshScrollPane(scrollPane)
 
-        searchTextField.border = BorderFactory.createEmptyBorder(0, 0, 8, 0)
-        dialogPanel.add(searchTextField, BorderLayout.NORTH)
+        // Create top panel with mode selector and search field
+        val topPanel = JPanel(BorderLayout())
+        topPanel.add(modePanel, BorderLayout.NORTH)
+        searchTextField.border = BorderFactory.createEmptyBorder(8, 0, 8, 0)
+        topPanel.add(searchTextField, BorderLayout.CENTER)
+        
+        dialogPanel.add(topPanel, BorderLayout.NORTH)
         dialogPanel.add(scrollPane, BorderLayout.CENTER)
         dialogPanel.preferredSize = Dimension(550, 500)
         return dialogPanel
@@ -122,9 +174,13 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
                 }
             }.withBorder(BorderFactory.createEmptyBorder(16, 8, 8, 8))
         } else if (suggestions.isEmpty()) {
+            val message = when (searchMode) {
+                SearchMode.STOCKS -> "Type to search for stocks (CN/HK/US)..."
+                SearchMode.CRYPTO -> "Type to search for crypto..."
+            }
             panel {
                 row {
-                    label("Type to search for stocks...").align(AlignX.CENTER)
+                    label(message).align(AlignX.CENTER)
                 }
             }.withBorder(BorderFactory.createEmptyBorder(16, 8, 8, 8))
         } else {

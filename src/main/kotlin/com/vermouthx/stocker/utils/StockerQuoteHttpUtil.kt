@@ -37,15 +37,25 @@ object StockerQuoteHttpUtil {
         if (codes.isEmpty()) {
             return emptyList()
         }
+        
+        // Validate provider supports market type
+        val prefix = quoteProvider.providerPrefixMap[marketType]
+        if (prefix == null) {
+            log.warn("Provider ${quoteProvider.title} does not support market type $marketType")
+            return emptyList()
+        }
+        
         val codesParam = when (quoteProvider) {
             StockerQuoteProvider.SINA -> {
+                // HKStocks use uppercase codes
                 if (marketType == StockerMarketType.HKStocks) {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
+                        "$prefix${code.uppercase()}"
                     }
                 } else {
+                    // AShare, USStocks, and Crypto use lowercase
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
+                        "$prefix${code.lowercase()}"
                     }
                 }
             }
@@ -53,11 +63,11 @@ object StockerQuoteHttpUtil {
             StockerQuoteProvider.TENCENT -> {
                 if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
+                        "$prefix${code.uppercase()}"
                     }
                 } else {
                     codes.joinToString(",") { code ->
-                        "${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
+                        "$prefix${code.lowercase()}"
                     }
                 }
             }
@@ -83,12 +93,21 @@ object StockerQuoteHttpUtil {
         marketType: StockerMarketType, quoteProvider: StockerQuoteProvider, code: String
     ): Boolean {
         return try {
+            // Validate provider supports market type
+            val prefix = quoteProvider.providerPrefixMap[marketType]
+            if (prefix == null) {
+                log.warn("Provider ${quoteProvider.title} does not support market type $marketType")
+                return false
+            }
+            
             when (quoteProvider) {
                 StockerQuoteProvider.SINA -> {
+                    // HKStocks use uppercase codes
                     val url = if (marketType == StockerMarketType.HKStocks) {
-                        "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
+                        "${quoteProvider.host}$prefix${code.uppercase()}"
                     } else {
-                        "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
+                        // AShare, USStocks, and Crypto use lowercase
+                        "${quoteProvider.host}$prefix${code.lowercase()}"
                     }
                     val httpGet = HttpGet(url)
                     httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
@@ -106,9 +125,9 @@ object StockerQuoteHttpUtil {
 
                 StockerQuoteProvider.TENCENT -> {
                     val url = if (marketType == StockerMarketType.HKStocks || marketType == StockerMarketType.USStocks) {
-                        "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.uppercase()}"
+                        "${quoteProvider.host}$prefix${code.uppercase()}"
                     } else {
-                        "${quoteProvider.host}${quoteProvider.providerPrefixMap[marketType]}${code.lowercase()}"
+                        "${quoteProvider.host}$prefix${code.lowercase()}"
                     }
                     val httpGet = HttpGet(url)
                     httpClientPool.execute(httpGet).use { response ->

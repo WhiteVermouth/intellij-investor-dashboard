@@ -8,6 +8,7 @@ class StockerSettingState {
     var version: String = ""
     var refreshInterval: Long = 5
     var quoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
+    var cryptoQuoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
     var displayNameWithPinyin: Boolean = false
     var visibleTableColumns: MutableList<String> = StockerTableColumn.defaultTitles().toMutableList()

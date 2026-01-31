@@ -32,11 +32,13 @@ enum class StockerQuoteProvider(
         )
     );
 
-    fun fromTitle(title: String): StockerQuoteProvider {
-        return when (title) {
-            SINA.title -> SINA
-            TENCENT.title -> TENCENT
-            else -> SINA
+    companion object {
+        fun fromTitle(title: String): StockerQuoteProvider {
+            return when (title) {
+                SINA.title -> SINA
+                TENCENT.title -> TENCENT
+                else -> SINA
+            }
         }
     }
 

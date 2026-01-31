@@ -126,14 +126,14 @@ class StockerToolWindow : ToolWindowFactory {
             injectPopupMenu(project, tabViewMap[StockerMarketType.USStocks])
         }
         contentManager.addContent(usStocksContent)
-//        val cryptoContent = contentFactory.createContent(
-//            tabViewMap[StockerMarketType.Crypto]?.component,
-//            StockerMarketType.Crypto.title,
-//            false
-//        ).also {
-//            injectPopupMenu(project, tabViewMap[StockerMarketType.Crypto])
-//        }
-//        contentManager.addContent(cryptoContent)
+        val cryptoContent = contentFactory.createContent(
+            tabViewMap[StockerMarketType.Crypto]?.component,
+            StockerMarketType.Crypto.title,
+            false
+        ).also {
+            injectPopupMenu(project, tabViewMap[StockerMarketType.Crypto])
+        }
+        contentManager.addContent(cryptoContent)
         this.subscribeMessage()
         
         // Register cleanup when disposable is disposed
