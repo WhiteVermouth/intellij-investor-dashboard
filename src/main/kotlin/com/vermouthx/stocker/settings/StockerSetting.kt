@@ -59,7 +59,7 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
 
     var visibleTableColumns: List<String>
         get() = if (myState.visibleTableColumns.isEmpty()) {
-            StockerTableColumn.defaultTitles()
+            StockerTableColumn.defaultVisibleTitles()
         } else {
             myState.visibleTableColumns
         }

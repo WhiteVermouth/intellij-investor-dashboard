@@ -25,21 +25,61 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                 String displayName = setting.getDisplayName(quote.getCode(), quote.getName());
                 int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
                 if (rowIndex != -1) {
+                    // Update existing row - check each column
+                    // Column 0: Code (doesn't change)
+                    // Column 1: Name
                     if (!tableModel.getValueAt(rowIndex, 1).equals(displayName)) {
                         tableModel.setValueAt(displayName, rowIndex, 1);
                         tableModel.fireTableCellUpdated(rowIndex, 1);
                     }
+                    // Column 2: Current
                     if (!tableModel.getValueAt(rowIndex, 2).equals(quote.getCurrent())) {
                         tableModel.setValueAt(quote.getCurrent(), rowIndex, 2);
                         tableModel.fireTableCellUpdated(rowIndex, 2);
                     }
-                    if (!tableModel.getValueAt(rowIndex, 3).equals(quote.getPercentage())) {
-                        tableModel.setValueAt(quote.getPercentage() + "%", rowIndex, 3);
+                    // Column 3: Opening
+                    if (!tableModel.getValueAt(rowIndex, 3).equals(quote.getOpening())) {
+                        tableModel.setValueAt(quote.getOpening(), rowIndex, 3);
                         tableModel.fireTableCellUpdated(rowIndex, 3);
+                    }
+                    // Column 4: Close
+                    if (!tableModel.getValueAt(rowIndex, 4).equals(quote.getClose())) {
+                        tableModel.setValueAt(quote.getClose(), rowIndex, 4);
+                        tableModel.fireTableCellUpdated(rowIndex, 4);
+                    }
+                    // Column 5: Low
+                    if (!tableModel.getValueAt(rowIndex, 5).equals(quote.getLow())) {
+                        tableModel.setValueAt(quote.getLow(), rowIndex, 5);
+                        tableModel.fireTableCellUpdated(rowIndex, 5);
+                    }
+                    // Column 6: High
+                    if (!tableModel.getValueAt(rowIndex, 6).equals(quote.getHigh())) {
+                        tableModel.setValueAt(quote.getHigh(), rowIndex, 6);
+                        tableModel.fireTableCellUpdated(rowIndex, 6);
+                    }
+                    // Column 7: Change
+                    if (!tableModel.getValueAt(rowIndex, 7).equals(quote.getChange())) {
+                        tableModel.setValueAt(quote.getChange(), rowIndex, 7);
+                        tableModel.fireTableCellUpdated(rowIndex, 7);
+                    }
+                    // Column 8: Change%
+                    if (!tableModel.getValueAt(rowIndex, 8).equals(quote.getPercentage())) {
+                        tableModel.setValueAt(quote.getPercentage() + "%", rowIndex, 8);
+                        tableModel.fireTableCellUpdated(rowIndex, 8);
                     }
                 } else {
                     if (quotes.size() == size) {
-                        tableModel.addRow(new Object[]{quote.getCode(), displayName, quote.getCurrent(), quote.getPercentage() + "%"});
+                        tableModel.addRow(new Object[]{
+                            quote.getCode(), 
+                            displayName, 
+                            quote.getCurrent(), 
+                            quote.getOpening(), 
+                            quote.getClose(), 
+                            quote.getLow(), 
+                            quote.getHigh(), 
+                            quote.getChange(), 
+                            quote.getPercentage() + "%"
+                        });
                         // Clear sort state when new rows are added
                         myTableView.clearSortState();
                     }

@@ -11,7 +11,7 @@ class StockerSettingState {
     var cryptoQuoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
     var displayNameWithPinyin: Boolean = false
-    var visibleTableColumns: MutableList<String> = StockerTableColumn.defaultTitles().toMutableList()
+    var visibleTableColumns: MutableList<String> = StockerTableColumn.defaultVisibleTitles().toMutableList()
     var aShareList: MutableList<String> = mutableListOf()
     var hkStocksList: MutableList<String> = mutableListOf()
     var usStocksList: MutableList<String> = mutableListOf()

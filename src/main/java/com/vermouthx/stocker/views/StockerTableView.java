@@ -50,7 +50,8 @@ public class StockerTableView implements Disposable {
     // Cache renderers to avoid creating new instances on every refresh
     private final StockerDefaultTableCellRender defaultRenderer = new StockerDefaultTableCellRender();
     private final StockerDefaultTableCellRender codeRenderer = new CodeCellRenderer();
-    private final StockerDefaultTableCellRender currentRenderer = new CurrentCellRenderer();
+    private final StockerDefaultTableCellRender numericRenderer = new NumericCellRenderer();
+    private final StockerDefaultTableCellRender changeRenderer = new ChangeCellRenderer();
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
     
     // Sorting state
@@ -229,6 +230,11 @@ public class StockerTableView implements Disposable {
     private static final String codeColumn = StockerTableColumn.SYMBOL.getTitle();
     private static final String nameColumn = StockerTableColumn.NAME.getTitle();
     private static final String currentColumn = StockerTableColumn.CURRENT.getTitle();
+    private static final String openingColumn = StockerTableColumn.OPENING.getTitle();
+    private static final String closeColumn = StockerTableColumn.CLOSE.getTitle();
+    private static final String lowColumn = StockerTableColumn.LOW.getTitle();
+    private static final String highColumn = StockerTableColumn.HIGH.getTitle();
+    private static final String changeColumn = StockerTableColumn.CHANGE.getTitle();
     private static final String percentColumn = StockerTableColumn.CHANGE_PERCENT.getTitle();
     private static final List<String> allColumns = StockerTableColumn.defaultTitles();
 
@@ -251,7 +257,7 @@ public class StockerTableView implements Disposable {
             }
         });
 
-        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, percentColumn});
+        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn});
 
         tbBody.setShowVerticalLines(false);
         tbBody.setModel(tbModel);
@@ -338,7 +344,27 @@ public class StockerTableView implements Disposable {
         }
         TableColumn current = getColumnIfPresent(currentColumn);
         if (current != null) {
-            current.setCellRenderer(currentRenderer);
+            current.setCellRenderer(numericRenderer);
+        }
+        TableColumn opening = getColumnIfPresent(openingColumn);
+        if (opening != null) {
+            opening.setCellRenderer(numericRenderer);
+        }
+        TableColumn close = getColumnIfPresent(closeColumn);
+        if (close != null) {
+            close.setCellRenderer(numericRenderer);
+        }
+        TableColumn low = getColumnIfPresent(lowColumn);
+        if (low != null) {
+            low.setCellRenderer(numericRenderer);
+        }
+        TableColumn high = getColumnIfPresent(highColumn);
+        if (high != null) {
+            high.setCellRenderer(numericRenderer);
+        }
+        TableColumn change = getColumnIfPresent(changeColumn);
+        if (change != null) {
+            change.setCellRenderer(changeRenderer);
         }
         TableColumn percent = getColumnIfPresent(percentColumn);
         if (percent != null) {
@@ -511,17 +537,6 @@ public class StockerTableView implements Disposable {
                 String str1 = val1 != null ? val1.toString() : "";
                 String str2 = val2 != null ? val2.toString() : "";
                 result = str1.compareToIgnoreCase(str2);
-            } else if (columnName.equals(currentColumn)) {
-                // Numeric sorting for Current column
-                Double num1 = parseDouble(val1);
-                Double num2 = parseDouble(val2);
-                if (num1 != null && num2 != null) {
-                    result = Double.compare(num1, num2);
-                } else if (num1 != null) {
-                    result = 1;
-                } else if (num2 != null) {
-                    result = -1;
-                }
             } else if (columnName.equals(percentColumn)) {
                 // Numeric sorting for Change% column (parse percentage values)
                 Double percent1 = parsePercentage(val1 != null ? val1.toString() : "");
@@ -531,6 +546,17 @@ public class StockerTableView implements Disposable {
                 } else if (percent1 != null) {
                     result = 1;
                 } else if (percent2 != null) {
+                    result = -1;
+                }
+            } else {
+                // Numeric sorting for all other columns (Current, Opening, Close, Low, High, Change)
+                Double num1 = parseDouble(val1);
+                Double num2 = parseDouble(val2);
+                if (num1 != null && num2 != null) {
+                    result = Double.compare(num1, num2);
+                } else if (num1 != null) {
+                    result = 1;
+                } else if (num2 != null) {
                     result = -1;
                 }
             }
@@ -586,8 +612,8 @@ public class StockerTableView implements Disposable {
         }
     }
 
-    // Inner class for Current column renderer with color coding
-    private class CurrentCellRenderer extends StockerDefaultTableCellRender {
+    // Inner class for numeric columns (Current, Opening, Close, Low, High) with color coding based on percentage
+    private class NumericCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
@@ -608,6 +634,32 @@ public class StockerTableView implements Disposable {
             } catch (IllegalArgumentException e) {
                 // Fallback to default foreground color on parsing error
                 setForeground(JBColor.foreground());
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
+    }
+
+    // Inner class for Change column renderer with color coding based on value sign
+    private class ChangeCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (value != null) {
+                try {
+                    Double changeValue = parseDouble(value);
+                    if (changeValue != null) {
+                        if (changeValue > 0) {
+                            setForeground(upColor);
+                        } else if (changeValue < 0) {
+                            setForeground(downColor);
+                        } else {
+                            setForeground(zeroColor);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Fallback to default foreground color on parsing error
+                    setForeground(JBColor.foreground());
+                }
             }
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }

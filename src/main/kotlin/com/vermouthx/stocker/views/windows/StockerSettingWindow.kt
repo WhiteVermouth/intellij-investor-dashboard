@@ -24,11 +24,21 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
     private var showSymbol: Boolean = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
     private var showName: Boolean = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
     private var showCurrent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
+    private var showOpening: Boolean = setting.isTableColumnVisible(StockerTableColumn.OPENING.title)
+    private var showClose: Boolean = setting.isTableColumnVisible(StockerTableColumn.CLOSE.title)
+    private var showLow: Boolean = setting.isTableColumnVisible(StockerTableColumn.LOW.title)
+    private var showHigh: Boolean = setting.isTableColumnVisible(StockerTableColumn.HIGH.title)
+    private var showChange: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE.title)
     private var showChangePercent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
     
     private var symbolCheckBox: JCheckBox? = null
     private var nameCheckBox: JCheckBox? = null
     private var currentCheckBox: JCheckBox? = null
+    private var openingCheckBox: JCheckBox? = null
+    private var closeCheckBox: JCheckBox? = null
+    private var lowCheckBox: JCheckBox? = null
+    private var highCheckBox: JCheckBox? = null
+    private var changeCheckBox: JCheckBox? = null
     private var changePercentCheckBox: JCheckBox? = null
     private var columnWarningLabel: JLabel? = null
 
@@ -111,10 +121,42 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                                 addItemListener { handleColumnToggle(this) }
                             }
                             .component
-                    }
-                    row {
                         currentCheckBox = checkBox(StockerTableColumn.CURRENT.title)
                             .bindSelected(::showCurrent.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                    }
+                    row {
+                        openingCheckBox = checkBox(StockerTableColumn.OPENING.title)
+                            .bindSelected(::showOpening.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                        closeCheckBox = checkBox(StockerTableColumn.CLOSE.title)
+                            .bindSelected(::showClose.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                        lowCheckBox = checkBox(StockerTableColumn.LOW.title)
+                            .bindSelected(::showLow.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                    }
+                    row {
+                        highCheckBox = checkBox(StockerTableColumn.HIGH.title)
+                            .bindSelected(::showHigh.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                        changeCheckBox = checkBox(StockerTableColumn.CHANGE.title)
+                            .bindSelected(::showChange.toMutableProperty())
                             .applyToComponent {
                                 addItemListener { handleColumnToggle(this) }
                             }
@@ -177,6 +219,11 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                 showSymbol = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
                 showName = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
                 showCurrent = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
+                showOpening = setting.isTableColumnVisible(StockerTableColumn.OPENING.title)
+                showClose = setting.isTableColumnVisible(StockerTableColumn.CLOSE.title)
+                showLow = setting.isTableColumnVisible(StockerTableColumn.LOW.title)
+                showHigh = setting.isTableColumnVisible(StockerTableColumn.HIGH.title)
+                showChange = setting.isTableColumnVisible(StockerTableColumn.CHANGE.title)
                 showChangePercent = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
                 columnWarningLabel?.isVisible = false
             }
@@ -188,12 +235,27 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
         if (showSymbol) visibleColumns.add(StockerTableColumn.SYMBOL.title)
         if (showName) visibleColumns.add(StockerTableColumn.NAME.title)
         if (showCurrent) visibleColumns.add(StockerTableColumn.CURRENT.title)
+        if (showOpening) visibleColumns.add(StockerTableColumn.OPENING.title)
+        if (showClose) visibleColumns.add(StockerTableColumn.CLOSE.title)
+        if (showLow) visibleColumns.add(StockerTableColumn.LOW.title)
+        if (showHigh) visibleColumns.add(StockerTableColumn.HIGH.title)
+        if (showChange) visibleColumns.add(StockerTableColumn.CHANGE.title)
         if (showChangePercent) visibleColumns.add(StockerTableColumn.CHANGE_PERCENT.title)
         return visibleColumns
     }
 
     private fun handleColumnToggle(changed: JCheckBox) {
-        val allCheckboxes = listOfNotNull(symbolCheckBox, nameCheckBox, currentCheckBox, changePercentCheckBox)
+        val allCheckboxes = listOfNotNull(
+            symbolCheckBox, 
+            nameCheckBox, 
+            currentCheckBox, 
+            openingCheckBox, 
+            closeCheckBox, 
+            lowCheckBox, 
+            highCheckBox, 
+            changeCheckBox, 
+            changePercentCheckBox
+        )
         val selectedCount = allCheckboxes.count { it.isSelected }
         
         if (selectedCount == 0) {
