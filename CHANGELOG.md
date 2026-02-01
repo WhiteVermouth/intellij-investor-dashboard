@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.1
+
+### 🎨 UI Improvements / 界面改进
+
+- Improved user interface for better visual experience / 改进用户界面以获得更好的视觉体验
+
 ## 1.15.0
 
 ### ✨ New Features / 新功能

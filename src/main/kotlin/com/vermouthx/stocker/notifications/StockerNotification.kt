@@ -37,10 +37,9 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🚀 <strong>New Features</strong> / 新功能
+                <li style="${Styles.LIST_ITEM}">🎨 <strong>UI Improvements</strong> / 界面改进
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Added cryptocurrency support / 添加加密货币支持</li>
-                        <li>Added more table columns for enhanced data display / 添加更多表格列以增强数据显示</li>
+                        <li>Improved user interface for better visual experience / 改进用户界面以获得更好的视觉体验</li>
                     </ul>
                 </li>
             </ul>
@@ -57,13 +56,13 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> This release brings cryptocurrency support back and adds more columns for better data visualization. Customize your view in Settings!<br/>
-                    此版本重新支持加密货币，并添加了更多列以更好地展示数据。在设置中自定义您的视图！
+                    💡 <strong>Pro tip / 小贴士：</strong> This release brings UI improvements for a better visual experience. Enjoy the enhanced interface!<br/>
+                    此版本带来了界面改进，提供更好的视觉体验。享受增强的界面！
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
-                💖 Your support helps me continue creating and improving the plugin. Thank you! 📈<br/>
-                您的支持帮助我继续创建和改进插件。谢谢！
+                💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈<br/>
+                如果您觉得这个插件有帮助，请考虑点击下方的<strong>Donate</strong>按钮以支持开发。谢谢！
             </p>
         </div>
     """.trimIndent()
@@ -87,8 +86,8 @@ object StockerNotification {
                 </ul>
             </div>
             <p style="${Styles.SMALL_TEXT}">
-                💖 Your support helps me continue creating and improving the plugin. Thank you! 📊<br/>
-                您的支持帮助我继续创建和改进插件。谢谢！
+                💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📊<br/>
+                如果您觉得这个插件有帮助，请考虑点击下方的<strong>Donate</strong>按钮以支持开发。谢谢！
             </p>
         </div>
     """.trimIndent()
