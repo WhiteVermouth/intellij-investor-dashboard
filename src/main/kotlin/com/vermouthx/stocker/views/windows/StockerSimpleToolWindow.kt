@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.vermouthx.stocker.actions.StockerRefreshAction
 import com.vermouthx.stocker.actions.StockerStockManageAction
 import com.vermouthx.stocker.actions.StockerStockSearchAction
-import com.vermouthx.stocker.actions.StockerStopAction
 import com.vermouthx.stocker.views.StockerTableView
 
 class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
@@ -16,10 +15,9 @@ class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
     init {
         val actionManager = ActionManager.getInstance()
         val actions = listOfNotNull(
+            StockerStockSearchAction::class.qualifiedName?.let { actionManager.getAction(it) },
             StockerRefreshAction::class.qualifiedName?.let { actionManager.getAction(it) },
-            StockerStopAction::class.qualifiedName?.let { actionManager.getAction(it) },
-            StockerStockManageAction::class.qualifiedName?.let { actionManager.getAction(it) },
-            StockerStockSearchAction::class.qualifiedName?.let { actionManager.getAction(it) }
+            StockerStockManageAction::class.qualifiedName?.let { actionManager.getAction(it) }
         )
         val actionGroup = DefaultActionGroup(actions)
         val actionToolbar = actionManager.createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, actionGroup, true)

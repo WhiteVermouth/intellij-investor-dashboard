@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.components;
 
+import com.intellij.ui.JBColor;
 import com.vermouthx.stocker.enums.StockerSortState;
 
 import javax.swing.*;
@@ -36,10 +37,22 @@ public class StockerTableHeaderRender implements TableCellRenderer {
             JLabel label = (JLabel) component;
             label.setHorizontalAlignment(SwingConstants.CENTER);
             
-            // Add sort indicator
+            // Add padding to header cells - reduced vertical padding to match rows
+            label.setBorder(BorderFactory.createCompoundBorder(
+                label.getBorder(),
+                BorderFactory.createEmptyBorder(4, 12, 4, 12)
+            ));
+            
+            // Make header text slightly bolder and more prominent
+            Font currentFont = label.getFont();
+            label.setFont(currentFont.deriveFont(Font.BOLD));
+            
+            // Add sort indicator with refined styling
             if (column == sortColumn && sortState != StockerSortState.NONE) {
-                String sortIndicator = sortState == StockerSortState.ASCENDING ? " ▲" : " ▼";
+                String sortIndicator = sortState == StockerSortState.ASCENDING ? " ↑" : " ↓";
                 label.setText(value + sortIndicator);
+                // Subtle color to indicate active sorting
+                label.setForeground(JBColor.namedColor("Label.selectedForeground", label.getForeground()));
             } else {
                 label.setText(value != null ? value.toString() : "");
             }

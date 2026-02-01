@@ -215,8 +215,18 @@ public class StockerTableView implements Disposable {
         tbPane = new JBScrollPane();
         tbPane.setBorder(BorderFactory.createEmptyBorder());
 
-        JPanel iPane = new JPanel(new GridLayout(1, 4));
-        iPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()));
+        JPanel iPane = new JPanel(new GridLayout(1, 4, 8, 0)); // Add horizontal gap between components
+        iPane.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
+            BorderFactory.createEmptyBorder(8, 12, 8, 12) // Add padding to index panel
+        ));
+        
+        // Style the index components
+        Font indexFont = lbIndexValue.getFont().deriveFont(Font.BOLD, lbIndexValue.getFont().getSize() + 1f);
+        lbIndexValue.setFont(indexFont);
+        lbIndexExtent.setFont(indexFont);
+        lbIndexPercent.setFont(indexFont);
+        
         iPane.add(cbIndex);
         iPane.add(lbIndexValue);
         iPane.add(lbIndexExtent);
@@ -259,15 +269,31 @@ public class StockerTableView implements Disposable {
 
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn});
 
-        tbBody.setShowVerticalLines(false);
+        tbBody.setShowVerticalLines(true);
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
+        
+        // Enhanced table styling for better UX
+        tbBody.setRowHeight(26); // Compact row height for cleaner look
+        tbBody.setIntercellSpacing(new Dimension(0, 0)); // No spacing to avoid shadowed effect
+        tbBody.setShowGrid(true);
+        tbBody.setGridColor(new JBColor(
+            new Color(220, 220, 220),  // Light mode: clean, single gray line
+            new Color(70, 70, 70)       // Dark mode: clean, single gray line
+        ));
+        
+        // Better selection colors
+        tbBody.setSelectionBackground(JBColor.namedColor("Table.selectionBackground", 
+            new JBColor(new Color(184, 207, 229), new Color(75, 110, 175))));
+        tbBody.setSelectionForeground(JBColor.namedColor("Table.selectionForeground", 
+            JBColor.foreground()));
 
         tbBody.getTableHeader().setReorderingAllowed(false);
+        tbBody.getTableHeader().setPreferredSize(new Dimension(tbBody.getTableHeader().getWidth(), 30)); // Compact header to match rows
         headerRenderer = new StockerTableHeaderRender(tbBody);
         tbBody.getTableHeader().setDefaultRenderer(headerRenderer);
         
-        // Add header click listener for sorting
+        // Add header click listener for sorting with visual feedback
         tbBody.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -275,6 +301,16 @@ public class StockerTableView implements Disposable {
                 if (column != -1) {
                     sortByColumn(column);
                 }
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                tbBody.getTableHeader().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                tbBody.getTableHeader().setCursor(Cursor.getDefaultCursor());
             }
         });
 

@@ -20,17 +20,13 @@
     <actions>
         <group id="com.vermouthx.stocker.actions.StockerActionGroup" text="Stocker" popup="true" icon="/icons/logo.png">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
+                    id="com.vermouthx.stocker.actions.StockerStockSearchAction"
+                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.General.Add">
+            </action>
             <action class="com.vermouthx.stocker.actions.StockerRefreshAction"
                     id="com.vermouthx.stocker.actions.StockerRefreshAction"
                     text="Refresh" description="Refresh" icon="AllIcons.Actions.Refresh">
-            </action>
-            <action class="com.vermouthx.stocker.actions.StockerStopAction"
-                    id="com.vermouthx.stocker.actions.StockerStopAction"
-                    text="Stop Refresh" description="Stop refresh" icon="AllIcons.Actions.StopRefresh"
-            />
-            <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    id="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.Actions.Find">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
