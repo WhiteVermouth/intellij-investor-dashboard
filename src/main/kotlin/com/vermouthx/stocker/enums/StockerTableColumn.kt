@@ -9,7 +9,9 @@ enum class StockerTableColumn(val title: String) {
     LOW("Low"),
     HIGH("High"),
     CHANGE("Change"),
-    CHANGE_PERCENT("Change%");
+    CHANGE_PERCENT("Change%"),
+    COST_PRICE("Cost"),
+    HOLDINGS("Holdings");
 
     companion object {
         @JvmStatic

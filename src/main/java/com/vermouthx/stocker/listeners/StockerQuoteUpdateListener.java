@@ -67,8 +67,24 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                         tableModel.setValueAt(quote.getPercentage() + "%", rowIndex, 8);
                         tableModel.fireTableCellUpdated(rowIndex, 8);
                     }
+                    // Column 9: Cost Price (user-set, read from settings)
+                    Double costPrice = setting.getCostPrice(quote.getCode());
+                    String costPriceStr = costPrice != null ? String.format("%.3f", costPrice) : "-";
+                    if (!costPriceStr.equals(tableModel.getValueAt(rowIndex, 9))) {
+                        tableModel.setValueAt(costPriceStr, rowIndex, 9);
+                        tableModel.fireTableCellUpdated(rowIndex, 9);
+                    }
+                    // Column 10: Holdings (user-set, read from settings)
+                    Integer holdings = setting.getHoldings(quote.getCode());
+                    Object holdingsVal = holdings != null ? holdings : "-";
+                    if (!holdingsVal.equals(tableModel.getValueAt(rowIndex, 10))) {
+                        tableModel.setValueAt(holdingsVal, rowIndex, 10);
+                        tableModel.fireTableCellUpdated(rowIndex, 10);
+                    }
                 } else {
                     if (quotes.size() == size) {
+                        Double costPrice = setting.getCostPrice(quote.getCode());
+                        Integer holdings = setting.getHoldings(quote.getCode());
                         tableModel.addRow(new Object[]{
                             quote.getCode(), 
                             displayName, 
@@ -78,7 +94,9 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                             quote.getLow(), 
                             quote.getHigh(), 
                             quote.getChange(), 
-                            quote.getPercentage() + "%"
+                            quote.getPercentage() + "%",
+                            costPrice != null ? String.format("%.3f", costPrice) : "-",
+                            holdings != null ? holdings : "-"
                         });
                         // Clear sort state when new rows are added
                         myTableView.clearSortState();

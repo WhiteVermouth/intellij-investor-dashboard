@@ -105,6 +105,18 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             myState.customStockNames = value
         }
 
+    var stockCostPrices: MutableMap<String, Double>
+        get() = myState.stockCostPrices
+        set(value) {
+            myState.stockCostPrices = value
+        }
+
+    var stockHoldings: MutableMap<String, Int>
+        get() = myState.stockHoldings
+        set(value) {
+            myState.stockHoldings = value
+        }
+
     val allStockListSize: Int
         get() = aShareList.size + hkStocksList.size + usStocksList.size + cryptoList.size
 
@@ -120,6 +132,35 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
     fun removeCustomName(code: String) {
         customStockNames.remove(code)
         log.info("Custom name removed for $code")
+    }
+
+    fun setCostPrice(code: String, costPrice: Double) {
+        val rounded = Math.round(costPrice * 1000.0) / 1000.0
+        stockCostPrices[code] = rounded
+        log.info("Cost price set for $code: $rounded")
+    }
+
+    fun getCostPrice(code: String): Double? {
+        return stockCostPrices[code]
+    }
+
+    fun removeCostPrice(code: String) {
+        stockCostPrices.remove(code)
+        log.info("Cost price removed for $code")
+    }
+
+    fun setHoldings(code: String, holdings: Int) {
+        stockHoldings[code] = holdings
+        log.info("Holdings set for $code: $holdings")
+    }
+
+    fun getHoldings(code: String): Int? {
+        return stockHoldings[code]
+    }
+
+    fun removeHoldings(code: String) {
+        stockHoldings.remove(code)
+        log.info("Holdings removed for $code")
     }
 
     fun getDisplayName(code: String, originalName: String): String {

@@ -247,6 +247,8 @@ public class StockerTableView implements Disposable {
     private static final String highColumn = StockerTableColumn.HIGH.getTitle();
     private static final String changeColumn = StockerTableColumn.CHANGE.getTitle();
     private static final String percentColumn = StockerTableColumn.CHANGE_PERCENT.getTitle();
+    private static final String costPriceColumn = StockerTableColumn.COST_PRICE.getTitle();
+    private static final String holdingsColumn = StockerTableColumn.HOLDINGS.getTitle();
     private static final List<String> allColumns = StockerTableColumn.defaultTitles();
 
     private void initTable() {
@@ -268,7 +270,7 @@ public class StockerTableView implements Disposable {
             }
         });
 
-        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn});
+        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn, costPriceColumn, holdingsColumn});
 
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
@@ -409,6 +411,14 @@ public class StockerTableView implements Disposable {
         TableColumn percent = getColumnIfPresent(percentColumn);
         if (percent != null) {
             percent.setCellRenderer(percentRenderer);
+        }
+        TableColumn costPrice = getColumnIfPresent(costPriceColumn);
+        if (costPrice != null) {
+            costPrice.setCellRenderer(numericRenderer);
+        }
+        TableColumn holdings = getColumnIfPresent(holdingsColumn);
+        if (holdings != null) {
+            holdings.setCellRenderer(numericRenderer);
         }
     }
 

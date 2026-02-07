@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.AlignY
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.entities.StockerQuote
@@ -166,6 +167,8 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             
             // Get custom name if exists
             val customName = setting.getCustomName(symbol.code)
+            val costPrice = setting.getCostPrice(symbol.code)
+            val holdings = setting.getHoldings(symbol.code)
             
             panel {
                 row {
@@ -181,20 +184,32 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                             "${originalName.substring(0, 25)}..."
                         }
                     ).applyToComponent {
-                        minimumSize = java.awt.Dimension(200, 0)
-                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                        minimumSize = java.awt.Dimension(150, 0)
+                        preferredSize = java.awt.Dimension(150, preferredSize.height)
                     }
                     label(
                         customName?.let {
-                            if (it.length <= 25) {
+                            if (it.length <= 15) {
                                 it
                             } else {
-                                "${it.substring(0, 25)}..."
+                                "${it.substring(0, 15)}..."
                             }
                         } ?: "-"
                     ).applyToComponent {
-                        minimumSize = java.awt.Dimension(200, 0)
-                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                        minimumSize = java.awt.Dimension(120, 0)
+                        preferredSize = java.awt.Dimension(120, preferredSize.height)
+                    }
+                    label(
+                        costPrice?.let { String.format("%.3f", it) } ?: "-"
+                    ).applyToComponent {
+                        minimumSize = java.awt.Dimension(80, 0)
+                        preferredSize = java.awt.Dimension(80, preferredSize.height)
+                    }
+                    label(
+                        holdings?.toString() ?: "-"
+                    ).applyToComponent {
+                        minimumSize = java.awt.Dimension(80, 0)
+                        preferredSize = java.awt.Dimension(80, preferredSize.height)
                     }
                 }
             }.withBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8))
@@ -210,13 +225,23 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                     }
                 label("Original Name").bold()
                     .applyToComponent {
-                        minimumSize = java.awt.Dimension(200, 0)
-                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                        minimumSize = java.awt.Dimension(150, 0)
+                        preferredSize = java.awt.Dimension(150, preferredSize.height)
                     }
                 label("Custom Name").bold()
                     .applyToComponent {
-                        minimumSize = java.awt.Dimension(200, 0)
-                        preferredSize = java.awt.Dimension(200, preferredSize.height)
+                        minimumSize = java.awt.Dimension(120, 0)
+                        preferredSize = java.awt.Dimension(120, preferredSize.height)
+                    }
+                label("Cost").bold()
+                    .applyToComponent {
+                        minimumSize = java.awt.Dimension(80, 0)
+                        preferredSize = java.awt.Dimension(80, preferredSize.height)
+                    }
+                label("Holdings").bold()
+                    .applyToComponent {
+                        minimumSize = java.awt.Dimension(80, 0)
+                        preferredSize = java.awt.Dimension(80, preferredSize.height)
                     }
             }
         }.withBorder(BorderFactory.createCompoundBorder(
@@ -231,18 +256,78 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                 if (selectedIndex >= 0) {
                     val selectedQuote = listModel.getElementAt(selectedIndex)
                     val currentCustomName = setting.getCustomName(selectedQuote.code)
-                    val newName = JOptionPane.showInputDialog(
-                        pane,
-                        "Enter custom name for ${selectedQuote.code}:",
-                        currentCustomName ?: selectedQuote.name
+                    val currentCostPrice = setting.getCostPrice(selectedQuote.code)
+                    val currentHoldings = setting.getHoldings(selectedQuote.code)
+
+                    val nameField = javax.swing.JTextField(currentCustomName ?: "", 20)
+                    val costPriceField = javax.swing.JTextField(
+                        currentCostPrice?.let { String.format("%.3f", it) } ?: "", 20
                     )
-                    if (newName != null && newName.isNotBlank()) {
-                        setting.setCustomName(selectedQuote.code, newName.trim())
-                        // Trigger list repaint to show new name
-                        list.repaint()
-                    } else if (newName != null && newName.isBlank() && currentCustomName != null) {
-                        // If user clears the name, remove custom name
-                        setting.removeCustomName(selectedQuote.code)
+                    val holdingsField = javax.swing.JTextField(
+                        currentHoldings?.toString() ?: "", 20
+                    )
+
+                    val editPanel = panel {
+                        row {
+                            label("Custom name:")
+                                .widthGroup("editLabels")
+                            cell(nameField)
+                        }.layout(RowLayout.LABEL_ALIGNED)
+                        row {
+                            label("Cost price:")
+                                .widthGroup("editLabels")
+                            cell(costPriceField)
+                        }.layout(RowLayout.LABEL_ALIGNED)
+                        row {
+                            label("Holdings:")
+                                .widthGroup("editLabels")
+                            cell(holdingsField)
+                        }.layout(RowLayout.LABEL_ALIGNED)
+                    }
+
+                    val result = JOptionPane.showConfirmDialog(
+                        pane,
+                        editPanel,
+                        "Edit ${selectedQuote.code}",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                    )
+
+                    if (result == JOptionPane.OK_OPTION) {
+                        // Handle custom name
+                        val newName = nameField.text.trim()
+                        if (newName.isNotBlank()) {
+                            setting.setCustomName(selectedQuote.code, newName)
+                        } else if (currentCustomName != null) {
+                            setting.removeCustomName(selectedQuote.code)
+                        }
+
+                        // Handle cost price
+                        val costPriceText = costPriceField.text.trim()
+                        if (costPriceText.isNotBlank()) {
+                            try {
+                                val costPrice = costPriceText.toDouble()
+                                setting.setCostPrice(selectedQuote.code, costPrice)
+                            } catch (e: NumberFormatException) {
+                                // Ignore invalid input
+                            }
+                        } else if (currentCostPrice != null) {
+                            setting.removeCostPrice(selectedQuote.code)
+                        }
+
+                        // Handle holdings
+                        val holdingsText = holdingsField.text.trim()
+                        if (holdingsText.isNotBlank()) {
+                            try {
+                                val holdings = holdingsText.toInt()
+                                setting.setHoldings(selectedQuote.code, holdings)
+                            } catch (e: NumberFormatException) {
+                                // Ignore invalid input
+                            }
+                        } else if (currentHoldings != null) {
+                            setting.removeHoldings(selectedQuote.code)
+                        }
+
                         list.repaint()
                     }
                 }
