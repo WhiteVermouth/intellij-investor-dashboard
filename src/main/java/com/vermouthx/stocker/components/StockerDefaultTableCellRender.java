@@ -1,26 +1,30 @@
 package com.vermouthx.stocker.components;
 
-import com.intellij.ui.JBColor;
-
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
 public class StockerDefaultTableCellRender extends DefaultTableCellRenderer {
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        setHorizontalAlignment(SwingConstants.CENTER);
         Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        
-        // Add padding to cells for better readability - reduced vertical padding
-        setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
-        
-        // Use uniform background without alternating colors to avoid shadowed effect
+
+        setHorizontalAlignment(SwingConstants.CENTER);
+        Border innerPadding = BorderFactory.createEmptyBorder(2, 8, 2, 8);
+        boolean isLastVisibleColumn = column == table.getColumnCount() - 1;
+        Border dividerBorder = isLastVisibleColumn
+            ? innerPadding
+            : BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 0, 1, table.getGridColor()),
+                innerPadding
+            );
+        setBorder(dividerBorder);
+
         if (!isSelected) {
-            setBackground(JBColor.background());
+            setBackground(table.getBackground());
         }
-        
+
         return component;
     }
 }

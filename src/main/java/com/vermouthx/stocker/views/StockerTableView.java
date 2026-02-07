@@ -214,6 +214,7 @@ public class StockerTableView implements Disposable {
     private void initPane() {
         tbPane = new JBScrollPane();
         tbPane.setBorder(BorderFactory.createEmptyBorder());
+        tbPane.setViewportBorder(BorderFactory.createEmptyBorder());
 
         JPanel iPane = new JPanel(new GridLayout(1, 4, 8, 0)); // Add horizontal gap between components
         iPane.setBorder(BorderFactory.createCompoundBorder(
@@ -269,28 +270,29 @@ public class StockerTableView implements Disposable {
 
         tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn});
 
-        tbBody.setShowVerticalLines(true);
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
         
-        // Enhanced table styling for better UX
-        tbBody.setRowHeight(26); // Compact row height for cleaner look
-        tbBody.setIntercellSpacing(new Dimension(0, 0)); // No spacing to avoid shadowed effect
+        // Table grid styling
+        tbBody.setRowHeight(26);
+        tbBody.setIntercellSpacing(new Dimension(0, 1));
         tbBody.setShowGrid(true);
-        tbBody.setGridColor(new JBColor(
-            new Color(220, 220, 220),  // Light mode: clean, single gray line
-            new Color(70, 70, 70)       // Dark mode: clean, single gray line
-        ));
+        tbBody.setShowVerticalLines(false);
+        tbBody.setShowHorizontalLines(true);
+        tbBody.setGridColor(JBColor.namedColor("Table.gridColor", JBColor.border()));
+        tbBody.setFillsViewportHeight(true);
+        tbBody.getColumnModel().setColumnMargin(0);
         
-        // Better selection colors
-        tbBody.setSelectionBackground(JBColor.namedColor("Table.selectionBackground", 
-            new JBColor(new Color(184, 207, 229), new Color(75, 110, 175))));
-        tbBody.setSelectionForeground(JBColor.namedColor("Table.selectionForeground", 
-            JBColor.foreground()));
+        // Use IDE theme colors for selection
+        tbBody.setSelectionBackground(JBColor.namedColor("Table.selectionBackground", UIManager.getColor("Table.selectionBackground")));
+        tbBody.setSelectionForeground(JBColor.namedColor("Table.selectionForeground", UIManager.getColor("Table.selectionForeground")));
 
+        // Avoid extra separator lines from custom LAF header UI; renderer will own divider painting.
+        tbBody.getTableHeader().setUI(new javax.swing.plaf.basic.BasicTableHeaderUI());
         tbBody.getTableHeader().setReorderingAllowed(false);
         tbBody.getTableHeader().setPreferredSize(new Dimension(tbBody.getTableHeader().getWidth(), 30)); // Compact header to match rows
-        headerRenderer = new StockerTableHeaderRender(tbBody);
+        tbBody.getTableHeader().setBorder(BorderFactory.createEmptyBorder());
+        headerRenderer = new StockerTableHeaderRender();
         tbBody.getTableHeader().setDefaultRenderer(headerRenderer);
         
         // Add header click listener for sorting with visual feedback
@@ -333,6 +335,8 @@ public class StockerTableView implements Disposable {
             }
         }
 
+        // Re-apply after column model rebuild to keep header/body cell geometry in sync.
+        tbBody.getColumnModel().setColumnMargin(0);
         applyColumnRenderers();
     }
 
@@ -652,7 +656,11 @@ public class StockerTableView implements Disposable {
     private class NumericCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (isSelected) {
+                return component;
+            }
             try {
                 int percentModelIndex = -1;
                 if (table.getModel() instanceof DefaultTableModel) {
@@ -664,14 +672,19 @@ public class StockerTableView implements Disposable {
                         Double v = parsePercentage(percentValue.toString());
                         if (v != null) {
                             applyColorPatternToTable(v, this);
+                        } else {
+                            setForeground(table.getForeground());
                         }
+                    } else {
+                        setForeground(table.getForeground());
                     }
+                } else {
+                    setForeground(table.getForeground());
                 }
             } catch (IllegalArgumentException e) {
-                // Fallback to default foreground color on parsing error
-                setForeground(JBColor.foreground());
+                setForeground(table.getForeground());
             }
-            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            return component;
         }
     }
 
@@ -679,8 +692,12 @@ public class StockerTableView implements Disposable {
     private class ChangeCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            if (value != null) {
+            if (isSelected) {
+                return component;
+            }
+            if (value != null && !value.toString().isEmpty()) {
                 try {
                     Double changeValue = parseDouble(value);
                     if (changeValue != null) {
@@ -691,13 +708,16 @@ public class StockerTableView implements Disposable {
                         } else {
                             setForeground(zeroColor);
                         }
+                    } else {
+                        setForeground(table.getForeground());
                     }
                 } catch (Exception e) {
-                    // Fallback to default foreground color on parsing error
-                    setForeground(JBColor.foreground());
+                    setForeground(table.getForeground());
                 }
+            } else {
+                setForeground(table.getForeground());
             }
-            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            return component;
         }
     }
 
@@ -705,21 +725,27 @@ public class StockerTableView implements Disposable {
     private class PercentCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (isSelected) {
+                return component;
+            }
             if (value == null) {
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setForeground(table.getForeground());
+                return component;
             }
             try {
                 String percentValue = value.toString();
                 Double v = parsePercentage(percentValue);
                 if (v != null) {
                     applyColorPatternToTable(v, this);
+                } else {
+                    setForeground(table.getForeground());
                 }
             } catch (NumberFormatException e) {
-                // Fallback to default foreground color on parsing error
-                setForeground(JBColor.foreground());
+                setForeground(table.getForeground());
             }
-            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            return component;
         }
     }
 
