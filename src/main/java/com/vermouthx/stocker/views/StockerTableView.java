@@ -9,10 +9,13 @@ import com.intellij.ui.table.JBTable;
 import com.vermouthx.stocker.components.StockerDefaultTableCellRender;
 import com.vermouthx.stocker.components.StockerTableHeaderRender;
 import com.vermouthx.stocker.components.StockerTableModel;
+import com.vermouthx.stocker.entities.StockerSuggestion;
 import com.vermouthx.stocker.entities.StockerQuote;
+import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.enums.StockerSortState;
 import com.vermouthx.stocker.enums.StockerTableColumn;
 import com.vermouthx.stocker.settings.StockerSetting;
+import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerPinyinUtil;
 
 import javax.swing.*;
@@ -254,6 +257,7 @@ public class StockerTableView implements Disposable {
     private void initTable() {
         tbModel = new StockerTableModel();
         tbBody = new JBTable();
+        JPopupMenu rowPopupMenu = createRowPopupMenu();
 
         tbBody.addFocusListener(new FocusAdapter() {
             @Override
@@ -264,9 +268,12 @@ public class StockerTableView implements Disposable {
         tbBody.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (tbBody.isFocusOwner() && tbBody.rowAtPoint(e.getPoint()) == -1) {
-                    tbBody.clearSelection();
-                }
+                handleTableMouseEvent(e, rowPopupMenu);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                handleTableMouseEvent(e, rowPopupMenu);
             }
         });
 
@@ -320,6 +327,72 @@ public class StockerTableView implements Disposable {
 
         applyColumnVisibility();
         tbPane.setViewportView(tbBody);
+    }
+
+    private void handleTableMouseEvent(MouseEvent event, JPopupMenu rowPopupMenu) {
+        int row = tbBody.rowAtPoint(event.getPoint());
+        if (tbBody.isFocusOwner() && row == -1 && !event.isPopupTrigger()) {
+            tbBody.clearSelection();
+            return;
+        }
+
+        if (row != -1 && (event.isPopupTrigger() || SwingUtilities.isRightMouseButton(event))) {
+            tbBody.setRowSelectionInterval(row, row);
+        }
+
+        if (event.isPopupTrigger() && row != -1) {
+            rowPopupMenu.show(tbBody, event.getX(), event.getY());
+        }
+    }
+
+    private JPopupMenu createRowPopupMenu() {
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem deleteMenuItem = new JMenuItem("Delete");
+        deleteMenuItem.setOpaque(true);
+        deleteMenuItem.setRolloverEnabled(true);
+        deleteMenuItem.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        Color defaultBackground = JBColor.namedColor("MenuItem.background", UIManager.getColor("MenuItem.background"));
+        Color defaultForeground = JBColor.namedColor("MenuItem.foreground", UIManager.getColor("MenuItem.foreground"));
+        Color hoverBackground = JBColor.namedColor(
+                "MenuItem.selectionBackground",
+                JBColor.namedColor("List.selectionBackground", tbBody.getSelectionBackground())
+        );
+        Color hoverForeground = JBColor.namedColor(
+                "MenuItem.selectionForeground",
+                JBColor.namedColor("List.selectionForeground", tbBody.getSelectionForeground())
+        );
+        deleteMenuItem.setBackground(defaultBackground);
+        deleteMenuItem.setForeground(defaultForeground);
+        deleteMenuItem.getModel().addChangeListener(e -> {
+            ButtonModel model = deleteMenuItem.getModel();
+            boolean hovering = model.isArmed() || model.isRollover();
+            deleteMenuItem.setBackground(hovering ? hoverBackground : defaultBackground);
+            deleteMenuItem.setForeground(hovering ? hoverForeground : defaultForeground);
+        });
+        deleteMenuItem.addActionListener(e -> deleteSelectedStock());
+        popupMenu.add(deleteMenuItem);
+        return popupMenu;
+    }
+
+    private void deleteSelectedStock() {
+        int selectedRow = tbBody.getSelectedRow();
+        if (selectedRow < 0) {
+            return;
+        }
+        Object codeValue = tbModel.getValueAt(selectedRow, 0);
+        if (codeValue == null) {
+            return;
+        }
+        String code = codeValue.toString();
+        StockerSetting setting = StockerSetting.Companion.getInstance();
+        StockerMarketType market = setting.marketOf(code);
+        if (market == null) {
+            return;
+        }
+
+        Object nameValue = tbModel.getValueAt(selectedRow, 1);
+        String name = nameValue == null ? code : nameValue.toString();
+        StockerActionUtil.removeStock(market, new StockerSuggestion(code, name, market));
     }
 
     private void applyColumnVisibility() {
