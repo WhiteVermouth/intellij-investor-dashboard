@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.16.1
+
+### ✨ Improvements / 改进
+
+- Added right-click row popup menu in table view with one-click stock deletion / 在表格视图中添加右键行弹出菜单，支持一键删除股票
+- Improved popup delete menu hover styling for better theme consistency and visibility / 改进删除菜单悬浮样式，提升主题一致性与可见性
+
 ## 1.16.0
 
 ### ✨ New Features / 新功能

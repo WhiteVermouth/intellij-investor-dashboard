@@ -37,15 +37,14 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">📊 <strong>Cost Price & Holdings Columns</strong> / 成本价与持仓列
+                <li style="${Styles.LIST_ITEM}">🗑️ <strong>Row Delete Popup Menu</strong> / 行删除弹出菜单
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Added cost price and holdings columns with visibility toggling for enhanced portfolio tracking / 添加成本价和持仓列，支持显示切换，增强投资组合跟踪</li>
+                        <li>Added a right-click popup menu on table rows with one-click stock deletion / 在表格行上新增右键弹出菜单，支持一键删除股票</li>
                     </ul>
                 </li>
-                <li style="${Styles.LIST_ITEM}">🎨 <strong>UI Improvements</strong> / 界面改进
+                <li style="${Styles.LIST_ITEM}">🎨 <strong>Menu Interaction Refinement</strong> / 菜单交互优化
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Refined table rendering with improved padding and border styling / 优化表格渲染，改进内边距和边框样式</li>
-                        <li>Adopted IDE theme colors for table selection for better visual consistency / 采用 IDE 主题颜色用于表格选中状态，确保更好的视觉一致性</li>
+                        <li>Improved delete menu hover background and foreground styling for better visibility / 改进删除菜单悬浮时的背景与前景样式，提升可见性</li>
                     </ul>
                 </li>
             </ul>
@@ -62,8 +61,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> You can now track your cost price and holdings directly in the table. Toggle column visibility in Settings → Tools → Stocker.<br/>
-                    您现在可以直接在表格中跟踪成本价和持仓。在设置 → 工具 → Stocker 中切换列的显示。
+                    💡 <strong>Pro tip / 小贴士：</strong> Right-click any table row to quickly remove a stock from your watchlist.<br/>
+                    右键单击任意表格行，即可快速从自选列表中删除该股票。
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
