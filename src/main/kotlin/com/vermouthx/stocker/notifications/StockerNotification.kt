@@ -37,9 +37,9 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">💰 <strong>Cost Column Color Coding</strong> / 成本列颜色编码
+                <li style="${Styles.LIST_ITEM}">⚙️ <strong>Settings Button in Action Bar</strong> / 操作栏设置按钮
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Enhanced Cost column with smart color indicators: up color for profit (cost < current), down color for loss (cost > current) / 增强成本列，配备智能颜色指示器：盈利时显示上涨颜色（成本 < 当前价），亏损时显示下跌颜色（成本 > 当前价）</li>
+                        <li>Added right-aligned settings button to tool window action bar for quick access to Stocker settings / 在工具窗口操作栏添加右对齐的设置按钮，快速访问 Stocker 设置</li>
                     </ul>
                 </li>
             </ul>
@@ -56,8 +56,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> The Cost column now shows at a glance whether you're in profit or loss with color-coded indicators.<br/>
-                    成本列现在通过颜色编码指示器直观显示您的盈亏状态。
+                    💡 <strong>Pro tip / 小贴士：</strong> Click the settings button in the tool window action bar for quick access to customize your Stocker experience.<br/>
+                    点击工具窗口操作栏中的设置按钮，快速自定义您的 Stocker 体验。
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">

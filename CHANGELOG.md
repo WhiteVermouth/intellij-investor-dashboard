@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.0
+
+### ✨ New Features / 新功能
+
+- Added settings button to tool window action bar (right-aligned) for quick access to Stocker settings / 在工具窗口操作栏添加设置按钮（右对齐），快速访问 Stocker 设置
+
 ## 1.16.2
 
 ### ✨ Improvements / 改进
