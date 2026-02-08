@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.2
+
+### ✨ Improvements / 改进
+
+- Enhanced Cost column color coding: displays up color when cost is below current price (profit) and down color when cost is above current price (loss) / 增强成本列颜色编码：成本低于当前价格时显示上涨颜色（盈利），成本高于当前价格时显示下跌颜色（亏损）
+
 ## 1.16.1
 
 ### ✨ Improvements / 改进

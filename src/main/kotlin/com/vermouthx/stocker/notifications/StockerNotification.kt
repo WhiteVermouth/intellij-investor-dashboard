@@ -37,14 +37,9 @@ object StockerNotification {
         <div style="${Styles.CONTAINER}">
             <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
             <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">🗑️ <strong>Row Delete Popup Menu</strong> / 行删除弹出菜单
+                <li style="${Styles.LIST_ITEM}">💰 <strong>Cost Column Color Coding</strong> / 成本列颜色编码
                     <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Added a right-click popup menu on table rows with one-click stock deletion / 在表格行上新增右键弹出菜单，支持一键删除股票</li>
-                    </ul>
-                </li>
-                <li style="${Styles.LIST_ITEM}">🎨 <strong>Menu Interaction Refinement</strong> / 菜单交互优化
-                    <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Improved delete menu hover background and foreground styling for better visibility / 改进删除菜单悬浮时的背景与前景样式，提升可见性</li>
+                        <li>Enhanced Cost column with smart color indicators: up color for profit (cost < current), down color for loss (cost > current) / 增强成本列，配备智能颜色指示器：盈利时显示上涨颜色（成本 < 当前价），亏损时显示下跌颜色（成本 > 当前价）</li>
                     </ul>
                 </li>
             </ul>
@@ -61,8 +56,8 @@ object StockerNotification {
             $whatsNew
             <div style="${Styles.INFO_BOX}">
                 <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> Right-click any table row to quickly remove a stock from your watchlist.<br/>
-                    右键单击任意表格行，即可快速从自选列表中删除该股票。
+                    💡 <strong>Pro tip / 小贴士：</strong> The Cost column now shows at a glance whether you're in profit or loss with color-coded indicators.<br/>
+                    成本列现在通过颜色编码指示器直观显示您的盈亏状态。
                 </p>
             </div>
             <p style="${Styles.SMALL_TEXT}">
