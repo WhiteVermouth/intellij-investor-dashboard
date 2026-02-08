@@ -32,6 +32,10 @@
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
                     text="Manage Favorite Stocks" description="Manage stock symbols" icon="AllIcons.Actions.Edit">
             </action>
+            <action class="com.vermouthx.stocker.actions.StockerSettingAction"
+                    id="com.vermouthx.stocker.actions.StockerSettingAction"
+                    text="Settings" description="Open Stocker settings" icon="AllIcons.General.Settings">
+            </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"
                     text="Remove All Favorite Stocks" description="Remove all stock symbols"
