@@ -9,8 +9,8 @@ import com.intellij.ui.table.JBTable;
 import com.vermouthx.stocker.components.StockerDefaultTableCellRender;
 import com.vermouthx.stocker.components.StockerTableHeaderRender;
 import com.vermouthx.stocker.components.StockerTableModel;
-import com.vermouthx.stocker.entities.StockerSuggestion;
 import com.vermouthx.stocker.entities.StockerQuote;
+import com.vermouthx.stocker.entities.StockerSuggestion;
 import com.vermouthx.stocker.enums.StockerMarketType;
 import com.vermouthx.stocker.enums.StockerSortState;
 import com.vermouthx.stocker.enums.StockerTableColumn;
@@ -56,14 +56,15 @@ public class StockerTableView implements Disposable {
     private final StockerDefaultTableCellRender numericRenderer = new NumericCellRenderer();
     private final StockerDefaultTableCellRender changeRenderer = new ChangeCellRenderer();
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
-    
+    private final StockerDefaultTableCellRender costRenderer = new CostCellRenderer();
+
     // Sorting state
     private StockerTableHeaderRender headerRenderer;
     private int lastSortColumn = -1;
     private StockerSortState currentSortState = StockerSortState.NONE;
     // Backup data only when sorting is active (cleared when returning to NONE state)
     private List<Object[]> sortBackupData = null;
-    
+
     private volatile boolean disposed = false;
 
     public StockerTableView() {
@@ -84,14 +85,14 @@ public class StockerTableView implements Disposable {
         }
         disposed = true;
         tableViews.remove(this);
-        
+
         // Clear data structures to help with garbage collection
         indices.clear();
         if (sortBackupData != null) {
             sortBackupData.clear();
             sortBackupData = null;
         }
-        
+
         // Clear table model
         if (tbModel != null) {
             tbModel.setRowCount(0);
@@ -224,13 +225,13 @@ public class StockerTableView implements Disposable {
             BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
             BorderFactory.createEmptyBorder(8, 12, 8, 12) // Add padding to index panel
         ));
-        
+
         // Style the index components
         Font indexFont = lbIndexValue.getFont().deriveFont(Font.BOLD, lbIndexValue.getFont().getSize() + 1f);
         lbIndexValue.setFont(indexFont);
         lbIndexExtent.setFont(indexFont);
         lbIndexPercent.setFont(indexFont);
-        
+
         iPane.add(cbIndex);
         iPane.add(lbIndexValue);
         iPane.add(lbIndexExtent);
@@ -281,7 +282,7 @@ public class StockerTableView implements Disposable {
 
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
-        
+
         // Table grid styling
         tbBody.setRowHeight(26);
         tbBody.setIntercellSpacing(new Dimension(0, 1));
@@ -291,7 +292,7 @@ public class StockerTableView implements Disposable {
         tbBody.setGridColor(JBColor.namedColor("Table.gridColor", JBColor.border()));
         tbBody.setFillsViewportHeight(true);
         tbBody.getColumnModel().setColumnMargin(0);
-        
+
         // Use IDE theme colors for selection
         tbBody.setSelectionBackground(JBColor.namedColor("Table.selectionBackground", UIManager.getColor("Table.selectionBackground")));
         tbBody.setSelectionForeground(JBColor.namedColor("Table.selectionForeground", UIManager.getColor("Table.selectionForeground")));
@@ -303,7 +304,7 @@ public class StockerTableView implements Disposable {
         tbBody.getTableHeader().setBorder(BorderFactory.createEmptyBorder());
         headerRenderer = new StockerTableHeaderRender();
         tbBody.getTableHeader().setDefaultRenderer(headerRenderer);
-        
+
         // Add header click listener for sorting with visual feedback
         tbBody.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
@@ -313,12 +314,12 @@ public class StockerTableView implements Disposable {
                     sortByColumn(column);
                 }
             }
-            
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 tbBody.getTableHeader().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
-            
+
             @Override
             public void mouseExited(MouseEvent e) {
                 tbBody.getTableHeader().setCursor(Cursor.getDefaultCursor());
@@ -487,7 +488,7 @@ public class StockerTableView implements Disposable {
         }
         TableColumn costPrice = getColumnIfPresent(costPriceColumn);
         if (costPrice != null) {
-            costPrice.setCellRenderer(numericRenderer);
+            costPrice.setCellRenderer(costRenderer);
         }
         TableColumn holdings = getColumnIfPresent(holdingsColumn);
         if (holdings != null) {
@@ -562,7 +563,7 @@ public class StockerTableView implements Disposable {
 
     private void sortByColumn(int column) {
         String columnName = tbBody.getColumnName(column);
-        
+
         // Cycle through sort states: NONE -> ASCENDING -> DESCENDING -> NONE
         if (column == lastSortColumn) {
             // Same column clicked, cycle to next state
@@ -582,15 +583,15 @@ public class StockerTableView implements Disposable {
             lastSortColumn = column;
             currentSortState = StockerSortState.ASCENDING;
         }
-        
+
         // Update header renderer
         headerRenderer.setSortState(column, currentSortState);
         tbBody.getTableHeader().repaint();
-        
+
         // Sort the table data using optimized in-place sorting
         sortTableDataOptimized(columnName, currentSortState);
     }
-    
+
     /**
      * Optimized sorting that works with row indices instead of copying entire dataset.
      * Backup data is only stored when sorting is active and cleared when returning to NONE state.
@@ -600,7 +601,7 @@ public class StockerTableView implements Disposable {
         if (rowCount == 0) {
             return;
         }
-        
+
         // For NONE state, restore original data and clear backup
         if (sortState == StockerSortState.NONE) {
             if (sortBackupData != null && !sortBackupData.isEmpty()) {
@@ -613,7 +614,7 @@ public class StockerTableView implements Disposable {
             }
             return;
         }
-        
+
         // Capture original data before first sort (only once)
         if (sortBackupData == null) {
             sortBackupData = new ArrayList<>(rowCount);
@@ -625,7 +626,7 @@ public class StockerTableView implements Disposable {
                 sortBackupData.add(row);
             }
         }
-        
+
         // Get the column index in the model
         int columnIndex = -1;
         for (int i = 0; i < tbModel.getColumnCount(); i++) {
@@ -634,27 +635,27 @@ public class StockerTableView implements Disposable {
                 break;
             }
         }
-        
+
         if (columnIndex == -1) {
             return;
         }
-        
+
         final int sortColumnIndex = columnIndex;
         final boolean ascending = (sortState == StockerSortState.ASCENDING);
-        
+
         // Create lightweight index array instead of copying all data
         Integer[] indices = new Integer[rowCount];
         for (int i = 0; i < rowCount; i++) {
             indices[i] = i;
         }
-        
+
         // Sort indices based on values - only references are sorted, not actual data
         java.util.Arrays.sort(indices, (i1, i2) -> {
             Object val1 = tbModel.getValueAt(i1, sortColumnIndex);
             Object val2 = tbModel.getValueAt(i2, sortColumnIndex);
-            
+
             int result = 0;
-            
+
             if (columnName.equals(codeColumn) || columnName.equals(nameColumn)) {
                 // Alphabetical sorting
                 String str1 = val1 != null ? val1.toString() : "";
@@ -683,10 +684,10 @@ public class StockerTableView implements Disposable {
                     result = -1;
                 }
             }
-            
+
             return ascending ? result : -result;
         });
-        
+
         // Reorder rows based on sorted indices - minimal memory footprint
         java.util.List<Object[]> sortedRows = new ArrayList<>(rowCount);
         for (int i = 0; i < rowCount; i++) {
@@ -697,14 +698,14 @@ public class StockerTableView implements Disposable {
             }
             sortedRows.add(row);
         }
-        
+
         // Update table with sorted data
         tbModel.setRowCount(0);
         for (Object[] row : sortedRows) {
             tbModel.addRow(row);
         }
     }
-    
+
     private Double parseDouble(Object value) {
         if (value == null) {
             return null;
@@ -721,7 +722,7 @@ public class StockerTableView implements Disposable {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            
+
             // Strip BTC prefix from crypto codes for display
             if (value != null) {
                 String code = value.toString();
@@ -730,7 +731,7 @@ public class StockerTableView implements Disposable {
                     value = code.substring(3);
                 }
             }
-            
+
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
@@ -826,6 +827,63 @@ public class StockerTableView implements Disposable {
                     setForeground(table.getForeground());
                 }
             } catch (NumberFormatException e) {
+                setForeground(table.getForeground());
+            }
+            return component;
+        }
+    }
+
+    // Inner class for Cost column renderer with inverted color coding (cost > current = up color, cost < current = down color)
+    private class CostCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (isSelected) {
+                return component;
+            }
+            if (value == null || value.toString().isEmpty()) {
+                setForeground(table.getForeground());
+                return component;
+            }
+            try {
+                // Get the cost price value
+                Double costPrice = parseDouble(value);
+                if (costPrice == null) {
+                    setForeground(table.getForeground());
+                    return component;
+                }
+
+                // Get the current price from the same row
+                int currentModelIndex = -1;
+                if (table.getModel() instanceof DefaultTableModel) {
+                    currentModelIndex = ((DefaultTableModel) table.getModel()).findColumn(currentColumn);
+                }
+                if (currentModelIndex != -1 && row >= 0 && row < table.getModel().getRowCount()) {
+                    Object currentValue = table.getModel().getValueAt(row, currentModelIndex);
+                    if (currentValue != null) {
+                        Double currentPrice = parseDouble(currentValue);
+                        if (currentPrice != null) {
+                            // If cost > current, show down color (we're losing money)
+                            // If cost < current, show up color (we're making money)
+                            // If cost == current, show zero color
+                            if (costPrice > currentPrice) {
+                                setForeground(downColor);
+                            } else if (costPrice < currentPrice) {
+                                setForeground(upColor);
+                            } else {
+                                setForeground(zeroColor);
+                            }
+                        } else {
+                            setForeground(table.getForeground());
+                        }
+                    } else {
+                        setForeground(table.getForeground());
+                    }
+                } else {
+                    setForeground(table.getForeground());
+                }
+            } catch (Exception e) {
                 setForeground(table.getForeground());
             }
             return component;
