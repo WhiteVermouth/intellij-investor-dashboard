@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.18.0
+
+### 🌐 i18n / 国际化
+
+- Fixed language switching: the plugin language setting now works correctly and applies immediately to the table view / 修复语言切换：插件语言设置现已正常工作，更改后立即应用到表格视图
+- Notifications now follow the plugin language setting instead of showing dual-language text / 通知消息现在遵循插件语言设置，不再同时显示中英文
+
+### 🐛 Bug Fixes / 错误修复
+
+- Fixed settings reverting when clicking Apply then OK in the settings dialog / 修复在设置中先点击应用再点击确定时设置被还原的问题
+- Fixed table column visibility breaking after language switch (now stored as locale-independent identifiers with automatic migration) / 修复语言切换后表格列可见性失效的问题（现以语言无关的标识符存储，并自动迁移旧配置）
+
+### 🎨 UI Improvements / 界面改进
+
+- Reorganized settings layout into three focused groups: General, Data Provider, and Table Display / 重新整理设置页面为三个分组：通用、数据提供商和表格显示
+
 ## 1.17.0
 
 ### ✨ New Features / 新功能

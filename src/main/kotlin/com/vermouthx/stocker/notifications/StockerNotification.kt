@@ -8,89 +8,115 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import com.vermouthx.stocker.StockerMeta
+import com.vermouthx.stocker.settings.StockerSetting
 import org.intellij.lang.annotations.Language
+import java.util.*
 
 object StockerNotification {
 
-    // Stocker Color Palette
     private object Colors {
-        const val PRIMARY = "#4CAF50"          // Green (for stock market theme)
-        const val SECONDARY = "#2196F3"        // Blue
-        const val ACCENT = "#FF9800"           // Orange (for highlights)
-        const val BACKGROUND = "rgba(33, 150, 243, 0.08)" // Subtle background
-        const val BORDER = "#2196F3"           // Border color
+        const val PRIMARY = "#4CAF50"
+        const val BACKGROUND = "rgba(33, 150, 243, 0.08)"
+        const val BORDER = "#2196F3"
     }
 
-    // Common CSS styles for consistency
     private object Styles {
         const val CONTAINER = "margin: 8px 0; line-height: 1.4;"
         const val HEADING = "margin: 0 0 8px 0; color: ${Colors.PRIMARY}; font-size: 14px; font-weight: 600;"
         const val PARAGRAPH = "margin: 0 0 12px 0; font-size: 13px;"
         const val SMALL_TEXT = "margin: 12px 0 0 0; font-size: 12px; font-style: italic; opacity: 0.7;"
         const val LIST_ITEM = "margin: 6px 0;"
+        const val SUB_LIST = "margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;"
         const val INFO_BOX = "background: ${Colors.BACKGROUND}; border-left: 3px solid ${Colors.BORDER}; padding: 10px 12px; margin: 12px 0; border-radius: 3px;"
-        const val HIGHLIGHT = "color: ${Colors.ACCENT}; font-weight: 500;"
+    }
+
+    private val version get() = StockerMeta.currentVersion
+
+    private fun isChinese(): Boolean {
+        val override = try { StockerSetting.instance.languageOverride } catch (_: Exception) { "" }
+        if (override == "zh_CN") return true
+        if (override == "en") return false
+        return Locale.getDefault().language == "zh"
     }
 
     @Language("HTML")
-    private val whatsNew = """
-        <div style="${Styles.CONTAINER}">
-            <h4 style="${Styles.HEADING}">✨ What's New / 新功能</h4>
-            <ul style="margin: 0; padding-left: 18px;">
-                <li style="${Styles.LIST_ITEM}">⚙️ <strong>Settings Button in Action Bar</strong> / 操作栏设置按钮
-                    <ul style="margin: 4px 0 0 0; padding-left: 18px; font-size: 12px;">
-                        <li>Added right-aligned settings button to tool window action bar for quick access to Stocker settings / 在工具窗口操作栏添加右对齐的设置按钮，快速访问 Stocker 设置</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    """.trimIndent()
-
-    @Language("HTML")
-    private val releaseNote = """
-        <div style="${Styles.CONTAINER}">
-            <p style="${Styles.PARAGRAPH}">
-                🎉 <strong>Welcome to Stocker v${StockerMeta.currentVersion}!</strong> Here's what's new in this release:<br/>
-                欢迎使用 Stocker v${StockerMeta.currentVersion}！本次更新内容：
-            </p>
-            $whatsNew
-            <div style="${Styles.INFO_BOX}">
-                <p style="margin: 0; font-size: 12px;">
-                    💡 <strong>Pro tip / 小贴士：</strong> Click the settings button in the tool window action bar for quick access to customize your Stocker experience.<br/>
-                    点击工具窗口操作栏中的设置按钮，快速自定义您的 Stocker 体验。
-                </p>
-            </div>
-            <p style="${Styles.SMALL_TEXT}">
-                💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈<br/>
-                如果您觉得这个插件有帮助，请考虑点击下方的<strong>Donate</strong>按钮以支持开发。谢谢！
-            </p>
-        </div>
-    """.trimIndent()
-
-    @Language("HTML")
-    private val welcomeMessage = """
-        <div style="${Styles.CONTAINER}">
-            <p style="${Styles.PARAGRAPH}">
-                🎉 <strong>Welcome to Stocker!</strong> Your investment dashboard is now installed and ready to track your favorite stocks.<br/>
-                欢迎使用 Stocker！您的投资仪表板已安装完成，可以开始跟踪您喜爱的股票了。
-            </p>
-            <div style="${Styles.INFO_BOX}">
-                <p style="margin: 0 0 8px 0; font-size: 12px;">
-                    💡 <strong>Quick Setup / 快速设置：</strong>
-                </p>
-                <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
-                    <li style="margin: 4px 0;">Open the <span style="${Styles.HIGHLIGHT}">Stocker</span> tool window from the left panel<br/>从左侧面板打开 <span style="${Styles.HIGHLIGHT}">Stocker</span> 工具窗口</li>
-                    <li style="margin: 4px 0;">Click <span style="${Styles.HIGHLIGHT}">Add Favorite Stocks</span> to search and add stocks<br/>点击<span style="${Styles.HIGHLIGHT}">添加自选股票</span>来搜索和添加股票</li>
-                    <li style="margin: 4px 0;">Configure settings at <span style="${Styles.HIGHLIGHT}">Settings → Tools → Stocker</span><br/>在<span style="${Styles.HIGHLIGHT}">设置 → 工具 → Stocker</span>中配置选项</li>
-                    <li style="margin: 4px 0;">Start tracking your investments in real-time!<br/>开始实时跟踪您的投资！</li>
+    private fun buildReleaseNote(): String {
+        val v = version
+        return if (isChinese()) """
+            <div style="${Styles.CONTAINER}">
+                <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
+                <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
+                <ul style="margin: 0; padding-left: 18px;">
+                    <li style="${Styles.LIST_ITEM}">🌐 <strong>国际化支持</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>语言切换现已正常工作，更改后立即应用到表格视图</li></ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">⚙️ <strong>设置页面重组</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>重新整理为通用、数据提供商和表格显示三个分组</li></ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>问题修复</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>修复在设置中先点击应用再点击确定时设置被还原的问题</li></ul>
+                    </li>
                 </ul>
+                <div style="${Styles.INFO_BOX}">
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>前往设置 → 工具 → Stocker 切换插件语言并自定义您的使用体验。</p>
+                </div>
+                <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
-            <p style="${Styles.SMALL_TEXT}">
-                💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📊<br/>
-                如果您觉得这个插件有帮助，请考虑点击下方的<strong>Donate</strong>按钮以支持开发。谢谢！
-            </p>
-        </div>
-    """.trimIndent()
+        """.trimIndent() else """
+            <div style="${Styles.CONTAINER}">
+                <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
+                <h4 style="${Styles.HEADING}">✨ What's New in v${v}</h4>
+                <ul style="margin: 0; padding-left: 18px;">
+                    <li style="${Styles.LIST_ITEM}">🌐 <strong>i18n Support</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>Language switching now works properly and applies immediately to the table view</li></ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">⚙️ <strong>Settings Reorganized</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>Rearranged into General, Data Provider, and Table Display groups</li></ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>Fixed settings reverting when clicking Apply then OK</li></ul>
+                    </li>
+                </ul>
+                <div style="${Styles.INFO_BOX}">
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> Go to Settings → Tools → Stocker to switch the plugin language and customize your experience.</p>
+                </div>
+                <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
+            </div>
+        """.trimIndent()
+    }
+
+    @Language("HTML")
+    private fun buildWelcomeMessage(): String {
+        return if (isChinese()) """
+            <div style="${Styles.CONTAINER}">
+                <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker！</strong>您的投资仪表板已安装完成，可以开始跟踪您喜爱的股票了。</p>
+                <div style="${Styles.INFO_BOX}">
+                    <p style="margin: 0 0 8px 0; font-size: 12px;">💡 <strong>快速设置：</strong></p>
+                    <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
+                        <li style="margin: 4px 0;">从左侧面板打开 <strong>Stocker</strong> 工具窗口</li>
+                        <li style="margin: 4px 0;">点击<strong>添加自选股</strong>来搜索和添加股票</li>
+                        <li style="margin: 4px 0;">在<strong>设置 → 工具 → Stocker</strong> 中配置选项</li>
+                        <li style="margin: 4px 0;">开始实时跟踪您的投资！</li>
+                    </ul>
+                </div>
+                <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📊</p>
+            </div>
+        """.trimIndent() else """
+            <div style="${Styles.CONTAINER}">
+                <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker!</strong> Your investment dashboard is now installed and ready to track your favorite stocks.</p>
+                <div style="${Styles.INFO_BOX}">
+                    <p style="margin: 0 0 8px 0; font-size: 12px;">💡 <strong>Quick Setup:</strong></p>
+                    <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
+                        <li style="margin: 4px 0;">Open the <strong>Stocker</strong> tool window from the left panel</li>
+                        <li style="margin: 4px 0;">Click <strong>Add Favorite Stocks</strong> to search and add stocks</li>
+                        <li style="margin: 4px 0;">Configure settings at <strong>Settings → Tools → Stocker</strong></li>
+                        <li style="margin: 4px 0;">Start tracking your investments in real-time!</li>
+                    </ul>
+                </div>
+                <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📊</p>
+            </div>
+        """.trimIndent()
+    }
 
     private const val NOTIFICATION_GROUP_ID = "Stocker"
 
@@ -101,18 +127,18 @@ object StockerNotification {
     private const val DONATE_LINK = "https://www.buymeacoffee.com/nszihan"
 
     fun notifyReleaseNote(project: Project) {
-        val title = "Stocker v${StockerMeta.currentVersion} - Release Notes / 版本说明"
+        val title = if (isChinese()) "Stocker v${version} - 版本说明" else "Stocker v${version} - Release Notes"
         val notification = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
-            .createNotification(title, releaseNote, NotificationType.INFORMATION)
+            .createNotification(title, buildReleaseNote(), NotificationType.INFORMATION)
         addNotificationActions(notification)
         notification.icon = notificationIcon
         notification.notify(project)
     }
 
     fun notifyWelcome(project: Project) {
-        val title = "Stocker Successfully Installed / 安装成功"
+        val title = if (isChinese()) "Stocker 安装成功" else "Stocker Successfully Installed"
         val notification = NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
-            .createNotification(title, welcomeMessage, NotificationType.INFORMATION)
+            .createNotification(title, buildWelcomeMessage(), NotificationType.INFORMATION)
         addNotificationActions(notification)
         notification.icon = notificationIcon
         notification.notify(project)
