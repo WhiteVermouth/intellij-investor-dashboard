@@ -242,18 +242,25 @@ public class StockerTableView implements Disposable {
         mPane.add(iPane, BorderLayout.SOUTH);
     }
 
-    private static final String codeColumn = StockerTableColumn.SYMBOL.getTitle();
-    private static final String nameColumn = StockerTableColumn.NAME.getTitle();
-    private static final String currentColumn = StockerTableColumn.CURRENT.getTitle();
-    private static final String openingColumn = StockerTableColumn.OPENING.getTitle();
-    private static final String closeColumn = StockerTableColumn.CLOSE.getTitle();
-    private static final String lowColumn = StockerTableColumn.LOW.getTitle();
-    private static final String highColumn = StockerTableColumn.HIGH.getTitle();
-    private static final String changeColumn = StockerTableColumn.CHANGE.getTitle();
-    private static final String percentColumn = StockerTableColumn.CHANGE_PERCENT.getTitle();
-    private static final String costPriceColumn = StockerTableColumn.COST_PRICE.getTitle();
-    private static final String holdingsColumn = StockerTableColumn.HOLDINGS.getTitle();
-    private static final List<String> allColumns = StockerTableColumn.defaultTitles();
+    private static final String codeColumn = StockerTableColumn.SYMBOL.name();
+    private static final String nameColumn = StockerTableColumn.NAME.name();
+    private static final String currentColumn = StockerTableColumn.CURRENT.name();
+    private static final String openingColumn = StockerTableColumn.OPENING.name();
+    private static final String closeColumn = StockerTableColumn.CLOSE.name();
+    private static final String lowColumn = StockerTableColumn.LOW.name();
+    private static final String highColumn = StockerTableColumn.HIGH.name();
+    private static final String changeColumn = StockerTableColumn.CHANGE.name();
+    private static final String percentColumn = StockerTableColumn.CHANGE_PERCENT.name();
+    private static final String costPriceColumn = StockerTableColumn.COST_PRICE.name();
+    private static final String holdingsColumn = StockerTableColumn.HOLDINGS.name();
+    private static final List<String> allColumnNames;
+
+    static {
+        allColumnNames = new ArrayList<>();
+        for (StockerTableColumn col : StockerTableColumn.values()) {
+            allColumnNames.add(col.name());
+        }
+    }
 
     private void initTable() {
         tbModel = new StockerTableModel();
@@ -282,6 +289,7 @@ public class StockerTableView implements Disposable {
 
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
+        updateLocalizedHeaders();
 
         // Table grid styling
         tbBody.setRowHeight(26);
@@ -401,10 +409,11 @@ public class StockerTableView implements Disposable {
         List<String> visibleColumns = setting.getVisibleTableColumns();
 
         tbBody.createDefaultColumnsFromModel();
+        updateLocalizedHeaders();
 
-        for (String column : allColumns) {
-            if (!visibleColumns.contains(column)) {
-                TableColumn tableColumn = getColumnIfPresent(column);
+        for (String columnName : allColumnNames) {
+            if (!visibleColumns.contains(columnName)) {
+                TableColumn tableColumn = getColumnIfPresent(columnName);
                 if (tableColumn != null) {
                     tbBody.removeColumn(tableColumn);
                 }
@@ -414,6 +423,18 @@ public class StockerTableView implements Disposable {
         // Re-apply after column model rebuild to keep header/body cell geometry in sync.
         tbBody.getColumnModel().setColumnMargin(0);
         applyColumnRenderers();
+    }
+
+    private void updateLocalizedHeaders() {
+        for (int i = 0; i < tbBody.getColumnCount(); i++) {
+            TableColumn tableColumn = tbBody.getColumnModel().getColumn(i);
+            int modelIndex = tableColumn.getModelIndex();
+            if (modelIndex >= 0 && modelIndex < StockerTableColumn.values().length) {
+                StockerTableColumn col = StockerTableColumn.values()[modelIndex];
+                tableColumn.setIdentifier(col.name());
+                tableColumn.setHeaderValue(col.getTitle());
+            }
+        }
     }
 
     public void refreshColumnVisibility() {
@@ -496,10 +517,17 @@ public class StockerTableView implements Disposable {
         }
     }
 
-    private TableColumn getColumnIfPresent(String columnName) {
+    private TableColumn getColumnIfPresent(String identifier) {
         try {
-            return tbBody.getColumn(columnName);
+            return tbBody.getColumn(identifier);
         } catch (IllegalArgumentException e) {
+            // JTable.getColumn searches by identifier first, fall back to manual search
+            for (int i = 0; i < tbBody.getColumnCount(); i++) {
+                TableColumn col = tbBody.getColumnModel().getColumn(i);
+                if (identifier.equals(col.getIdentifier())) {
+                    return col;
+                }
+            }
             return null;
         }
     }

@@ -11,7 +11,8 @@ class StockerSettingState {
     var cryptoQuoteProvider: StockerQuoteProvider = StockerQuoteProvider.SINA
     var quoteColorPattern: StockerQuoteColorPattern = StockerQuoteColorPattern.RED_UP_GREEN_DOWN
     var displayNameWithPinyin: Boolean = false
-    var visibleTableColumns: MutableList<String> = StockerTableColumn.defaultVisibleTitles().toMutableList()
+    var languageOverride: String = "" // Empty string means follow system language
+    var visibleTableColumns: MutableList<String> = mutableListOf() // Empty list will be populated with defaults on first access
     var aShareList: MutableList<String> = mutableListOf()
     var hkStocksList: MutableList<String> = mutableListOf()
     var usStocksList: MutableList<String> = mutableListOf()

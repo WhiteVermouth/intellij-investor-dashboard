@@ -3,8 +3,10 @@ package com.vermouthx.stocker.views.windows
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.JBColor
+import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.dsl.builder.*
 import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 import com.vermouthx.stocker.enums.StockerTableColumn
@@ -13,26 +15,27 @@ import com.vermouthx.stocker.views.StockerTableView
 import javax.swing.JCheckBox
 import javax.swing.JLabel
 
-class StockerSettingWindow : BoundConfigurable("Stocker") {
+class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.name")) {
 
     private val setting = StockerSetting.instance
 
     private var colorPattern: StockerQuoteColorPattern = setting.quoteColorPattern
-    private var quoteProviderTitle: String = setting.quoteProvider.title
-    private var cryptoQuoteProviderTitle: String = setting.cryptoQuoteProvider.title
+    private var selectedProvider: StockerQuoteProvider = setting.quoteProvider
+    private var selectedCryptoProvider: StockerQuoteProvider = setting.cryptoQuoteProvider
     private var displayNameWithPinyin: Boolean = setting.displayNameWithPinyin
-    private var showSymbol: Boolean = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
-    private var showName: Boolean = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
-    private var showCurrent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
-    private var showOpening: Boolean = setting.isTableColumnVisible(StockerTableColumn.OPENING.title)
-    private var showClose: Boolean = setting.isTableColumnVisible(StockerTableColumn.CLOSE.title)
-    private var showLow: Boolean = setting.isTableColumnVisible(StockerTableColumn.LOW.title)
-    private var showHigh: Boolean = setting.isTableColumnVisible(StockerTableColumn.HIGH.title)
-    private var showChange: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE.title)
-    private var showChangePercent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
-    private var showCostPrice: Boolean = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE.title)
-    private var showHoldings: Boolean = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS.title)
-    
+    private var languageOverride: String = setting.languageOverride
+    private var showSymbol: Boolean = setting.isTableColumnVisible(StockerTableColumn.SYMBOL)
+    private var showName: Boolean = setting.isTableColumnVisible(StockerTableColumn.NAME)
+    private var showCurrent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CURRENT)
+    private var showOpening: Boolean = setting.isTableColumnVisible(StockerTableColumn.OPENING)
+    private var showClose: Boolean = setting.isTableColumnVisible(StockerTableColumn.CLOSE)
+    private var showLow: Boolean = setting.isTableColumnVisible(StockerTableColumn.LOW)
+    private var showHigh: Boolean = setting.isTableColumnVisible(StockerTableColumn.HIGH)
+    private var showChange: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE)
+    private var showChangePercent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT)
+    private var showCostPrice: Boolean = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE)
+    private var showHoldings: Boolean = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS)
+
     private var symbolCheckBox: JCheckBox? = null
     private var nameCheckBox: JCheckBox? = null
     private var currentCheckBox: JCheckBox? = null
@@ -46,68 +49,92 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
     private var holdingsCheckBox: JCheckBox? = null
     private var columnWarningLabel: JLabel? = null
 
+    companion object {
+        private val LANGUAGE_CODES = listOf("", "en", "zh_CN")
+
+        private fun languageDisplayName(code: String): String = when (code) {
+            "" -> StockerBundle.message("settings.language.system")
+            "en" -> StockerBundle.message("settings.language.english")
+            "zh_CN" -> StockerBundle.message("settings.language.chinese")
+            else -> code
+        }
+    }
+
     override fun createPanel(): DialogPanel {
+        val providerRenderer = SimpleListCellRenderer.create<StockerQuoteProvider>("") { it.title }
+        val languageRenderer = SimpleListCellRenderer.create<String>("") { languageDisplayName(it) }
+
         return panel {
-            group("Data Provider") {
+            group(StockerBundle.message("settings.group.general")) {
                 row {
-                    label("Stock quote source:")
+                    label(StockerBundle.message("settings.language"))
                         .widthGroup("labels")
-                    comboBox(StockerQuoteProvider.values().map { it.title })
-                        .bindItem(::quoteProviderTitle.toNullableProperty())
+                    comboBox(LANGUAGE_CODES, languageRenderer)
+                        .bindItem(
+                            { languageOverride },
+                            { languageOverride = it ?: "" }
+                        )
                         .widthGroup("comboboxes")
-                        .comment("Select the data source for stock quotes (A-Share, HK, US)")
-                }.layout(RowLayout.LABEL_ALIGNED)
-                
-                row {
-                    label("Crypto quote source:")
-                        .widthGroup("labels")
-                    comboBox(listOf(StockerQuoteProvider.SINA.title))
-                        .bindItem(::cryptoQuoteProviderTitle.toNullableProperty())
-                        .widthGroup("comboboxes")
-                        .comment("Crypto quotes are only available from Sina")
+                        .comment(StockerBundle.message("settings.language.comment"))
                 }.layout(RowLayout.LABEL_ALIGNED)
             }
 
-            group("Display Settings") {
+            group(StockerBundle.message("settings.group.data.provider")) {
+                row {
+                    label(StockerBundle.message("settings.stock.quote.source"))
+                        .widthGroup("labels")
+                    comboBox(StockerQuoteProvider.entries.toList(), providerRenderer)
+                        .bindItem(::selectedProvider.toNullableProperty())
+                        .widthGroup("comboboxes")
+                        .comment(StockerBundle.message("settings.stock.quote.source.comment"))
+                }.layout(RowLayout.LABEL_ALIGNED)
+
+                row {
+                    label(StockerBundle.message("settings.crypto.quote.source"))
+                        .widthGroup("labels")
+                    comboBox(listOf(StockerQuoteProvider.SINA), providerRenderer)
+                        .bindItem(::selectedCryptoProvider.toNullableProperty())
+                        .widthGroup("comboboxes")
+                        .comment(StockerBundle.message("settings.crypto.quote.source.comment"))
+                }.layout(RowLayout.LABEL_ALIGNED)
+            }
+
+            group(StockerBundle.message("settings.group.table.display")) {
                 buttonsGroup {
                     row {
-                        label("Color pattern:")
+                        label(StockerBundle.message("settings.color.pattern"))
                             .widthGroup("labels")
                     }
                     indent {
                         row {
-                            radioButton("Red up, green down", StockerQuoteColorPattern.RED_UP_GREEN_DOWN)
-                                .comment("Traditional Asian market color scheme")
+                            radioButton(StockerBundle.message("settings.color.pattern.red.up"), StockerQuoteColorPattern.RED_UP_GREEN_DOWN)
+                                .comment(StockerBundle.message("settings.color.pattern.red.up.comment"))
                         }
                         row {
-                            radioButton("Green up, red down", StockerQuoteColorPattern.GREEN_UP_RED_DOWN)
-                                .comment("Western market color scheme")
+                            radioButton(StockerBundle.message("settings.color.pattern.green.up"), StockerQuoteColorPattern.GREEN_UP_RED_DOWN)
+                                .comment(StockerBundle.message("settings.color.pattern.green.up.comment"))
                         }
                         row {
-                            radioButton("No color coding", StockerQuoteColorPattern.NONE)
-                                .comment("Display all values in default text color")
+                            radioButton(StockerBundle.message("settings.color.pattern.none"), StockerQuoteColorPattern.NONE)
+                                .comment(StockerBundle.message("settings.color.pattern.none.comment"))
                         }
                     }
                 }.bind(::colorPattern.toMutableProperty(), StockerQuoteColorPattern::class.java)
 
-                separator()
-
                 row {
-                    label("Name format:")
+                    label(StockerBundle.message("settings.name.format"))
                         .widthGroup("labels")
                 }.layout(RowLayout.LABEL_ALIGNED)
 
                 indent {
                     row {
-                        checkBox("Convert Chinese names to Pinyin")
+                        checkBox(StockerBundle.message("settings.name.format.pinyin"))
                             .bindSelected(::displayNameWithPinyin.toMutableProperty())
-                    }.rowComment("Example: 平安银行 → PingAnYinHang")
+                    }.rowComment(StockerBundle.message("settings.name.format.pinyin.comment"))
                 }
 
-                separator()
-
                 row {
-                    label("Table columns:")
+                    label(StockerBundle.message("settings.table.columns"))
                         .widthGroup("labels")
                 }.layout(RowLayout.LABEL_ALIGNED)
 
@@ -201,8 +228,8 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                             .component
                     }
                     row {
-                        columnWarningLabel = label("Please keep at least one visible column.")
-                            .applyToComponent { 
+                        columnWarningLabel = label(StockerBundle.message("settings.table.columns.warning"))
+                            .applyToComponent {
                                 foreground = JBColor.RED
                                 isVisible = false
                             }
@@ -215,50 +242,53 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
                 val visibleColumns = buildVisibleColumns()
                 val columnsModified = visibleColumns != setting.visibleTableColumns
                 val colorPatternModified = colorPattern != setting.quoteColorPattern
-                val providerModified = quoteProviderTitle != setting.quoteProvider.title
-                val cryptoProviderModified = cryptoQuoteProviderTitle != setting.cryptoQuoteProvider.title
+                val providerModified = selectedProvider != setting.quoteProvider
+                val cryptoProviderModified = selectedCryptoProvider != setting.cryptoQuoteProvider
                 val pinyinModified = displayNameWithPinyin != setting.displayNameWithPinyin
+                val languageModified = languageOverride != setting.languageOverride
 
-                setting.quoteProvider = StockerQuoteProvider.fromTitle(quoteProviderTitle)
-                setting.cryptoQuoteProvider = StockerQuoteProvider.fromTitle(cryptoQuoteProviderTitle)
+                setting.quoteProvider = selectedProvider
+                setting.cryptoQuoteProvider = selectedCryptoProvider
                 setting.quoteColorPattern = colorPattern
                 setting.displayNameWithPinyin = displayNameWithPinyin
                 setting.visibleTableColumns = visibleColumns
+                setting.languageOverride = languageOverride
 
-                if (columnsModified) {
+                if (columnsModified || languageModified) {
                     StockerTableView.refreshAllColumnVisibility()
                 }
                 if (colorPatternModified) {
                     StockerTableView.refreshAllColorPatterns()
                 }
-                // Refresh all active projects when quote provider or pinyin setting changes
-                if (providerModified || cryptoProviderModified || pinyinModified) {
+                if (providerModified || cryptoProviderModified || pinyinModified || languageModified) {
                     refreshAllWindows()
                 }
             }
             onIsModified {
-                quoteProviderTitle != setting.quoteProvider.title ||
-                        cryptoQuoteProviderTitle != setting.cryptoQuoteProvider.title ||
+                selectedProvider != setting.quoteProvider ||
+                        selectedCryptoProvider != setting.cryptoQuoteProvider ||
                         colorPattern != setting.quoteColorPattern ||
                         displayNameWithPinyin != setting.displayNameWithPinyin ||
+                        languageOverride != setting.languageOverride ||
                         buildVisibleColumns() != setting.visibleTableColumns
             }
             onReset {
-                quoteProviderTitle = setting.quoteProvider.title
-                cryptoQuoteProviderTitle = setting.cryptoQuoteProvider.title
+                selectedProvider = setting.quoteProvider
+                selectedCryptoProvider = setting.cryptoQuoteProvider
                 colorPattern = setting.quoteColorPattern
                 displayNameWithPinyin = setting.displayNameWithPinyin
-                showSymbol = setting.isTableColumnVisible(StockerTableColumn.SYMBOL.title)
-                showName = setting.isTableColumnVisible(StockerTableColumn.NAME.title)
-                showCurrent = setting.isTableColumnVisible(StockerTableColumn.CURRENT.title)
-                showOpening = setting.isTableColumnVisible(StockerTableColumn.OPENING.title)
-                showClose = setting.isTableColumnVisible(StockerTableColumn.CLOSE.title)
-                showLow = setting.isTableColumnVisible(StockerTableColumn.LOW.title)
-                showHigh = setting.isTableColumnVisible(StockerTableColumn.HIGH.title)
-                showChange = setting.isTableColumnVisible(StockerTableColumn.CHANGE.title)
-                showChangePercent = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT.title)
-                showCostPrice = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE.title)
-                showHoldings = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS.title)
+                languageOverride = setting.languageOverride
+                showSymbol = setting.isTableColumnVisible(StockerTableColumn.SYMBOL)
+                showName = setting.isTableColumnVisible(StockerTableColumn.NAME)
+                showCurrent = setting.isTableColumnVisible(StockerTableColumn.CURRENT)
+                showOpening = setting.isTableColumnVisible(StockerTableColumn.OPENING)
+                showClose = setting.isTableColumnVisible(StockerTableColumn.CLOSE)
+                showLow = setting.isTableColumnVisible(StockerTableColumn.LOW)
+                showHigh = setting.isTableColumnVisible(StockerTableColumn.HIGH)
+                showChange = setting.isTableColumnVisible(StockerTableColumn.CHANGE)
+                showChangePercent = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT)
+                showCostPrice = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE)
+                showHoldings = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS)
                 columnWarningLabel?.isVisible = false
             }
         }
@@ -266,38 +296,37 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
 
     private fun buildVisibleColumns(): MutableList<String> {
         val visibleColumns = mutableListOf<String>()
-        if (showSymbol) visibleColumns.add(StockerTableColumn.SYMBOL.title)
-        if (showName) visibleColumns.add(StockerTableColumn.NAME.title)
-        if (showCurrent) visibleColumns.add(StockerTableColumn.CURRENT.title)
-        if (showOpening) visibleColumns.add(StockerTableColumn.OPENING.title)
-        if (showClose) visibleColumns.add(StockerTableColumn.CLOSE.title)
-        if (showLow) visibleColumns.add(StockerTableColumn.LOW.title)
-        if (showHigh) visibleColumns.add(StockerTableColumn.HIGH.title)
-        if (showChange) visibleColumns.add(StockerTableColumn.CHANGE.title)
-        if (showChangePercent) visibleColumns.add(StockerTableColumn.CHANGE_PERCENT.title)
-        if (showCostPrice) visibleColumns.add(StockerTableColumn.COST_PRICE.title)
-        if (showHoldings) visibleColumns.add(StockerTableColumn.HOLDINGS.title)
+        if (showSymbol) visibleColumns.add(StockerTableColumn.SYMBOL.name)
+        if (showName) visibleColumns.add(StockerTableColumn.NAME.name)
+        if (showCurrent) visibleColumns.add(StockerTableColumn.CURRENT.name)
+        if (showOpening) visibleColumns.add(StockerTableColumn.OPENING.name)
+        if (showClose) visibleColumns.add(StockerTableColumn.CLOSE.name)
+        if (showLow) visibleColumns.add(StockerTableColumn.LOW.name)
+        if (showHigh) visibleColumns.add(StockerTableColumn.HIGH.name)
+        if (showChange) visibleColumns.add(StockerTableColumn.CHANGE.name)
+        if (showChangePercent) visibleColumns.add(StockerTableColumn.CHANGE_PERCENT.name)
+        if (showCostPrice) visibleColumns.add(StockerTableColumn.COST_PRICE.name)
+        if (showHoldings) visibleColumns.add(StockerTableColumn.HOLDINGS.name)
         return visibleColumns
     }
 
     private fun handleColumnToggle(changed: JCheckBox) {
         val allCheckboxes = listOfNotNull(
-            symbolCheckBox, 
-            nameCheckBox, 
-            currentCheckBox, 
-            openingCheckBox, 
-            closeCheckBox, 
-            lowCheckBox, 
-            highCheckBox, 
-            changeCheckBox, 
+            symbolCheckBox,
+            nameCheckBox,
+            currentCheckBox,
+            openingCheckBox,
+            closeCheckBox,
+            lowCheckBox,
+            highCheckBox,
+            changeCheckBox,
             changePercentCheckBox,
             costPriceCheckBox,
             holdingsCheckBox
         )
         val selectedCount = allCheckboxes.count { it.isSelected }
-        
+
         if (selectedCount == 0) {
-            // Prevent unchecking the last checkbox
             changed.isSelected = true
             columnWarningLabel?.isVisible = true
         } else {
@@ -306,8 +335,6 @@ class StockerSettingWindow : BoundConfigurable("Stocker") {
     }
 
     private fun refreshAllWindows() {
-        // Restart all active applications to reload with new settings
-        // This will clear tables and reload data with updated settings
         StockerAppManager.getAllApplications().forEach { app ->
             app.shutdownThenClear()
             app.schedule()

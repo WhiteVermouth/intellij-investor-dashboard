@@ -57,11 +57,25 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
             log.info("Stocker display name with pinyin set to $value")
         }
 
+    var languageOverride: String
+        get() = myState.languageOverride
+        set(value) {
+            myState.languageOverride = value
+            log.info("Stocker language override set to $value")
+        }
+
     var visibleTableColumns: List<String>
-        get() = if (myState.visibleTableColumns.isEmpty()) {
-            StockerTableColumn.defaultVisibleTitles()
-        } else {
-            myState.visibleTableColumns
+        get() {
+            val stored = myState.visibleTableColumns
+            if (stored.isEmpty()) return StockerTableColumn.defaultVisibleNames()
+            if (stored.all { name -> StockerTableColumn.fromName(name) != null }) return stored
+            val migrated = stored.mapNotNull { StockerTableColumn.migrateLocalizedTitle(it) }
+            if (migrated.isNotEmpty()) {
+                myState.visibleTableColumns = migrated.toMutableList()
+                log.info("Migrated visibleTableColumns from localized titles to enum names: $migrated")
+                return migrated
+            }
+            return StockerTableColumn.defaultVisibleNames()
         }
         set(value) {
             myState.visibleTableColumns = value.toMutableList()
@@ -172,8 +186,8 @@ class StockerSetting : PersistentStateComponent<StockerSettingState> {
         return originalName
     }
 
-    fun isTableColumnVisible(columnTitle: String): Boolean {
-        return visibleTableColumns.contains(columnTitle)
+    fun isTableColumnVisible(column: StockerTableColumn): Boolean {
+        return visibleTableColumns.contains(column.name)
     }
 
     fun containsCode(code: String): Boolean {

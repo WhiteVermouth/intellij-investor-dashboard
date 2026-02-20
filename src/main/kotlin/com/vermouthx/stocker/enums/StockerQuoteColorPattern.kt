@@ -1,7 +1,12 @@
 package com.vermouthx.stocker.enums
 
-enum class StockerQuoteColorPattern(val title: String) {
-    RED_UP_GREEN_DOWN("R.U.G.D. Mode"),
-    GREEN_UP_RED_DOWN("G.U.R.D. Mode"),
-    NONE("None")
+import com.vermouthx.stocker.StockerBundle
+
+enum class StockerQuoteColorPattern(val titleKey: String) {
+    RED_UP_GREEN_DOWN("color.pattern.rugd"),
+    GREEN_UP_RED_DOWN("color.pattern.gurd"),
+    NONE("color.pattern.none");
+
+    val title: String
+        get() = StockerBundle.message(titleKey)
 }

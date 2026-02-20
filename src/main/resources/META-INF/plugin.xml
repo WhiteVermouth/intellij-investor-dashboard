@@ -3,6 +3,7 @@
     <name>Stocker</name>
     <vendor email="developer@nszihan.com" url="https://nszihan.com">Zihan Ma</vendor>
     <idea-version since-build="241"/>
+    <resource-bundle>messages.StockerBundle</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.vermouthx.stocker.settings.StockerSetting"/>
@@ -22,23 +23,32 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <action class="com.vermouthx.stocker.actions.StockerStockSearchAction"
                     id="com.vermouthx.stocker.actions.StockerStockSearchAction"
-                    text="Add Favorite Stocks" description="Search and add stock symbols" icon="AllIcons.General.Add">
+                    text="%action.add.favorite.stocks"
+                    description="%action.add.favorite.stocks.description"
+                    icon="AllIcons.General.Add">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerRefreshAction"
                     id="com.vermouthx.stocker.actions.StockerRefreshAction"
-                    text="Refresh" description="Refresh" icon="AllIcons.Actions.Refresh">
+                    text="%action.refresh"
+                    description="%action.refresh.description"
+                    icon="AllIcons.Actions.Refresh">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
-                    text="Manage Favorite Stocks" description="Manage stock symbols" icon="AllIcons.Actions.Edit">
+                    text="%action.manage.favorite.stocks"
+                    description="%action.manage.favorite.stocks.description"
+                    icon="AllIcons.Actions.Edit">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerSettingAction"
                     id="com.vermouthx.stocker.actions.StockerSettingAction"
-                    text="Settings" description="Open Stocker settings" icon="AllIcons.General.Settings">
+                    text="%action.settings"
+                    description="%action.settings.description"
+                    icon="AllIcons.General.Settings">
             </action>
             <action class="com.vermouthx.stocker.actions.StockerResetAction"
                     id="com.vermouthx.stocker.actions.StockerResetAction"
-                    text="Remove All Favorite Stocks" description="Remove all stock symbols"
+                    text="%action.remove.all.favorite.stocks"
+                    description="%action.remove.all.favorite.stocks.description"
                     icon="AllIcons.General.Reset">
             </action>
         </group>
