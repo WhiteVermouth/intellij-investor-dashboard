@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.util.messages.MessageBus;
 import com.vermouthx.stocker.entities.StockerSuggestion;
 import com.vermouthx.stocker.enums.StockerMarketType;
+import com.vermouthx.stocker.enums.StockerQuoteProvider;
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier;
 import com.vermouthx.stocker.settings.StockerSetting;
 
@@ -14,8 +15,11 @@ public class StockerActionUtil {
         StockerSetting setting = StockerSetting.Companion.getInstance();
         String code = suggest.getCode();
         String fullName = suggest.getName();
+        StockerQuoteProvider provider = market == StockerMarketType.Crypto
+                ? setting.getCryptoQuoteProvider()
+                : setting.getQuoteProvider();
         if (!setting.containsCode(code)) {
-            if (StockerQuoteHttpUtil.INSTANCE.validateCode(market, setting.getQuoteProvider(), code)) {
+            if (StockerQuoteHttpUtil.INSTANCE.validateCode(market, provider, code)) {
                 switch (market) {
                     case AShare:
                         return setting.getAShareList().add(code);
