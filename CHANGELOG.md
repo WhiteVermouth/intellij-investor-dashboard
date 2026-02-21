@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.18.1
+
+### 🌐 i18n / 国际化
+
+- Fixed action text/description localization in Tools menu and tool window actions; labels now follow the selected plugin language immediately / 修复工具菜单与工具窗口操作项的文本和描述本地化问题；标签现在会立即跟随插件语言设置
+- Aligned action naming style for better consistency across English and Chinese labels / 统一中英文操作项命名风格，提升一致性
+
+### 🐛 Bug Fixes / 错误修复
+
+- Fixed "Clear Favorites" to clear all markets including Crypto and trigger proper view refresh / 修复“清空自选”未覆盖加密货币的问题，并确保触发正确的视图刷新
+- Fixed crypto symbol validation to use crypto quote provider instead of stock quote provider / 修复加密货币代码校验使用错误数据源的问题（改为使用加密行情源）
+
 ## 1.18.0
 
 ### 🌐 i18n / 国际化

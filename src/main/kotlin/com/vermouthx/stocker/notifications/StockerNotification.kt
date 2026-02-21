@@ -47,14 +47,17 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
                 <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🌐 <strong>国际化支持</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>语言切换现已正常工作，更改后立即应用到表格视图</li></ul>
+                    <li style="${Styles.LIST_ITEM}">🌐 <strong>国际化修复</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>工具菜单和工具窗口中的操作项名称与描述现已正确跟随插件语言</li></ul>
                     </li>
-                    <li style="${Styles.LIST_ITEM}">⚙️ <strong>设置页面重组</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>重新整理为通用、数据提供商和表格显示三个分组</li></ul>
+                    <li style="${Styles.LIST_ITEM}">🎨 <strong>操作项命名优化</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>统一中英文操作项命名风格，菜单阅读更一致</li></ul>
                     </li>
                     <li style="${Styles.LIST_ITEM}">🐛 <strong>问题修复</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>修复在设置中先点击应用再点击确定时设置被还原的问题</li></ul>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>修复“清空自选”未清空加密货币的问题</li>
+                            <li>修复加密货币代码校验使用错误数据源的问题</li>
+                        </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
@@ -67,14 +70,17 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
                 <h4 style="${Styles.HEADING}">✨ What's New in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🌐 <strong>i18n Support</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>Language switching now works properly and applies immediately to the table view</li></ul>
+                    <li style="${Styles.LIST_ITEM}">🌐 <strong>i18n Fixes</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>Action names and descriptions in the Tools menu and tool window now correctly follow the selected plugin language</li></ul>
                     </li>
-                    <li style="${Styles.LIST_ITEM}">⚙️ <strong>Settings Reorganized</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>Rearranged into General, Data Provider, and Table Display groups</li></ul>
+                    <li style="${Styles.LIST_ITEM}">🎨 <strong>Action Naming Cleanup</strong>
+                        <ul style="${Styles.SUB_LIST}"><li>Aligned action naming style across English and Chinese labels for better menu consistency</li></ul>
                     </li>
                     <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>Fixed settings reverting when clicking Apply then OK</li></ul>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>Fixed "Clear Favorites" not clearing crypto symbols</li>
+                            <li>Fixed crypto symbol validation using the wrong quote provider</li>
+                        </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
