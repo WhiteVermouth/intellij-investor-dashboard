@@ -19,6 +19,8 @@ import com.vermouthx.stocker.utils.StockerActionUtil;
 import com.vermouthx.stocker.utils.StockerPinyinUtil;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -64,6 +66,8 @@ public class StockerTableView implements Disposable {
     private StockerSortState currentSortState = StockerSortState.NONE;
     // Backup data only when sorting is active (cleared when returning to NONE state)
     private List<Object[]> sortBackupData = null;
+    private String popupTargetCode = null;
+    private String popupTargetName = null;
 
     private volatile boolean disposed = false;
 
@@ -347,6 +351,8 @@ public class StockerTableView implements Disposable {
 
         if (row != -1 && (event.isPopupTrigger() || SwingUtilities.isRightMouseButton(event))) {
             tbBody.setRowSelectionInterval(row, row);
+            popupTargetCode = getStringValueAt(row, 0);
+            popupTargetName = getStringValueAt(row, 1);
         }
 
         if (event.isPopupTrigger() && row != -1) {
@@ -379,29 +385,59 @@ public class StockerTableView implements Disposable {
             deleteMenuItem.setForeground(hovering ? hoverForeground : defaultForeground);
         });
         deleteMenuItem.addActionListener(e -> deleteSelectedStock());
+        popupMenu.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                clearPopupTarget();
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                clearPopupTarget();
+            }
+        });
         popupMenu.add(deleteMenuItem);
         return popupMenu;
     }
 
     private void deleteSelectedStock() {
-        int selectedRow = tbBody.getSelectedRow();
-        if (selectedRow < 0) {
+        String code = popupTargetCode;
+        String name = popupTargetName;
+        if (code == null) {
+            int selectedRow = tbBody.getSelectedRow();
+            if (selectedRow < 0) {
+                clearPopupTarget();
+                return;
+            }
+            code = getStringValueAt(selectedRow, 0);
+            name = getStringValueAt(selectedRow, 1);
+        }
+        if (code == null) {
+            clearPopupTarget();
             return;
         }
-        Object codeValue = tbModel.getValueAt(selectedRow, 0);
-        if (codeValue == null) {
-            return;
-        }
-        String code = codeValue.toString();
         StockerSetting setting = StockerSetting.Companion.getInstance();
         StockerMarketType market = setting.marketOf(code);
         if (market == null) {
+            clearPopupTarget();
             return;
         }
+        StockerActionUtil.removeStock(market, new StockerSuggestion(code, name == null ? code : name, market));
+        clearPopupTarget();
+    }
 
-        Object nameValue = tbModel.getValueAt(selectedRow, 1);
-        String name = nameValue == null ? code : nameValue.toString();
-        StockerActionUtil.removeStock(market, new StockerSuggestion(code, name, market));
+    private String getStringValueAt(int row, int column) {
+        Object value = tbModel.getValueAt(row, column);
+        return value == null ? null : value.toString();
+    }
+
+    private void clearPopupTarget() {
+        popupTargetCode = null;
+        popupTargetName = null;
     }
 
     private void applyColumnVisibility() {
