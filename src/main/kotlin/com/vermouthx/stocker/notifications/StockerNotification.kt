@@ -47,21 +47,15 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
                 <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🌐 <strong>国际化修复</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>工具菜单和工具窗口中的操作项名称与描述现已正确跟随插件语言</li></ul>
-                    </li>
-                    <li style="${Styles.LIST_ITEM}">🎨 <strong>操作项命名优化</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>统一中英文操作项命名风格，菜单阅读更一致</li></ul>
-                    </li>
                     <li style="${Styles.LIST_ITEM}">🐛 <strong>问题修复</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>修复“清空自选”未清空加密货币的问题</li>
-                            <li>修复加密货币代码校验使用错误数据源的问题</li>
+                            <li>修复右键删除偶发失效的问题，避免弹出菜单操作时丢失目标行</li>
+                            <li>移除重复的表格删除通知，减少删除后的刷新异常</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>前往设置 → 工具 → Stocker 切换插件语言并自定义您的使用体验。</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>您现在可以更稳定地通过右键菜单管理自选股票。</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
@@ -70,21 +64,15 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
                 <h4 style="${Styles.HEADING}">✨ What's New in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🌐 <strong>i18n Fixes</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>Action names and descriptions in the Tools menu and tool window now correctly follow the selected plugin language</li></ul>
-                    </li>
-                    <li style="${Styles.LIST_ITEM}">🎨 <strong>Action Naming Cleanup</strong>
-                        <ul style="${Styles.SUB_LIST}"><li>Aligned action naming style across English and Chinese labels for better menu consistency</li></ul>
-                    </li>
                     <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>Fixed "Clear Favorites" not clearing crypto symbols</li>
-                            <li>Fixed crypto symbol validation using the wrong quote provider</li>
+                            <li>Fixed right-click delete occasionally failing when the popup interaction cleared the target row</li>
+                            <li>Removed duplicate table deletion notifications to avoid inconsistent refresh behavior after removal</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> Go to Settings → Tools → Stocker to switch the plugin language and customize your experience.</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> You can now manage favorites more reliably from the table row context menu.</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
             </div>

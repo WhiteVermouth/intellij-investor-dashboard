@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.18.2
+
+### 🐛 Bug Fixes / 错误修复
+
+- Fixed right-click delete sometimes failing because the popup action could lose the selected row before deletion / 修复右键删除偶发失效的问题：弹出菜单执行前表格选中行可能已丢失
+- Removed duplicate table row deletion notifications during stock removal to avoid inconsistent refresh behavior / 移除删除股票时重复触发表格行删除通知的问题，避免刷新行为不一致
+
 ## 1.18.1
 
 ### 🌐 i18n / 国际化
