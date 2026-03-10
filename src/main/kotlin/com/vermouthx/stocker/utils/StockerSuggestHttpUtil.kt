@@ -5,31 +5,16 @@ import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.enums.StockerQuoteProvider
 import org.apache.commons.text.StringEscapeUtils
-import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
 
 object StockerSuggestHttpUtil {
 
     private val log = Logger.getInstance(javaClass)
+    private val httpClientPool = StockerHttpClientPool(log)
 
-    private val httpClientPool = run {
-        val connectionManager = PoolingHttpClientConnectionManager()
-        connectionManager.maxTotal = 20
-        connectionManager.defaultMaxPerRoute = 10
-        // Configure timeouts to prevent hanging requests
-        val requestConfig = RequestConfig.custom()
-            .setConnectTimeout(10000) // 10 seconds to establish connection
-            .setSocketTimeout(15000) // 15 seconds to read data
-            .setConnectionRequestTimeout(5000) // 5 seconds to get connection from pool
-            .build()
-        HttpClients.custom()
-            .setConnectionManager(connectionManager)
-            .setDefaultRequestConfig(requestConfig)
-            .useSystemProperties()
-            .build()
+    fun closeConnections() {
+        httpClientPool.close()
     }
 
     /**
@@ -51,7 +36,7 @@ object StockerSuggestHttpUtil {
             httpGet.setHeader("Referer", "https://finance.sina.com.cn") // Sina API requires this header
         }
         return try {
-            httpClientPool.execute(httpGet).use { response ->
+            httpClientPool.client().execute(httpGet).use { response ->
                 val allSuggestions = when (provider) {
                     StockerQuoteProvider.SINA -> {
                         val responseText = EntityUtils.toString(response.entity, "UTF-8")

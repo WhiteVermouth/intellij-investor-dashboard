@@ -162,6 +162,8 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         } catch (e: InterruptedException) {
             service.shutdownNow()
             Thread.currentThread().interrupt()
+        } finally {
+            StockerSuggestHttpUtil.closeConnections()
         }
         super.dispose()
     }

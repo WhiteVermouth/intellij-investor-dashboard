@@ -50,7 +50,7 @@
 - `pluginVersion` lives in `gradle.properties`.
 - `build.gradle.kts` uses `CHANGELOG.md` as the source for plugin change notes shown on release.
 - `StockerNotification.kt` contains the in-product release note content shown to users after upgrade.
-- When bumping to the next plugin version, always update these files together:
+- When bumping the plugin version, you must update these files together in the same change:
   - `gradle.properties`
   - `CHANGELOG.md`
   - `src/main/kotlin/com/vermouthx/stocker/notifications/StockerNotification.kt`

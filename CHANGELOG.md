@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.19.0
+
+### ✨ Improvements / 改进
+
+- Restored the toolbar "Stop Refresh" action so scheduled quote updates can be paused without clearing the current table data / 恢复工具栏“停止刷新”操作，可在不清空当前表格数据的情况下暂停定时行情更新
+
 ## 1.18.2
 
 ### 🐛 Bug Fixes / 错误修复
