@@ -8,6 +8,7 @@ import com.vermouthx.stocker.actions.StockerRefreshAction
 import com.vermouthx.stocker.actions.StockerSettingAction
 import com.vermouthx.stocker.actions.StockerStockManageAction
 import com.vermouthx.stocker.actions.StockerStockSearchAction
+import com.vermouthx.stocker.actions.StockerStopAction
 import com.vermouthx.stocker.views.StockerTableView
 
 class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
@@ -18,6 +19,7 @@ class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
         val leftActions = listOfNotNull(
             StockerStockSearchAction::class.qualifiedName?.let { actionManager.getAction(it) },
             StockerRefreshAction::class.qualifiedName?.let { actionManager.getAction(it) },
+            StockerStopAction::class.qualifiedName?.let { actionManager.getAction(it) },
             StockerStockManageAction::class.qualifiedName?.let { actionManager.getAction(it) }
         )
         val actionGroup = DefaultActionGroup(leftActions)

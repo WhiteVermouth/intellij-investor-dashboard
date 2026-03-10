@@ -33,6 +33,12 @@
                     description="%action.refresh.description"
                     icon="AllIcons.Actions.Refresh">
             </action>
+            <action class="com.vermouthx.stocker.actions.StockerStopAction"
+                    id="com.vermouthx.stocker.actions.StockerStopAction"
+                    text="%action.stop.refresh"
+                    description="%action.stop.refresh.description"
+                    icon="AllIcons.Actions.StopRefresh">
+            </action>
             <action class="com.vermouthx.stocker.actions.StockerStockManageAction"
                     id="com.vermouthx.stocker.actions.StockerStockManageAction"
                     text="%action.manage.favorite.stocks"
