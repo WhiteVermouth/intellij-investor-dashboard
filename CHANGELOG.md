@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.20.0
+
+### ✨ New Features / 新功能
+
+- Added a Net Profit column computed from current price, cost price, and holdings, with sorting and color coding support / 新增净收益额列，基于现价、成本价和持仓自动计算，并支持排序与颜色编码
+
+### 🔧 Maintenance / 维护
+
+- Upgraded the IntelliJ Platform Gradle plugin to 2.12.0 / 升级 IntelliJ Platform Gradle 插件到 2.12.0
+
 ## 1.19.0
 
 ### ✨ Improvements / 改进

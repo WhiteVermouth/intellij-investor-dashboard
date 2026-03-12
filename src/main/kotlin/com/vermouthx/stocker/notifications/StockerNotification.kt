@@ -47,14 +47,19 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
                 <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>功能改进</strong>
+                    <li style="${Styles.LIST_ITEM}">✨ <strong>新功能</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>恢复工具栏“停止刷新”按钮，可在保留当前表格内容的同时暂停定时刷新</li>
+                            <li>新增“净收益额”列，可根据现价、成本价和持仓自动计算盈亏</li>
+                        </ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🔧 <strong>维护更新</strong>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>升级 IntelliJ Platform Gradle 插件到 2.12.0</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>如果您只想暂停自动更新但保留当前行情显示，可以直接点击“停止刷新”。</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>填写成本价和持仓后，您可以直接在表格中查看每个标的的净收益额。</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
@@ -63,14 +68,19 @@ object StockerNotification {
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
                 <h4 style="${Styles.HEADING}">✨ What's New in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>Improvements</strong>
+                    <li style="${Styles.LIST_ITEM}">✨ <strong>New Features</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>Restored the toolbar Stop Refresh action so you can pause scheduled updates without clearing the current table</li>
+                            <li>Added a Net Profit column that calculates gains and losses from current price, cost, and holdings</li>
+                        </ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🔧 <strong>Maintenance</strong>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>Upgraded the IntelliJ Platform Gradle plugin to 2.12.0</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> Use Stop Refresh when you want to freeze the current quote view without removing the data already on screen.</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> Set both cost and holdings to see net profit directly in the quote table.</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
             </div>
