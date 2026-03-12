@@ -59,6 +59,7 @@ public class StockerTableView implements Disposable {
     private final StockerDefaultTableCellRender changeRenderer = new ChangeCellRenderer();
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
     private final StockerDefaultTableCellRender costRenderer = new CostCellRenderer();
+    private final StockerDefaultTableCellRender netProfitRenderer = new NetProfitCellRenderer();
 
     // Sorting state
     private StockerTableHeaderRender headerRenderer;
@@ -257,6 +258,7 @@ public class StockerTableView implements Disposable {
     private static final String percentColumn = StockerTableColumn.CHANGE_PERCENT.name();
     private static final String costPriceColumn = StockerTableColumn.COST_PRICE.name();
     private static final String holdingsColumn = StockerTableColumn.HOLDINGS.name();
+    private static final String netProfitColumn = StockerTableColumn.NET_PROFIT.name();
     private static final List<String> allColumnNames;
 
     static {
@@ -289,7 +291,7 @@ public class StockerTableView implements Disposable {
             }
         });
 
-        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn, costPriceColumn, holdingsColumn});
+        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn, costPriceColumn, holdingsColumn, netProfitColumn});
 
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
@@ -506,6 +508,58 @@ public class StockerTableView implements Disposable {
         });
     }
 
+    public static void refreshAllFinancialColumns() {
+        SwingUtilities.invokeLater(() -> {
+            synchronized (tableViews) {
+                for (StockerTableView view : tableViews) {
+                    view.refreshFinancialColumns();
+                }
+            }
+        });
+    }
+
+    public void refreshFinancialColumns() {
+        StockerSetting setting = StockerSetting.Companion.getInstance();
+        int codeColumnIndex = tbModel.findColumn(codeColumn);
+        int currentColumnIndex = tbModel.findColumn(currentColumn);
+        int costPriceColumnIndex = tbModel.findColumn(costPriceColumn);
+        int holdingsColumnIndex = tbModel.findColumn(holdingsColumn);
+        int netProfitColumnIndex = tbModel.findColumn(netProfitColumn);
+
+        for (int row = 0; row < tbModel.getRowCount(); row++) {
+            Object codeValue = tbModel.getValueAt(row, codeColumnIndex);
+            if (codeValue == null) {
+                continue;
+            }
+            String code = codeValue.toString();
+
+            Double costPrice = setting.getCostPrice(code);
+            Integer holdings = setting.getHoldings(code);
+            tbModel.setValueAt(formatCostPrice(costPrice), row, costPriceColumnIndex);
+            tbModel.setValueAt(formatHoldings(holdings), row, holdingsColumnIndex);
+
+            Double currentPrice = parseDouble(tbModel.getValueAt(row, currentColumnIndex));
+            tbModel.setValueAt(formatNetProfit(currentPrice, costPrice, holdings), row, netProfitColumnIndex);
+        }
+
+        tbModel.fireTableDataChanged();
+    }
+
+    private static String formatCostPrice(Double costPrice) {
+        return costPrice != null ? String.format("%.3f", costPrice) : "-";
+    }
+
+    private static Object formatHoldings(Integer holdings) {
+        return holdings != null ? holdings : "-";
+    }
+
+    private static Object formatNetProfit(Double currentPrice, Double costPrice, Integer holdings) {
+        if (currentPrice == null || costPrice == null || holdings == null) {
+            return "-";
+        }
+        return String.format("%.3f", (currentPrice - costPrice) * holdings);
+    }
+
     private void applyColumnRenderers() {
         TableColumn code = getColumnIfPresent(codeColumn);
         if (code != null) {
@@ -550,6 +604,10 @@ public class StockerTableView implements Disposable {
         TableColumn holdings = getColumnIfPresent(holdingsColumn);
         if (holdings != null) {
             holdings.setCellRenderer(numericRenderer);
+        }
+        TableColumn netProfit = getColumnIfPresent(netProfitColumn);
+        if (netProfit != null) {
+            netProfit.setCellRenderer(netProfitRenderer);
         }
     }
 
@@ -949,6 +1007,28 @@ public class StockerTableView implements Disposable {
                 }
             } catch (Exception e) {
                 setForeground(table.getForeground());
+            }
+            return component;
+        }
+    }
+
+    private class NetProfitCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (isSelected) {
+                return component;
+            }
+            Double netProfit = parseDouble(value);
+            if (netProfit == null) {
+                setForeground(table.getForeground());
+            } else if (netProfit > 0) {
+                setForeground(upColor);
+            } else if (netProfit < 0) {
+                setForeground(downColor);
+            } else {
+                setForeground(zeroColor);
             }
             return component;
         }

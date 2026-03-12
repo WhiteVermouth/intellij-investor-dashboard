@@ -11,6 +11,21 @@ import java.util.List;
 public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     private final StockerTableView myTableView;
 
+    private static String formatCostPrice(Double costPrice) {
+        return costPrice != null ? String.format("%.3f", costPrice) : "-";
+    }
+
+    private static Object formatHoldings(Integer holdings) {
+        return holdings != null ? holdings : "-";
+    }
+
+    private static Object formatNetProfit(StockerQuote quote, Double costPrice, Integer holdings) {
+        if (costPrice == null || holdings == null) {
+            return "-";
+        }
+        return String.format("%.3f", (quote.getCurrent() - costPrice) * holdings);
+    }
+
     public StockerQuoteUpdateListener(StockerTableView myTableView) {
         this.myTableView = myTableView;
     }
@@ -69,17 +84,23 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                     }
                     // Column 9: Cost Price (user-set, read from settings)
                     Double costPrice = setting.getCostPrice(quote.getCode());
-                    String costPriceStr = costPrice != null ? String.format("%.3f", costPrice) : "-";
+                    String costPriceStr = formatCostPrice(costPrice);
                     if (!costPriceStr.equals(tableModel.getValueAt(rowIndex, 9))) {
                         tableModel.setValueAt(costPriceStr, rowIndex, 9);
                         tableModel.fireTableCellUpdated(rowIndex, 9);
                     }
                     // Column 10: Holdings (user-set, read from settings)
                     Integer holdings = setting.getHoldings(quote.getCode());
-                    Object holdingsVal = holdings != null ? holdings : "-";
+                    Object holdingsVal = formatHoldings(holdings);
                     if (!holdingsVal.equals(tableModel.getValueAt(rowIndex, 10))) {
                         tableModel.setValueAt(holdingsVal, rowIndex, 10);
                         tableModel.fireTableCellUpdated(rowIndex, 10);
+                    }
+                    // Column 11: Net Profit (derived from current, cost price, and holdings)
+                    Object netProfitVal = formatNetProfit(quote, costPrice, holdings);
+                    if (!netProfitVal.equals(tableModel.getValueAt(rowIndex, 11))) {
+                        tableModel.setValueAt(netProfitVal, rowIndex, 11);
+                        tableModel.fireTableCellUpdated(rowIndex, 11);
                     }
                 } else {
                     if (quotes.size() == size) {
@@ -95,8 +116,9 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                             quote.getHigh(), 
                             quote.getChange(), 
                             quote.getPercentage() + "%",
-                            costPrice != null ? String.format("%.3f", costPrice) : "-",
-                            holdings != null ? holdings : "-"
+                            formatCostPrice(costPrice),
+                            formatHoldings(holdings),
+                            formatNetProfit(quote, costPrice, holdings)
                         });
                         // Clear sort state when new rows are added
                         myTableView.clearSortState();

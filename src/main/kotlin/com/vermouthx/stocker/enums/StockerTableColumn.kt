@@ -14,7 +14,8 @@ enum class StockerTableColumn(val titleKey: String) {
     CHANGE("column.change"),
     CHANGE_PERCENT("column.change.percent"),
     COST_PRICE("column.cost.price"),
-    HOLDINGS("column.holdings");
+    HOLDINGS("column.holdings"),
+    NET_PROFIT("column.net.profit");
 
     val title: String
         get() = StockerBundle.message(titleKey)

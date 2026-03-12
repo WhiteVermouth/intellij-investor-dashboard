@@ -35,6 +35,7 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
     private var showChangePercent: Boolean = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT)
     private var showCostPrice: Boolean = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE)
     private var showHoldings: Boolean = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS)
+    private var showNetProfit: Boolean = setting.isTableColumnVisible(StockerTableColumn.NET_PROFIT)
 
     private var symbolCheckBox: JCheckBox? = null
     private var nameCheckBox: JCheckBox? = null
@@ -47,6 +48,7 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
     private var changePercentCheckBox: JCheckBox? = null
     private var costPriceCheckBox: JCheckBox? = null
     private var holdingsCheckBox: JCheckBox? = null
+    private var netProfitCheckBox: JCheckBox? = null
     private var columnWarningLabel: JLabel? = null
 
     companion object {
@@ -228,6 +230,14 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
                             .component
                     }
                     row {
+                        netProfitCheckBox = checkBox(StockerTableColumn.NET_PROFIT.title)
+                            .bindSelected(::showNetProfit.toMutableProperty())
+                            .applyToComponent {
+                                addItemListener { handleColumnToggle(this) }
+                            }
+                            .component
+                    }
+                    row {
                         columnWarningLabel = label(StockerBundle.message("settings.table.columns.warning"))
                             .applyToComponent {
                                 foreground = JBColor.RED
@@ -289,6 +299,7 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
                 showChangePercent = setting.isTableColumnVisible(StockerTableColumn.CHANGE_PERCENT)
                 showCostPrice = setting.isTableColumnVisible(StockerTableColumn.COST_PRICE)
                 showHoldings = setting.isTableColumnVisible(StockerTableColumn.HOLDINGS)
+                showNetProfit = setting.isTableColumnVisible(StockerTableColumn.NET_PROFIT)
                 columnWarningLabel?.isVisible = false
             }
         }
@@ -307,6 +318,7 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
         if (showChangePercent) visibleColumns.add(StockerTableColumn.CHANGE_PERCENT.name)
         if (showCostPrice) visibleColumns.add(StockerTableColumn.COST_PRICE.name)
         if (showHoldings) visibleColumns.add(StockerTableColumn.HOLDINGS.name)
+        if (showNetProfit) visibleColumns.add(StockerTableColumn.NET_PROFIT.name)
         return visibleColumns
     }
 
@@ -322,7 +334,8 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
             changeCheckBox,
             changePercentCheckBox,
             costPriceCheckBox,
-            holdingsCheckBox
+            holdingsCheckBox,
+            netProfitCheckBox
         )
         val selectedCount = allCheckboxes.count { it.isSelected }
 

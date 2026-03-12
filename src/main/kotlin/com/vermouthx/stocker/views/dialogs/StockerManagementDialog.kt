@@ -18,6 +18,7 @@ import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.settings.StockerSetting
 import com.vermouthx.stocker.utils.StockerPinyinUtil
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
+import com.vermouthx.stocker.views.StockerTableView
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.util.concurrent.CompletableFuture
@@ -328,6 +329,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                             setting.removeHoldings(selectedQuote.code)
                         }
 
+                        StockerTableView.refreshAllFinancialColumns()
                         list.repaint()
                     }
                 }
