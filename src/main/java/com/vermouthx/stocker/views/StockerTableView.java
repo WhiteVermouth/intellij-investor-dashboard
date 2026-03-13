@@ -276,6 +276,9 @@ public class StockerTableView implements Disposable {
         tbBody.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
+                if (e.isTemporary() || rowPopupMenu.isVisible()) {
+                    return;
+                }
                 tbBody.clearSelection();
             }
         });
@@ -394,12 +397,12 @@ public class StockerTableView implements Disposable {
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                clearPopupTarget();
+                clearPopupStateLater(popupMenu);
             }
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
-                clearPopupTarget();
+                clearPopupStateLater(popupMenu);
             }
         });
         popupMenu.add(deleteMenuItem);
@@ -440,6 +443,18 @@ public class StockerTableView implements Disposable {
     private void clearPopupTarget() {
         popupTargetCode = null;
         popupTargetName = null;
+    }
+
+    private void clearPopupStateLater(JPopupMenu popupMenu) {
+        SwingUtilities.invokeLater(() -> {
+            if (popupMenu.isVisible()) {
+                return;
+            }
+            clearPopupTarget();
+            if (!tbBody.isFocusOwner()) {
+                tbBody.clearSelection();
+            }
+        });
     }
 
     private void applyColumnVisibility() {
