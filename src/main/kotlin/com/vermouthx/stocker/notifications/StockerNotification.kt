@@ -45,42 +45,32 @@ object StockerNotification {
         return if (isChinese()) """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
-                <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
+                <h4 style="${Styles.HEADING}">🐛 v${v} 错误修复</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>新功能</strong>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>错误修复</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>新增“净收益额”列，可根据现价、成本价和持仓自动计算盈亏</li>
-                        </ul>
-                    </li>
-                    <li style="${Styles.LIST_ITEM}">🔧 <strong>维护更新</strong>
-                        <ul style="${Styles.SUB_LIST}">
-                            <li>升级 IntelliJ Platform Gradle 插件到 2.12.0</li>
+                            <li>修复 Windows 下表格右键删除菜单的竞态问题，在新版 UI 中删除自选股更稳定</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>小贴士：</strong>填写成本价和持仓后，您可以直接在表格中查看每个标的的净收益额。</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>说明：</strong>如果您之前在 Windows 新版 UI 中遇到右键删除偶发失效，请升级到此版本。</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
         """.trimIndent() else """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
-                <h4 style="${Styles.HEADING}">✨ What's New in v${v}</h4>
+                <h4 style="${Styles.HEADING}">🐛 Bug Fixes in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>New Features</strong>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>Added a Net Profit column that calculates gains and losses from current price, cost, and holdings</li>
-                        </ul>
-                    </li>
-                    <li style="${Styles.LIST_ITEM}">🔧 <strong>Maintenance</strong>
-                        <ul style="${Styles.SUB_LIST}">
-                            <li>Upgraded the IntelliJ Platform Gradle plugin to 2.12.0</li>
+                            <li>Fixed the Windows right-click delete race in the table popup menu so favorites can be removed reliably under the new UI</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>Pro tip:</strong> Set both cost and holdings to see net profit directly in the quote table.</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Note:</strong> Upgrade to this version if right-click delete was intermittently failing on Windows with the new UI enabled.</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
             </div>

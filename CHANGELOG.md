@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.20.1
+
+### 🐛 Bug Fixes / 错误修复
+
+- Fixed the Windows right-click delete race in the table popup menu so stock removal works reliably under the new UI / 修复 Windows 下表格右键删除菜单的竞态问题，确保在新版 UI 中稳定删除股票
+
 ## 1.20.0
 
 ### ✨ New Features / 新功能
