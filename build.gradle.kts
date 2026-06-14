@@ -22,13 +22,29 @@ repositories {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("com.belerweb:pinyin4j:2.5.1")
+    testImplementation(kotlin("test-junit5"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     intellijPlatform {
         create(properties("platformType"), properties("platformVersion"))
         pluginVerifier()
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 changelog {
