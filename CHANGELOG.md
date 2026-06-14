@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.21.0
+
+### ✨ New Features / 新功能
+
+- Added a Daily P/L column showing each holding's profit or loss for the current trading day (Change × Holdings), with sorting and color coding / 新增当日盈亏列，按“涨跌额 × 持仓”显示每只自选股当日的盈亏，并支持排序与颜色编码
+
+### 🔧 Maintenance / 维护
+
+- Raised the minimum supported IDE to IntelliJ IDEA 2025.3 and migrated the build to the unified IntelliJ IDEA distribution on JDK 21 / 将最低支持版本提升至 IntelliJ IDEA 2025.3，并迁移到统一的 IntelliJ IDEA 发行版（JDK 21）构建
+
 ## 1.20.1
 
 ### 🐛 Bug Fixes / 错误修复

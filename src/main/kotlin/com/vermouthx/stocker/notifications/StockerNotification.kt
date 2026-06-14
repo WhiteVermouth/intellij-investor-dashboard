@@ -45,32 +45,32 @@ object StockerNotification {
         return if (isChinese()) """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
-                <h4 style="${Styles.HEADING}">🐛 v${v} 错误修复</h4>
+                <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🐛 <strong>错误修复</strong>
+                    <li style="${Styles.LIST_ITEM}">✨ <strong>新功能</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>修复 Windows 下表格右键删除菜单的竞态问题，在新版 UI 中删除自选股更稳定</li>
+                            <li>新增当日盈亏列，按“涨跌额 × 持仓”显示每只自选股当日的盈亏，支持排序与颜色编码</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>说明：</strong>如果您之前在 Windows 新版 UI 中遇到右键删除偶发失效，请升级到此版本。</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>说明：</strong>本版本要求 IntelliJ IDEA 2025.3 或更高版本。在 设置 → 工具 → Stocker 的表格列中即可启用“当日盈亏”列。</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
         """.trimIndent() else """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
-                <h4 style="${Styles.HEADING}">🐛 Bug Fixes in v${v}</h4>
+                <h4 style="${Styles.HEADING}">✨ New in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
+                    <li style="${Styles.LIST_ITEM}">✨ <strong>New Features</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>Fixed the Windows right-click delete race in the table popup menu so favorites can be removed reliably under the new UI</li>
+                            <li>Added a Daily P/L column showing each holding's profit or loss for the current trading day (Change × Holdings), with sorting and color coding</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>Note:</strong> Upgrade to this version if right-click delete was intermittently failing on Windows with the new UI enabled.</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Note:</strong> This release requires IntelliJ IDEA 2025.3 or newer. Enable the Daily P/L column under Settings → Tools → Stocker → table columns.</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
             </div>
