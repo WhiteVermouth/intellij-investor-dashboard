@@ -25,6 +25,8 @@
   - `META-INF/plugin.xml`: plugin registration and action declarations
   - `messages/*.properties`: localized strings
   - `icons/`: plugin assets
+- `src/test/kotlin/com/vermouthx/stocker`
+  - JUnit 5 unit tests mirroring the main package layout (e.g. `utils`, `entities`, `enums`)
 
 ## Working Rules
 
@@ -41,9 +43,20 @@
 
 - Default verification for code changes:
   - `./gradlew compileKotlin compileJava`
+- Run the unit tests when touching logic that has coverage (parser, settings/entity logic, enums, table-model utils):
+  - `./gradlew test`
 - For broader plugin or packaging changes, consider:
   - `./gradlew build`
 - If the change affects UI behavior, context menus, notifications, actions, or settings application, note whether the fix was only compile-verified or manually exercised in IntelliJ.
+
+## Testing
+
+- Tests are plain JUnit 5 (`kotlin("test-junit5")`, `useJUnitPlatform()`); there is no IntelliJ test-fixture setup.
+- Because of that, only **platform-free** logic is unit-testable today: anything reaching `ApplicationManager`/services, the message bus, or `StockerBundle` (localization via `DynamicBundle`, including any `*.title` getter) will not run under a plain unit test.
+  - Covered today: `StockerQuoteParser`, `StockerTableModelUtil`, `StockerQuote`, `StockerPinyinUtil`, and the non-localized parts of `StockerTableColumn`.
+  - Out of scope until platform test fixtures are added: `StockerSetting`, the message-bus listeners, `StockerActionUtil`, and anything depending on localized titles.
+- `StockerQuoteParser` extracts every field by hard-coded array index against undocumented Sina/Tencent response formats. Treat its tests as the contract: build fixtures with explicit index-to-field mapping and update them in lockstep with any parser change.
+- To enable tests for platform-dependent code, add the IntelliJ Platform test framework dependency (`testFramework(TestFrameworkType.Platform)`) — a separate, heavier step not yet wired up.
 
 ## Release And Versioning
 
@@ -54,6 +67,10 @@
   - `gradle.properties`
   - `CHANGELOG.md`
   - `src/main/kotlin/com/vermouthx/stocker/notifications/StockerNotification.kt`
+- Publishing is **tag-driven** via `.github/workflows/build.yml`:
+  - Pushing a tag matching `v1.*` triggers the release job, which builds the plugin, creates a GitHub Release with the `.zip` artifact, and runs `./gradlew publishPlugin` to the JetBrains Marketplace (using the `JETBRAINS_TOKEN` repo secret).
+  - Typical flow after the version bump: verify (`./gradlew test build`), commit, then `git tag vX.Y.Z && git push origin master --tags`.
+  - Manual fallback: `./gradlew publishPlugin -Djetbrains.token=<token>`.
 
 ## Common Pitfalls
 
