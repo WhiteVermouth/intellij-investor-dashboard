@@ -6,7 +6,7 @@
 - It is a mixed Kotlin/Java codebase:
   - Kotlin holds most application logic, actions, settings, dialogs, notifications, and tool window wiring.
   - Java holds table rendering, table view behavior, message-bus listeners, and some utility classes.
-- The plugin targets IntelliJ Platform `2024.1` via the `org.jetbrains.intellij.platform` Gradle plugin.
+- The plugin targets IntelliJ Platform `2025.3` (built against the unified IntelliJ IDEA / `IU` distribution, since Community `IC` is no longer published as of 253) via the `org.jetbrains.intellij.platform` Gradle plugin.
 
 ## Repository Layout
 

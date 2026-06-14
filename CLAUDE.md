@@ -15,7 +15,7 @@ should be fixed.
 `Stocker` — a JetBrains IDE plugin (`com.vermouthx.intellij-investor-dashboard`)
 that shows a real-time stock/crypto watchlist (A-shares, HK, US, crypto) in a
 tool window. Mixed Kotlin (logic/UI wiring) + Java (table rendering/listeners),
-built on the IntelliJ Platform Gradle plugin, targeting platform `2024.1`.
+built on the IntelliJ Platform Gradle plugin, targeting platform `2025.3`.
 
 ## Common commands
 
@@ -26,7 +26,7 @@ built on the IntelliJ Platform Gradle plugin, targeting platform `2024.1`.
 | Full build (packaging changes) | `./gradlew build` |
 | Plugin compatibility verification | `./gradlew verifyPlugin` |
 
-Toolchain: JDK 17, Gradle wrapper 9.5.0. Always use the wrapper (`./gradlew`).
+Toolchain: JDK 21, Gradle wrapper 9.5.0. Always use the wrapper (`./gradlew`).
 
 ## How the plugin works (data flow)
 

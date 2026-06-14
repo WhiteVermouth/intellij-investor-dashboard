@@ -63,7 +63,7 @@ Stocker is a JetBrains IDE extension dashboard for investors to track real-time 
 
 ## 🔧 Compatibility
 
-- **IDE Version**: IntelliJ IDEA 2024.1+ (and other JetBrains IDEs)
+- **IDE Version**: IntelliJ IDEA 2025.3+ (and other JetBrains IDEs)
 - **Platforms**: Windows, macOS, Linux
 
 ## 📖 Documentation
