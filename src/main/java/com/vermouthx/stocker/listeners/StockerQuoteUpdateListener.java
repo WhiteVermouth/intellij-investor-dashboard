@@ -26,6 +26,13 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
         return String.format("%.3f", (quote.getCurrent() - costPrice) * holdings);
     }
 
+    private static Object formatDailyProfit(StockerQuote quote, Integer holdings) {
+        if (holdings == null) {
+            return "-";
+        }
+        return String.format("%.3f", quote.getChange() * holdings);
+    }
+
     public StockerQuoteUpdateListener(StockerTableView myTableView) {
         this.myTableView = myTableView;
     }
@@ -102,6 +109,12 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                         tableModel.setValueAt(netProfitVal, rowIndex, 11);
                         tableModel.fireTableCellUpdated(rowIndex, 11);
                     }
+                    // Column 12: Daily Profit (derived from the day's change and holdings)
+                    Object dailyProfitVal = formatDailyProfit(quote, holdings);
+                    if (!dailyProfitVal.equals(tableModel.getValueAt(rowIndex, 12))) {
+                        tableModel.setValueAt(dailyProfitVal, rowIndex, 12);
+                        tableModel.fireTableCellUpdated(rowIndex, 12);
+                    }
                 } else {
                     if (quotes.size() == size) {
                         Double costPrice = setting.getCostPrice(quote.getCode());
@@ -118,7 +131,8 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                             quote.getPercentage() + "%",
                             formatCostPrice(costPrice),
                             formatHoldings(holdings),
-                            formatNetProfit(quote, costPrice, holdings)
+                            formatNetProfit(quote, costPrice, holdings),
+                            formatDailyProfit(quote, holdings)
                         });
                         // Clear sort state when new rows are added
                         myTableView.clearSortState();

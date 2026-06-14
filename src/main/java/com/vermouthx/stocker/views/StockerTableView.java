@@ -60,6 +60,7 @@ public class StockerTableView implements Disposable {
     private final StockerDefaultTableCellRender percentRenderer = new PercentCellRenderer();
     private final StockerDefaultTableCellRender costRenderer = new CostCellRenderer();
     private final StockerDefaultTableCellRender netProfitRenderer = new NetProfitCellRenderer();
+    private final StockerDefaultTableCellRender dailyProfitRenderer = new DailyProfitCellRenderer();
 
     // Sorting state
     private StockerTableHeaderRender headerRenderer;
@@ -259,6 +260,7 @@ public class StockerTableView implements Disposable {
     private static final String costPriceColumn = StockerTableColumn.COST_PRICE.name();
     private static final String holdingsColumn = StockerTableColumn.HOLDINGS.name();
     private static final String netProfitColumn = StockerTableColumn.NET_PROFIT.name();
+    private static final String dailyProfitColumn = StockerTableColumn.DAILY_PROFIT.name();
     private static final List<String> allColumnNames;
 
     static {
@@ -294,7 +296,7 @@ public class StockerTableView implements Disposable {
             }
         });
 
-        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn, costPriceColumn, holdingsColumn, netProfitColumn});
+        tbModel.setColumnIdentifiers(new String[]{codeColumn, nameColumn, currentColumn, openingColumn, closeColumn, lowColumn, highColumn, changeColumn, percentColumn, costPriceColumn, holdingsColumn, netProfitColumn, dailyProfitColumn});
 
         tbBody.setModel(tbModel);
         tbBody.setAutoCreateColumnsFromModel(false);
@@ -537,9 +539,11 @@ public class StockerTableView implements Disposable {
         StockerSetting setting = StockerSetting.Companion.getInstance();
         int codeColumnIndex = tbModel.findColumn(codeColumn);
         int currentColumnIndex = tbModel.findColumn(currentColumn);
+        int changeColumnIndex = tbModel.findColumn(changeColumn);
         int costPriceColumnIndex = tbModel.findColumn(costPriceColumn);
         int holdingsColumnIndex = tbModel.findColumn(holdingsColumn);
         int netProfitColumnIndex = tbModel.findColumn(netProfitColumn);
+        int dailyProfitColumnIndex = tbModel.findColumn(dailyProfitColumn);
 
         for (int row = 0; row < tbModel.getRowCount(); row++) {
             Object codeValue = tbModel.getValueAt(row, codeColumnIndex);
@@ -555,6 +559,9 @@ public class StockerTableView implements Disposable {
 
             Double currentPrice = parseDouble(tbModel.getValueAt(row, currentColumnIndex));
             tbModel.setValueAt(formatNetProfit(currentPrice, costPrice, holdings), row, netProfitColumnIndex);
+
+            Double change = parseDouble(tbModel.getValueAt(row, changeColumnIndex));
+            tbModel.setValueAt(formatDailyProfit(change, holdings), row, dailyProfitColumnIndex);
         }
 
         tbModel.fireTableDataChanged();
@@ -573,6 +580,13 @@ public class StockerTableView implements Disposable {
             return "-";
         }
         return String.format("%.3f", (currentPrice - costPrice) * holdings);
+    }
+
+    private static Object formatDailyProfit(Double change, Integer holdings) {
+        if (change == null || holdings == null) {
+            return "-";
+        }
+        return String.format("%.3f", change * holdings);
     }
 
     private void applyColumnRenderers() {
@@ -623,6 +637,10 @@ public class StockerTableView implements Disposable {
         TableColumn netProfit = getColumnIfPresent(netProfitColumn);
         if (netProfit != null) {
             netProfit.setCellRenderer(netProfitRenderer);
+        }
+        TableColumn dailyProfit = getColumnIfPresent(dailyProfitColumn);
+        if (dailyProfit != null) {
+            dailyProfit.setCellRenderer(dailyProfitRenderer);
         }
     }
 
@@ -1041,6 +1059,28 @@ public class StockerTableView implements Disposable {
             } else if (netProfit > 0) {
                 setForeground(upColor);
             } else if (netProfit < 0) {
+                setForeground(downColor);
+            } else {
+                setForeground(zeroColor);
+            }
+            return component;
+        }
+    }
+
+    private class DailyProfitCellRenderer extends StockerDefaultTableCellRender {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            if (isSelected) {
+                return component;
+            }
+            Double dailyProfit = parseDouble(value);
+            if (dailyProfit == null) {
+                setForeground(table.getForeground());
+            } else if (dailyProfit > 0) {
+                setForeground(upColor);
+            } else if (dailyProfit < 0) {
                 setForeground(downColor);
             } else {
                 setForeground(zeroColor);
