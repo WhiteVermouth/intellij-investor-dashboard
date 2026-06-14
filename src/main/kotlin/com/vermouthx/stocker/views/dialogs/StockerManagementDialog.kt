@@ -158,7 +158,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         pane.removeAll()
         
         val list = JBList(listModel)
-        list.installCellRenderer { symbol ->
+        list.cellRenderer = ListCellRenderer<StockerQuote> { _, symbol, _, _, _ ->
             // Get original name with Pinyin if enabled
             val originalName = if (setting.displayNameWithPinyin) {
                 StockerPinyinUtil.toPinyin(symbol.name)

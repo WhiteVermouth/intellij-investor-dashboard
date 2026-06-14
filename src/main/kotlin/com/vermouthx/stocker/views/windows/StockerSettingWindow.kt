@@ -65,8 +65,12 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
     }
 
     override fun createPanel(): DialogPanel {
-        val providerRenderer = SimpleListCellRenderer.create<StockerQuoteProvider>("") { it.title }
-        val languageRenderer = SimpleListCellRenderer.create<String>("") { languageDisplayName(it) }
+        val providerRenderer = SimpleListCellRenderer.create<StockerQuoteProvider> { label, value, _ ->
+            label.text = value?.title ?: ""
+        }
+        val languageRenderer = SimpleListCellRenderer.create<String> { label, value, _ ->
+            label.text = languageDisplayName(value ?: "")
+        }
 
         return panel {
             group(StockerBundle.message("settings.group.general")) {
