@@ -1,8 +1,9 @@
 package com.vermouthx.stocker
 
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.cl.PluginAwareClassLoader
 
 object StockerMeta {
     val currentVersion: String
-        get() = PluginManager.getPluginByClass(StockerMeta::class.java)?.version ?: ""
+        get() = (StockerMeta::class.java.classLoader as? PluginAwareClassLoader)
+            ?.pluginDescriptor?.version ?: ""
 }

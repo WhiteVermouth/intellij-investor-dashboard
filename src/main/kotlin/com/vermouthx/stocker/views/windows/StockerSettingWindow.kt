@@ -3,8 +3,8 @@ package com.vermouthx.stocker.views.windows
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.JBColor
-import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
@@ -65,12 +65,8 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
     }
 
     override fun createPanel(): DialogPanel {
-        val providerRenderer = SimpleListCellRenderer.create<StockerQuoteProvider> { label, value, _ ->
-            label.text = value?.title ?: ""
-        }
-        val languageRenderer = SimpleListCellRenderer.create<String> { label, value, _ ->
-            label.text = languageDisplayName(value ?: "")
-        }
+        val providerRenderer = textListCellRenderer { value: StockerQuoteProvider? -> value?.title ?: "" }
+        val languageRenderer = textListCellRenderer { value: String? -> languageDisplayName(value ?: "") }
 
         return panel {
             group(StockerBundle.message("settings.group.general")) {
