@@ -45,32 +45,48 @@ object StockerNotification {
         return if (isChinese()) """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>欢迎使用 Stocker v${v}！本次更新内容：</strong></p>
-                <h4 style="${Styles.HEADING}">✨ v${v} 新功能</h4>
+                <h4 style="${Styles.HEADING}">🐛 v${v} 修复与改进</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>新功能</strong>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>错误修复</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>新增当日盈亏列，按“涨跌额 × 持仓”显示每只自选股当日的盈亏，支持排序与颜色编码</li>
+                            <li>修复中文界面下“添加自选”按钮执行错误操作的问题</li>
+                            <li>修复“管理自选”点击确定时静默删除行情获取失败代码的问题</li>
+                            <li>修复“管理自选”选中行未高亮，以及编辑表单忽略无效输入的问题</li>
+                        </ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🎨 <strong>界面改进</strong>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>统一价格小数位，并为涨跌相关数值显示正负号</li>
+                            <li>为空表格与对话框加入操作提示，菜单与排序指示器改用 IDE 标准样式</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>说明：</strong>本版本要求 IntelliJ IDEA 2025.3 或更高版本。在 设置 → 工具 → Stocker 的表格列中即可启用“当日盈亏”列。</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>说明：</strong>本版本要求 IntelliJ IDEA 2025.3 或更高版本。</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 如果您觉得这个插件有帮助，请考虑点击下方的 <strong>Donate</strong> 按钮以支持开发。谢谢！📈</p>
             </div>
         """.trimIndent() else """
             <div style="${Styles.CONTAINER}">
                 <p style="${Styles.PARAGRAPH}">🎉 <strong>Welcome to Stocker v${v}! Here's what's new in this release:</strong></p>
-                <h4 style="${Styles.HEADING}">✨ New in v${v}</h4>
+                <h4 style="${Styles.HEADING}">🐛 Fixes &amp; improvements in v${v}</h4>
                 <ul style="margin: 0; padding-left: 18px;">
-                    <li style="${Styles.LIST_ITEM}">✨ <strong>New Features</strong>
+                    <li style="${Styles.LIST_ITEM}">🐛 <strong>Bug Fixes</strong>
                         <ul style="${Styles.SUB_LIST}">
-                            <li>Added a Daily P/L column showing each holding's profit or loss for the current trading day (Change × Holdings), with sorting and color coding</li>
+                            <li>Fixed the Add Favorites button running the wrong operation in the Chinese UI</li>
+                            <li>Fixed Manage Favorites silently dropping symbols whose quotes could not be fetched when clicking OK</li>
+                            <li>Fixed the unhighlighted selected row and the edit form ignoring invalid input in Manage Favorites</li>
+                        </ul>
+                    </li>
+                    <li style="${Styles.LIST_ITEM}">🎨 <strong>UI Improvements</strong>
+                        <ul style="${Styles.SUB_LIST}">
+                            <li>Consistent price decimals and explicit signs on change and profit values</li>
+                            <li>Helpful empty states, plus standard IDE styling for menus and sort indicators</li>
                         </ul>
                     </li>
                 </ul>
                 <div style="${Styles.INFO_BOX}">
-                    <p style="margin: 0; font-size: 12px;">💡 <strong>Note:</strong> This release requires IntelliJ IDEA 2025.3 or newer. Enable the Daily P/L column under Settings → Tools → Stocker → table columns.</p>
+                    <p style="margin: 0; font-size: 12px;">💡 <strong>Note:</strong> This release requires IntelliJ IDEA 2025.3 or newer.</p>
                 </div>
                 <p style="${Styles.SMALL_TEXT}">💖 If you find this plugin helpful, please consider clicking the <strong>Donate</strong> button below to support its development. Thank you! 📈</p>
             </div>
