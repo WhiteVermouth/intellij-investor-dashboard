@@ -30,10 +30,10 @@ class StockerToolWindow : ToolWindowFactory {
         super.init(toolWindow)
         allView = StockerSimpleToolWindow()
         tabViewMap = mapOf(
-            StockerMarketType.AShare to StockerSimpleToolWindow(),
-            StockerMarketType.HKStocks to StockerSimpleToolWindow(),
-            StockerMarketType.USStocks to StockerSimpleToolWindow(),
-            StockerMarketType.Crypto to StockerSimpleToolWindow()
+            StockerMarketType.AShare to StockerSimpleToolWindow(StockerMarketType.AShare),
+            StockerMarketType.HKStocks to StockerSimpleToolWindow(StockerMarketType.HKStocks),
+            StockerMarketType.USStocks to StockerSimpleToolWindow(StockerMarketType.USStocks),
+            StockerMarketType.Crypto to StockerSimpleToolWindow(StockerMarketType.Crypto)
         )
         myApplication = StockerApp()
     }

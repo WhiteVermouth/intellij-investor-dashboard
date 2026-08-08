@@ -4,15 +4,18 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
-import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.AlignY
-import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.settings.StockerSetting
@@ -20,11 +23,24 @@ import com.vermouthx.stocker.utils.StockerPinyinUtil
 import com.vermouthx.stocker.utils.StockerQuoteHttpUtil
 import com.vermouthx.stocker.views.StockerTableView
 import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Component
+import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.util.concurrent.CompletableFuture
 import javax.swing.*
 
 class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
+
+    companion object {
+        private const val CODE_WIDTH = 80
+        private const val ORIGINAL_NAME_WIDTH = 150
+        private const val CUSTOM_NAME_WIDTH = 120
+        private const val COST_WIDTH = 80
+        private const val HOLDINGS_WIDTH = 80
+        private const val NAME_TRIM_LENGTH = 25
+        private const val CUSTOM_NAME_TRIM_LENGTH = 15
+    }
 
     private val log = Logger.getInstance(StockerManagementDialog::class.java)
     private val setting = StockerSetting.instance
@@ -33,28 +49,21 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     private val currentSymbols: MutableMap<StockerMarketType, DefaultListModel<StockerQuote>> = mutableMapOf()
 
-    private var currentMarketSelection: StockerMarketType = StockerMarketType.AShare
-
     init {
-        title = "Manage Favorite Stocks"
+        title = StockerBundle.message("dialog.manage.title")
         init()
     }
 
     override fun createCenterPanel(): DialogPanel {
         val tabbedPane = JBTabbedPane()
-        tabbedPane.add("CN", createTabContent(StockerMarketType.AShare))
-        tabbedPane.add("HK", createTabContent(StockerMarketType.HKStocks))
-        tabbedPane.add("US", createTabContent(StockerMarketType.USStocks))
-        tabbedPane.add("Crypto", createTabContent(StockerMarketType.Crypto))
-        
-        tabbedPane.addChangeListener {
-            currentMarketSelection = when (tabbedPane.selectedIndex) {
-                0 -> StockerMarketType.AShare
-                1 -> StockerMarketType.HKStocks
-                2 -> StockerMarketType.USStocks
-                3 -> StockerMarketType.Crypto
-                else -> return@addChangeListener
-            }
+        val markets = listOf(
+            StockerMarketType.AShare,
+            StockerMarketType.HKStocks,
+            StockerMarketType.USStocks,
+            StockerMarketType.Crypto
+        )
+        markets.forEach { market ->
+            tabbedPane.add(market.title, createTabContent(market))
         }
 
         // Load data asynchronously for each market type
@@ -66,20 +75,20 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         tabbedPane.selectedIndex = 0
         return panel {
             row {
-                cell(tabbedPane).align(AlignX.FILL)
-            }
+                cell(tabbedPane).align(Align.FILL)
+            }.resizableRow()
         }.withPreferredWidth(600).withPreferredHeight(400)
     }
-    
+
     private fun loadMarketData(marketType: StockerMarketType, codes: List<String>) {
         val listModel = DefaultListModel<StockerQuote>()
         currentSymbols[marketType] = listModel
-        
+
         // Show loading state
         tabMap[marketType]?.let { pane ->
             showLoadingState(pane)
         }
-        
+
         CompletableFuture.supplyAsync {
             try {
                 // Use cryptoQuoteProvider for crypto, quoteProvider for stocks
@@ -95,20 +104,38 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
             }
         }.thenAccept { quotes ->
             SwingUtilities.invokeLater {
-                listModel.addAll(quotes)
+                // Keep every stored code visible even when its quote could not be fetched.
+                // Pressing OK rebuilds the watchlist from this model, so dropping a row
+                // here would silently delete the favorite (e.g. while offline).
+                val quotesByCode = quotes.associateBy { it.code.uppercase() }
+                codes.forEach { code ->
+                    val quote = quotesByCode[code.uppercase()]
+                        ?: StockerQuote(
+                            code = code, name = code,
+                            current = 0.0, opening = 0.0, close = 0.0,
+                            low = 0.0, high = 0.0, change = 0.0, percentage = 0.0,
+                            updateAt = ""
+                        )
+                    listModel.addElement(quote)
+                }
                 tabMap[marketType]?.let { pane ->
                     renderTabPane(pane, listModel)
                 }
             }
         }
     }
-    
+
     private fun showLoadingState(pane: JPanel) {
         pane.removeAll()
         pane.add(
             panel {
                 row {
-                    label("Loading...").align(AlignX.CENTER)
+                    label(StockerBundle.message("table.empty.loading"))
+                        .align(AlignX.CENTER)
+                        .applyToComponent {
+                            icon = AnimatedIcon.Default()
+                            iconTextGap = 8
+                        }
                 }
             }, BorderLayout.CENTER
         )
@@ -146,205 +173,197 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
     private fun createTabContent(marketType: StockerMarketType): JComponent {
         val pane = JPanel(BorderLayout())
         tabMap[marketType] = pane
-        return panel {
-            row {
-                cell(pane).align(AlignX.FILL).align(AlignY.FILL)
-            }
-        }
+        return pane
+    }
+
+    private fun <T : JComponent> Cell<T>.fixedWidth(width: Int): Cell<T> = applyToComponent {
+        minimumSize = Dimension(width, 0)
+        preferredSize = Dimension(width, preferredSize.height)
+    }
+
+    private fun <T : JComponent> Cell<T>.withForeground(color: Color): Cell<T> = applyToComponent {
+        foreground = color
     }
 
     private fun renderTabPane(pane: JPanel, listModel: DefaultListModel<StockerQuote>) {
         // Clear existing components to prevent stacking
         pane.removeAll()
-        
+
         val list = JBList(listModel)
-        list.cellRenderer = ListCellRenderer<StockerQuote> { _, symbol, _, _, _ ->
+        list.setEmptyText(StockerBundle.message("dialog.manage.empty"))
+        list.cellRenderer = ListCellRenderer<StockerQuote> { jList, symbol, _, isSelected, _ ->
             // Get original name with Pinyin if enabled
             val originalName = if (setting.displayNameWithPinyin) {
                 StockerPinyinUtil.toPinyin(symbol.name)
             } else {
                 symbol.name
             }
-            
+
             // Get custom name if exists
             val customName = setting.getCustomName(symbol.code)
             val costPrice = setting.getCostPrice(symbol.code)
             val holdings = setting.getHoldings(symbol.code)
-            
+
+            val textColor = if (isSelected) jList.selectionForeground else jList.foreground
+
             panel {
                 row {
-                    label(symbol.code)
-                        .applyToComponent { 
-                            minimumSize = java.awt.Dimension(80, 0)
-                            preferredSize = java.awt.Dimension(80, preferredSize.height)
-                        }
+                    label(symbol.code).fixedWidth(CODE_WIDTH).withForeground(textColor)
                     label(
-                        if (originalName.length <= 25) {
+                        if (originalName.length <= NAME_TRIM_LENGTH) {
                             originalName
                         } else {
-                            "${originalName.substring(0, 25)}..."
+                            "${originalName.take(NAME_TRIM_LENGTH)}…"
                         }
-                    ).applyToComponent {
-                        minimumSize = java.awt.Dimension(150, 0)
-                        preferredSize = java.awt.Dimension(150, preferredSize.height)
-                    }
+                    ).fixedWidth(ORIGINAL_NAME_WIDTH).withForeground(textColor)
                     label(
                         customName?.let {
-                            if (it.length <= 15) {
+                            if (it.length <= CUSTOM_NAME_TRIM_LENGTH) {
                                 it
                             } else {
-                                "${it.substring(0, 15)}..."
+                                "${it.take(CUSTOM_NAME_TRIM_LENGTH)}…"
                             }
                         } ?: "-"
-                    ).applyToComponent {
-                        minimumSize = java.awt.Dimension(120, 0)
-                        preferredSize = java.awt.Dimension(120, preferredSize.height)
-                    }
+                    ).fixedWidth(CUSTOM_NAME_WIDTH).withForeground(textColor)
                     label(
                         costPrice?.let { String.format("%.3f", it) } ?: "-"
-                    ).applyToComponent {
-                        minimumSize = java.awt.Dimension(80, 0)
-                        preferredSize = java.awt.Dimension(80, preferredSize.height)
-                    }
+                    ).fixedWidth(COST_WIDTH).withForeground(textColor)
                     label(
                         holdings?.toString() ?: "-"
-                    ).applyToComponent {
-                        minimumSize = java.awt.Dimension(80, 0)
-                        preferredSize = java.awt.Dimension(80, preferredSize.height)
-                    }
+                    ).fixedWidth(HOLDINGS_WIDTH).withForeground(textColor)
                 }
-            }.withBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8))
+            }.apply {
+                // JList paints nothing behind the renderer, so this panel has to carry the
+                // selection colours itself — otherwise the selected row looks unselected.
+                isOpaque = true
+                background = if (isSelected) jList.selectionBackground else jList.background
+                border = BorderFactory.createEmptyBorder(4, 8, 4, 8)
+            }
         }
-        
-        // Create header panel
+
+        // Column titles for this faux-table list. Left padding matches the cell renderer's so
+        // the titles line up with the values underneath. Deliberately no bottom rule: the
+        // toolbar below already carries ToolbarDecorator's own border, and a second line here
+        // read as a stray divider boxing the toolbar in.
         val headerPanel = panel {
             row {
-                label("Code").bold()
-                    .applyToComponent {
-                        minimumSize = java.awt.Dimension(80, 0)
-                        preferredSize = java.awt.Dimension(80, preferredSize.height)
-                    }
-                label("Original Name").bold()
-                    .applyToComponent {
-                        minimumSize = java.awt.Dimension(150, 0)
-                        preferredSize = java.awt.Dimension(150, preferredSize.height)
-                    }
-                label("Custom Name").bold()
-                    .applyToComponent {
-                        minimumSize = java.awt.Dimension(120, 0)
-                        preferredSize = java.awt.Dimension(120, preferredSize.height)
-                    }
-                label("Cost").bold()
-                    .applyToComponent {
-                        minimumSize = java.awt.Dimension(80, 0)
-                        preferredSize = java.awt.Dimension(80, preferredSize.height)
-                    }
-                label("Holdings").bold()
-                    .applyToComponent {
-                        minimumSize = java.awt.Dimension(80, 0)
-                        preferredSize = java.awt.Dimension(80, preferredSize.height)
-                    }
+                label(StockerBundle.message("column.symbol")).bold().fixedWidth(CODE_WIDTH)
+                label(StockerBundle.message("dialog.manage.column.original.name")).bold().fixedWidth(ORIGINAL_NAME_WIDTH)
+                label(StockerBundle.message("dialog.manage.column.custom.name")).bold().fixedWidth(CUSTOM_NAME_WIDTH)
+                label(StockerBundle.message("column.cost.price")).bold().fixedWidth(COST_WIDTH)
+                label(StockerBundle.message("column.holdings")).bold().fixedWidth(HOLDINGS_WIDTH)
             }
-        }.withBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, javax.swing.UIManager.getColor("Separator.foreground")),
-            BorderFactory.createEmptyBorder(8, 8, 8, 8)
-        ))
-        
+        }.withBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8))
+
         // ToolbarDecorator.createPanel() already includes the list with scrolling
         val decorator = ToolbarDecorator.createDecorator(list)
-            .setEditAction { button ->
+            .setEditAction {
                 val selectedIndex = list.selectedIndex
                 if (selectedIndex >= 0) {
-                    val selectedQuote = listModel.getElementAt(selectedIndex)
-                    val currentCustomName = setting.getCustomName(selectedQuote.code)
-                    val currentCostPrice = setting.getCostPrice(selectedQuote.code)
-                    val currentHoldings = setting.getHoldings(selectedQuote.code)
-
-                    val nameField = javax.swing.JTextField(currentCustomName ?: "", 20)
-                    val costPriceField = javax.swing.JTextField(
-                        currentCostPrice?.let { String.format("%.3f", it) } ?: "", 20
-                    )
-                    val holdingsField = javax.swing.JTextField(
-                        currentHoldings?.toString() ?: "", 20
-                    )
-
-                    val editPanel = panel {
-                        row {
-                            label("Custom name:")
-                                .widthGroup("editLabels")
-                            cell(nameField)
-                        }.layout(RowLayout.LABEL_ALIGNED)
-                        row {
-                            label("Cost price:")
-                                .widthGroup("editLabels")
-                            cell(costPriceField)
-                        }.layout(RowLayout.LABEL_ALIGNED)
-                        row {
-                            label("Holdings:")
-                                .widthGroup("editLabels")
-                            cell(holdingsField)
-                        }.layout(RowLayout.LABEL_ALIGNED)
-                    }
-
-                    val result = JOptionPane.showConfirmDialog(
-                        pane,
-                        editPanel,
-                        "Edit ${selectedQuote.code}",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE
-                    )
-
-                    if (result == JOptionPane.OK_OPTION) {
-                        // Handle custom name
-                        val newName = nameField.text.trim()
-                        if (newName.isNotBlank()) {
-                            setting.setCustomName(selectedQuote.code, newName)
-                        } else if (currentCustomName != null) {
-                            setting.removeCustomName(selectedQuote.code)
-                        }
-
-                        // Handle cost price
-                        val costPriceText = costPriceField.text.trim()
-                        if (costPriceText.isNotBlank()) {
-                            try {
-                                val costPrice = costPriceText.toDouble()
-                                setting.setCostPrice(selectedQuote.code, costPrice)
-                            } catch (e: NumberFormatException) {
-                                // Ignore invalid input
-                            }
-                        } else if (currentCostPrice != null) {
-                            setting.removeCostPrice(selectedQuote.code)
-                        }
-
-                        // Handle holdings
-                        val holdingsText = holdingsField.text.trim()
-                        if (holdingsText.isNotBlank()) {
-                            try {
-                                val holdings = holdingsText.toInt()
-                                setting.setHoldings(selectedQuote.code, holdings)
-                            } catch (e: NumberFormatException) {
-                                // Ignore invalid input
-                            }
-                        } else if (currentHoldings != null) {
-                            setting.removeHoldings(selectedQuote.code)
-                        }
-
-                        StockerTableView.refreshAllFinancialColumns()
-                        list.repaint()
-                    }
+                    editFavorite(pane, list, listModel.getElementAt(selectedIndex))
                 }
             }
             .setEditActionUpdater { list.selectedIndex >= 0 }
-        
+
         val decoratedPanel = decorator.createPanel()
-        
-        // Add header at top and decorated panel (which contains toolbar + list + scrollpane) below
+
+        // Column titles on top, toolbar + list below.
         pane.add(headerPanel, BorderLayout.NORTH)
         pane.add(decoratedPanel, BorderLayout.CENTER)
-        
+
         // Refresh the UI to show new components
         pane.revalidate()
         pane.repaint()
+    }
+
+    private fun editFavorite(parent: JComponent, list: JBList<StockerQuote>, quote: StockerQuote) {
+        val currentCustomName = setting.getCustomName(quote.code)
+        val currentCostPrice = setting.getCostPrice(quote.code)
+        val currentHoldings = setting.getHoldings(quote.code)
+
+        val dialog = EditFavoriteDialog(parent, quote.code, currentCustomName, currentCostPrice, currentHoldings)
+        if (!dialog.showAndGet()) {
+            return
+        }
+
+        // Handle custom name
+        val newName = dialog.customName
+        if (newName.isNotBlank()) {
+            setting.setCustomName(quote.code, newName)
+        } else if (currentCustomName != null) {
+            setting.removeCustomName(quote.code)
+        }
+
+        // Handle cost price (validated by the dialog)
+        val costPrice = dialog.costPrice
+        if (costPrice != null) {
+            setting.setCostPrice(quote.code, costPrice)
+        } else if (currentCostPrice != null) {
+            setting.removeCostPrice(quote.code)
+        }
+
+        // Handle holdings (validated by the dialog)
+        val holdings = dialog.holdings
+        if (holdings != null) {
+            setting.setHoldings(quote.code, holdings)
+        } else if (currentHoldings != null) {
+            setting.removeHoldings(quote.code)
+        }
+
+        StockerTableView.refreshAllFinancialColumns()
+        list.repaint()
+    }
+
+    /**
+     * Platform-styled replacement for the former JOptionPane popup: proper title,
+     * Esc/Enter handling, and inline validation of the numeric fields.
+     */
+    private class EditFavoriteDialog(
+        parent: Component,
+        code: String,
+        initialCustomName: String?,
+        initialCostPrice: Double?,
+        initialHoldings: Int?
+    ) : DialogWrapper(parent, false) {
+
+        private val nameField = JBTextField(initialCustomName ?: "", 20)
+        private val costPriceField = JBTextField(initialCostPrice?.let { String.format("%.3f", it) } ?: "", 20)
+        private val holdingsField = JBTextField(initialHoldings?.toString() ?: "", 20)
+
+        val customName: String get() = nameField.text.trim()
+        val costPrice: Double? get() = costPriceField.text.trim().toDoubleOrNull()
+        val holdings: Int? get() = holdingsField.text.trim().toIntOrNull()
+
+        init {
+            title = StockerBundle.message("dialog.manage.edit.title", code)
+            init()
+        }
+
+        override fun getPreferredFocusedComponent(): JComponent = nameField
+
+        override fun createCenterPanel(): JComponent = panel {
+            row(StockerBundle.message("dialog.manage.edit.custom.name")) {
+                cell(nameField).align(AlignX.FILL)
+            }
+            row(StockerBundle.message("dialog.manage.edit.cost.price")) {
+                cell(costPriceField).align(AlignX.FILL)
+            }
+            row(StockerBundle.message("dialog.manage.edit.holdings")) {
+                cell(holdingsField).align(AlignX.FILL)
+            }
+        }
+
+        override fun doValidate(): ValidationInfo? {
+            val costText = costPriceField.text.trim()
+            if (costText.isNotEmpty() && costText.toDoubleOrNull() == null) {
+                return ValidationInfo(StockerBundle.message("dialog.manage.edit.invalid.number"), costPriceField)
+            }
+            val holdingsText = holdingsField.text.trim()
+            if (holdingsText.isNotEmpty() && holdingsText.toIntOrNull() == null) {
+                return ValidationInfo(StockerBundle.message("dialog.manage.edit.invalid.integer"), holdingsField)
+            }
+            return null
+        }
     }
 
 }

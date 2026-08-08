@@ -1,11 +1,15 @@
 package com.vermouthx.stocker.views;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.vermouthx.stocker.StockerBundle;
 import com.vermouthx.stocker.components.StockerDefaultTableCellRender;
 import com.vermouthx.stocker.components.StockerTableHeaderRender;
 import com.vermouthx.stocker.components.StockerTableModel;
@@ -29,14 +33,27 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class StockerTableView implements Disposable {
 
     private static final List<StockerTableView> tableViews = Collections.synchronizedList(new ArrayList<>());
+
+    // Display-only formatting: at least 2 decimals, up to 6 for low-priced crypto quotes.
+    // Model values stay raw so sorting and cell-diff updates are unaffected.
+    private static final DecimalFormat PRICE_FORMAT =
+            new DecimalFormat("0.00####", DecimalFormatSymbols.getInstance(Locale.ROOT));
+    private static final DecimalFormat INDEX_FORMAT =
+            new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ROOT));
+
+    // null represents the aggregated "ALL" view
+    private final StockerMarketType myMarket;
 
     private JPanel mPane;
     private JScrollPane tbPane;
@@ -73,11 +90,47 @@ public class StockerTableView implements Disposable {
 
     private volatile boolean disposed = false;
 
-    public StockerTableView() {
+    public StockerTableView(StockerMarketType market) {
+        this.myMarket = market;
         tableViews.add(this);
         syncColorPatternSetting();
         initPane();
         initTable();
+        updateEmptyText();
+    }
+
+    /**
+     * Refreshes the placeholder shown when the table has no rows: an invitation to add
+     * favorites when the watchlist is empty, or a loading hint while quotes are in flight.
+     */
+    public void updateEmptyText() {
+        SwingUtilities.invokeLater(() -> {
+            StockerSetting setting = StockerSetting.Companion.getInstance();
+            boolean hasFavorites;
+            if (myMarket == null) {
+                hasFavorites = setting.getAllStockListSize() > 0;
+            } else {
+                switch (myMarket) {
+                    case AShare:
+                        hasFavorites = !setting.getAShareList().isEmpty();
+                        break;
+                    case HKStocks:
+                        hasFavorites = !setting.getHkStocksList().isEmpty();
+                        break;
+                    case USStocks:
+                        hasFavorites = !setting.getUsStocksList().isEmpty();
+                        break;
+                    case Crypto:
+                        hasFavorites = !setting.getCryptoList().isEmpty();
+                        break;
+                    default:
+                        hasFavorites = false;
+                        break;
+                }
+            }
+            String key = hasFavorites ? "table.empty.loading" : "table.empty.no.favorites";
+            tbBody.getEmptyText().setText(StockerBundle.message(key));
+        });
     }
 
     /**
@@ -177,9 +230,9 @@ public class StockerTableView implements Disposable {
                 String displayName = setting.getDisplayName(index.getCode(), index.getName());
                 boolean isSelected = selectedCode != null ? index.getCode().equals(selectedCode) : displayName.equals(selectedDisplayName);
                 if (isSelected) {
-                    lbIndexValue.setText(Double.toString(index.getCurrent()));
-                    lbIndexExtent.setText(Double.toString(index.getChange()));
-                    lbIndexPercent.setText(index.getPercentage() + "%");
+                    lbIndexValue.setText(INDEX_FORMAT.format(index.getCurrent()));
+                    lbIndexExtent.setText(formatSigned(index.getChange(), INDEX_FORMAT));
+                    lbIndexPercent.setText(formatSigned(index.getPercentage(), PRICE_FORMAT) + "%");
                     double value = index.getPercentage();
                     if (value > 0) {
                         lbIndexValue.setForeground(upColor);
@@ -368,29 +421,8 @@ public class StockerTableView implements Disposable {
     }
 
     private JPopupMenu createRowPopupMenu() {
-        JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem deleteMenuItem = new JMenuItem("Delete");
-        deleteMenuItem.setOpaque(true);
-        deleteMenuItem.setRolloverEnabled(true);
-        deleteMenuItem.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        Color defaultBackground = JBColor.namedColor("MenuItem.background", UIManager.getColor("MenuItem.background"));
-        Color defaultForeground = JBColor.namedColor("MenuItem.foreground", UIManager.getColor("MenuItem.foreground"));
-        Color hoverBackground = JBColor.namedColor(
-                "MenuItem.selectionBackground",
-                JBColor.namedColor("List.selectionBackground", tbBody.getSelectionBackground())
-        );
-        Color hoverForeground = JBColor.namedColor(
-                "MenuItem.selectionForeground",
-                JBColor.namedColor("List.selectionForeground", tbBody.getSelectionForeground())
-        );
-        deleteMenuItem.setBackground(defaultBackground);
-        deleteMenuItem.setForeground(defaultForeground);
-        deleteMenuItem.getModel().addChangeListener(e -> {
-            ButtonModel model = deleteMenuItem.getModel();
-            boolean hovering = model.isArmed() || model.isRollover();
-            deleteMenuItem.setBackground(hovering ? hoverBackground : defaultBackground);
-            deleteMenuItem.setForeground(hovering ? hoverForeground : defaultForeground);
-        });
+        JPopupMenu popupMenu = new JBPopupMenu();
+        JMenuItem deleteMenuItem = new JBMenuItem(StockerBundle.message("popup.delete"), AllIcons.General.Remove);
         deleteMenuItem.addActionListener(e -> deleteSelectedStock());
         popupMenu.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -478,6 +510,25 @@ public class StockerTableView implements Disposable {
         // Re-apply after column model rebuild to keep header/body cell geometry in sync.
         tbBody.getColumnModel().setColumnMargin(0);
         applyColumnRenderers();
+        applyColumnWidthHints();
+    }
+
+    /**
+     * Preferred widths steer proportional space distribution: identity columns need more
+     * room than tightly formatted numeric ones, especially in narrow tool windows.
+     */
+    private void applyColumnWidthHints() {
+        for (int i = 0; i < tbBody.getColumnCount(); i++) {
+            TableColumn column = tbBody.getColumnModel().getColumn(i);
+            Object identifier = column.getIdentifier();
+            if (codeColumn.equals(identifier)) {
+                column.setPreferredWidth(80);
+            } else if (nameColumn.equals(identifier)) {
+                column.setPreferredWidth(100);
+            } else {
+                column.setPreferredWidth(66);
+            }
+        }
     }
 
     private void updateLocalizedHeaders() {
@@ -563,8 +614,13 @@ public class StockerTableView implements Disposable {
             Double change = parseDouble(tbModel.getValueAt(row, changeColumnIndex));
             tbModel.setValueAt(formatDailyProfit(change, holdings), row, dailyProfitColumnIndex);
         }
+        // DefaultTableModel.setValueAt already fires per-cell updates; a trailing
+        // fireTableDataChanged would repaint the whole table and drop the selection.
+    }
 
-        tbModel.fireTableDataChanged();
+    private static String formatSigned(double value, DecimalFormat format) {
+        String text = format.format(value);
+        return value > 0 ? "+" + text : text;
     }
 
     private static String formatCostPrice(Double costPrice) {
@@ -630,9 +686,10 @@ public class StockerTableView implements Disposable {
         if (costPrice != null) {
             costPrice.setCellRenderer(costRenderer);
         }
+        // Holdings is a share count, not a price movement — keep it in the neutral foreground.
         TableColumn holdings = getColumnIfPresent(holdingsColumn);
         if (holdings != null) {
-            holdings.setCellRenderer(numericRenderer);
+            holdings.setCellRenderer(defaultRenderer);
         }
         TableColumn netProfit = getColumnIfPresent(netProfitColumn);
         if (netProfit != null) {
@@ -895,6 +952,10 @@ public class StockerTableView implements Disposable {
     private class NumericCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Double numericValue = parseDouble(value);
+            if (numericValue != null) {
+                value = PRICE_FORMAT.format(numericValue);
+            }
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
             if (isSelected) {
@@ -931,27 +992,22 @@ public class StockerTableView implements Disposable {
     private class ChangeCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Double changeValue = parseDouble(value);
+            if (changeValue != null) {
+                value = formatSigned(changeValue, PRICE_FORMAT);
+            }
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
             if (isSelected) {
                 return component;
             }
-            if (value != null && !value.toString().isEmpty()) {
-                try {
-                    Double changeValue = parseDouble(value);
-                    if (changeValue != null) {
-                        if (changeValue > 0) {
-                            setForeground(upColor);
-                        } else if (changeValue < 0) {
-                            setForeground(downColor);
-                        } else {
-                            setForeground(zeroColor);
-                        }
-                    } else {
-                        setForeground(table.getForeground());
-                    }
-                } catch (Exception e) {
-                    setForeground(table.getForeground());
+            if (changeValue != null) {
+                if (changeValue > 0) {
+                    setForeground(upColor);
+                } else if (changeValue < 0) {
+                    setForeground(downColor);
+                } else {
+                    setForeground(zeroColor);
                 }
             } else {
                 setForeground(table.getForeground());
@@ -964,24 +1020,18 @@ public class StockerTableView implements Disposable {
     private class PercentCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Double percent = value != null ? parsePercentage(value.toString()) : null;
+            if (percent != null && percent > 0 && !value.toString().startsWith("+")) {
+                value = "+" + value;
+            }
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
             if (isSelected) {
                 return component;
             }
-            if (value == null) {
-                setForeground(table.getForeground());
-                return component;
-            }
-            try {
-                String percentValue = value.toString();
-                Double v = parsePercentage(percentValue);
-                if (v != null) {
-                    applyColorPatternToTable(v, this);
-                } else {
-                    setForeground(table.getForeground());
-                }
-            } catch (NumberFormatException e) {
+            if (percent != null) {
+                applyColorPatternToTable(percent, this);
+            } else {
                 setForeground(table.getForeground());
             }
             return component;
@@ -1048,12 +1098,15 @@ public class StockerTableView implements Disposable {
     private class NetProfitCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Double netProfit = parseDouble(value);
+            if (netProfit != null && netProfit > 0) {
+                value = "+" + value;
+            }
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
             if (isSelected) {
                 return component;
             }
-            Double netProfit = parseDouble(value);
             if (netProfit == null) {
                 setForeground(table.getForeground());
             } else if (netProfit > 0) {
@@ -1070,12 +1123,15 @@ public class StockerTableView implements Disposable {
     private class DailyProfitCellRenderer extends StockerDefaultTableCellRender {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Double dailyProfit = parseDouble(value);
+            if (dailyProfit != null && dailyProfit > 0) {
+                value = "+" + value;
+            }
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
             if (isSelected) {
                 return component;
             }
-            Double dailyProfit = parseDouble(value);
             if (dailyProfit == null) {
                 setForeground(table.getForeground());
             } else if (dailyProfit > 0) {

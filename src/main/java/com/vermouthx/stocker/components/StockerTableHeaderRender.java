@@ -1,5 +1,6 @@
 package com.vermouthx.stocker.components;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import com.vermouthx.stocker.enums.StockerSortState;
 
@@ -17,14 +18,6 @@ public class StockerTableHeaderRender extends DefaultTableCellRenderer implement
     public void setSortState(int column, StockerSortState state) {
         this.sortColumn = column;
         this.sortState = state;
-    }
-
-    public int getSortColumn() {
-        return sortColumn;
-    }
-
-    public StockerSortState getSortState() {
-        return sortState;
     }
 
     @Override
@@ -48,13 +41,15 @@ public class StockerTableHeaderRender extends DefaultTableCellRenderer implement
         Font currentFont = getFont();
         setFont(currentFont.deriveFont(Font.BOLD));
 
+        setText(value != null ? value.toString() : "");
+        setForeground(JBColor.namedColor("TableHeader.foreground", UIManager.getColor("TableHeader.foreground")));
+        // Platform-style sort indicator: an icon after the title, no color shift.
         if (column == sortColumn && sortState != StockerSortState.NONE) {
-            String sortIndicator = sortState == StockerSortState.ASCENDING ? " ↑" : " ↓";
-            setText((value != null ? value.toString() : "") + sortIndicator);
-            setForeground(JBColor.namedColor("Label.selectedForeground", getForeground()));
+            setIcon(sortState == StockerSortState.ASCENDING ? AllIcons.General.ArrowUp : AllIcons.General.ArrowDown);
+            setHorizontalTextPosition(SwingConstants.LEADING);
+            setIconTextGap(2);
         } else {
-            setText(value != null ? value.toString() : "");
-            setForeground(JBColor.namedColor("TableHeader.foreground", UIManager.getColor("TableHeader.foreground")));
+            setIcon(null);
         }
         return this;
     }

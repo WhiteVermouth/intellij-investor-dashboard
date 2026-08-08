@@ -19,5 +19,6 @@ public class StockerQuoteReloadListener implements StockerQuoteReloadNotifier {
             tableModel.setRowCount(0);
             myTableView.clearSortState();
         }
+        myTableView.updateEmptyText();
     }
 }

@@ -9,10 +9,13 @@ import com.vermouthx.stocker.actions.StockerSettingAction
 import com.vermouthx.stocker.actions.StockerStockManageAction
 import com.vermouthx.stocker.actions.StockerStockSearchAction
 import com.vermouthx.stocker.actions.StockerStopAction
+import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.views.StockerTableView
+import java.awt.BorderLayout
+import javax.swing.JPanel
 
-class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
-    var tableView: StockerTableView = StockerTableView()
+class StockerSimpleToolWindow(market: StockerMarketType? = null) : SimpleToolWindowPanel(true) {
+    var tableView: StockerTableView = StockerTableView(market)
 
     init {
         val actionManager = ActionManager.getInstance()
@@ -25,21 +28,18 @@ class StockerSimpleToolWindow : SimpleToolWindowPanel(true) {
         val actionGroup = DefaultActionGroup(leftActions)
         val actionToolbar = actionManager.createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, actionGroup, true)
         actionToolbar.targetComponent = tableView.component
-        
+
         val rightActionGroup = DefaultActionGroup().apply {
             StockerSettingAction::class.qualifiedName?.let { actionManager.getAction(it) }?.let { add(it) }
         }
-        val rightActionToolbar = actionManager.createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, rightActionGroup, true)
+        val rightActionToolbar =
+            actionManager.createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, rightActionGroup, true)
         rightActionToolbar.targetComponent = tableView.component
-        
-        val toolbarPanel = com.intellij.ui.components.panels.HorizontalLayout(0).let { layout ->
-            javax.swing.JPanel(java.awt.BorderLayout()).apply {
-                add(actionToolbar.component, java.awt.BorderLayout.WEST)
-                add(rightActionToolbar.component, java.awt.BorderLayout.EAST)
-            }
+
+        this.toolbar = JPanel(BorderLayout()).apply {
+            add(actionToolbar.component, BorderLayout.WEST)
+            add(rightActionToolbar.component, BorderLayout.EAST)
         }
-        
-        this.toolbar = toolbarPanel
         setContent(tableView.component)
     }
 }

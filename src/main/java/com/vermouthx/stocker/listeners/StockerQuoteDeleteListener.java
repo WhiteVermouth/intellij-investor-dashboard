@@ -24,6 +24,7 @@ public class StockerQuoteDeleteListener implements StockerQuoteDeleteNotifier {
                 myTableView.clearSortState();
             }
         }
+        myTableView.updateEmptyText();
     }
 
 }
