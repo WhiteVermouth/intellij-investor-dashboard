@@ -38,7 +38,7 @@ object StockerQuoteParser {
                     val current = textArray[4].toDouble()
                     val high = textArray[5].toDouble()
                     val low = textArray[6].toDouble()
-                    val change = (current - close).twoDigits()
+                    val change = current - close
                     val percentage = ((current - close) / close * 100).twoDigits()
                     val updateAt = textArray[31] + " " + textArray[32]
                     StockerQuote(
@@ -63,7 +63,7 @@ object StockerQuoteParser {
                     val high = textArray[5].toDouble()
                     val low = textArray[6].toDouble()
                     val current = textArray[7].toDouble()
-                    val change = (current - close).twoDigits()
+                    val change = current - close
                     val percentage = textArray[9].toDouble().twoDigits()
                     val sourceFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
                     val targetFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -92,7 +92,7 @@ object StockerQuoteParser {
                     val high = textArray[7].toDouble()
                     val low = textArray[8].toDouble()
                     val close = textArray[27].toDouble()
-                    val change = (current - close).twoDigits()
+                    val change = current - close
                     val percentage = textArray[3].toDouble().twoDigits()
                     StockerQuote(
                         code = code,
@@ -115,7 +115,7 @@ object StockerQuoteParser {
                     val low = textArray[8].toDouble()
                     val high = textArray[7].toDouble()
                     val opening = textArray[6].toDouble()
-                    val change = (current - opening).twoDigits()
+                    val change = current - opening
                     val percentage = ((current - opening) / opening * 100).twoDigits()
                     val updateAt = "${textArray[12]} ${textArray[1]}"
                     StockerQuote(
@@ -153,7 +153,7 @@ object StockerQuoteParser {
             val current = textArray[4].toDouble()
             val high = textArray[34].toDouble()
             val low = textArray[35].toDouble()
-            val change = (current - close).twoDigits()
+            val change = current - close
             val percentage = textArray[33].toDouble().twoDigits()
             val updateAt = when (marketType) {
                 StockerMarketType.AShare -> {
