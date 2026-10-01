@@ -102,8 +102,8 @@ object StockerSuggestHttpUtil {
                 "31" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.HKStocks))
                 "41" -> result.add(StockerSuggestion(columns[3].uppercase(), columns[4], StockerMarketType.USStocks))
                 "71" -> {
-                    // Only include crypto codes that follow the supported pattern: BTC{COIN}{FIAT}
-                    // Examples: BTCBTCUSD, BTCETHUSD, BTCBTCCNY
+                    // Only include crypto codes that follow the supported pattern: BTC{COIN}USD
+                    // Examples: BTCBTCUSD, BTCETHUSD
                     val cryptoCode = columns[3].uppercase()
                     if (isSupportedCryptoCode(cryptoCode)) {
                         result.add(StockerSuggestion(cryptoCode, columns[4], StockerMarketType.Crypto))
@@ -117,23 +117,21 @@ object StockerSuggestHttpUtil {
     
     /**
      * Check if a crypto code follows Sina's supported format.
-     * Based on testing, Sina only supports USD/USDT-based crypto pairs with BTC prefix.
+     * Based on testing, Sina only quotes USD-based crypto pairs with a BTC prefix; USDT pairs
+     * (e.g. BTCBTCUSDT) come back as an empty record, so they are not offered.
      * 
-     * Supported pattern: BTC{COIN}USD or BTC{COIN}USDT where {COIN} is the cryptocurrency name
+     * Supported pattern: BTC{COIN}USD where {COIN} is the cryptocurrency name
      * 
      * Examples of supported codes:
      * - BTCBTCUSD (Bitcoin/USD) ✅
-     * - BTCBTCUSDT (Bitcoin/USDT) ✅
      * - BTCETHUSD (Ethereum/USD) ✅
-     * - BTCETHUSDT (Ethereum/USDT) ✅
      * - BTCLTCUSD (Litecoin/USD) ✅
      * 
      * Unsupported examples:
      * - BTCUSD (too short, missing coin name) ❌
      * - ETHUSD (missing BTC prefix) ❌
-     * - BCHUSD (missing BTC prefix) ❌
+     * - BTCBTCUSDT (USDT not quoted) ❌
      * - BTCBTCCNY (CNY not supported) ❌
-     * - BTCBTCEUR (EUR not supported) ❌
      */
     private fun isSupportedCryptoCode(code: String): Boolean {
         // Must start with "BTC" prefix
@@ -141,23 +139,20 @@ object StockerSuggestHttpUtil {
             return false
         }
         
-        // Must end with "USD" or "USDT"
-        val endsWithUSD = code.endsWith("USD")
-        val endsWithUSDT = code.endsWith("USDT")
-        if (!endsWithUSD && !endsWithUSDT) {
+        // Must end with "USD" (a "USDT" code ends with "T", so it is rejected here)
+        if (!code.endsWith("USD")) {
             return false
         }
         
-        // Length check: minimum is BTCBTCUSD (9), with USDT it's 10+
+        // Length check: minimum is BTCBTCUSD (9)
         // Maximum reasonable length is 15 chars
         if (code.length < 9 || code.length > 15) {
             return false
         }
         
-        // Pattern: BTC + {COIN} + (USD|USDT)
-        // The coin name part must exist (at least 3 chars after BTC and before USD/USDT)
-        val fiatSuffix = if (endsWithUSDT) "USDT" else "USD"
-        val coinPart = code.substring(3, code.length - fiatSuffix.length)
+        // Pattern: BTC + {COIN} + USD
+        // The coin name part must exist (at least 3 chars after BTC and before USD)
+        val coinPart = code.substring(3, code.length - "USD".length)
         
         // Coin name must have at least 3 characters
         if (coinPart.length < 3) {

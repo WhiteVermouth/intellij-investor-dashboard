@@ -37,9 +37,4 @@ object StockerBundle : DynamicBundle(BUNDLE) {
         val template = bundle.getString(key)
         return if (params.isEmpty()) template else MessageFormat.format(template, *params)
     }
-
-    @Nls
-    @JvmStatic
-    fun messagePointer(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =
-        getLazyMessage(key, *params)
 }

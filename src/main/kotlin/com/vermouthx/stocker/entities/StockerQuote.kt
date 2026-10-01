@@ -10,8 +10,6 @@ data class StockerQuote(
     var high: Double,
     var change: Double,
     var percentage: Double,
-    var buys: Array<Double> = emptyArray(),
-    var sells: Array<Double> = emptyArray(),
     var updateAt: String
 ) {
     override fun equals(other: Any?): Boolean {

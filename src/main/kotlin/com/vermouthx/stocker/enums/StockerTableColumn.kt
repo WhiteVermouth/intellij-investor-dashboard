@@ -23,9 +23,6 @@ enum class StockerTableColumn(val titleKey: String) {
 
     companion object {
         @JvmStatic
-        fun defaultTitles(): List<String> = entries.map { it.title }
-
-        @JvmStatic
         fun defaultVisibleNames(): List<String> = listOf(
             NAME.name,
             CURRENT.name,

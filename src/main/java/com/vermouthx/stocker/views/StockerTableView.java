@@ -745,10 +745,6 @@ public class StockerTableView implements Disposable {
         return mPane;
     }
 
-    public JBTable getTableBody() {
-        return tbBody;
-    }
-
     public DefaultTableModel getTableModel() {
         return tbModel;
     }
