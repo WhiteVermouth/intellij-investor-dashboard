@@ -2,11 +2,20 @@
 
 ## Project Overview
 
-- This repository contains the `Stocker` JetBrains plugin (`com.vermouthx.intellij-investor-dashboard`).
+- This repository contains the `Stocker` JetBrains plugin (`com.vermouthx.intellij-investor-dashboard`), which shows a real-time stock/crypto watchlist (A-shares, HK, US, crypto) in a tool window.
 - It is a mixed Kotlin/Java codebase:
   - Kotlin holds most application logic, actions, settings, dialogs, notifications, and tool window wiring.
   - Java holds table rendering, table view behavior, message-bus listeners, and some utility classes.
 - The plugin targets IntelliJ Platform `2025.3` (built against the unified IntelliJ IDEA / `IU` distribution, since Community `IC` is no longer published as of 253) via the `org.jetbrains.intellij.platform` Gradle plugin.
+- Toolchain: JDK 21 (`jvmToolchain(21)` in `build.gradle.kts`). Always build through the Gradle wrapper (`./gradlew`); its version is pinned in `gradle/wrapper/gradle-wrapper.properties`.
+
+## How It Works
+
+- `StockerApp` is an application-level service that runs one consolidated `ScheduledExecutorService` task on the configured refresh interval while any Stocker tool window is open. Each run fetches favorites and indices for all markets once and publishes the results over the application message bus, so every project's tool window updates from the same fetch.
+- `StockerQuoteHttpUtil` builds the provider URLs (Sina / Tencent), and `StockerQuoteParser` parses the text responses into `StockerQuote`.
+- Each tool-window tab subscribes to its market's update/delete/reload topics; the Java listeners apply cell-level diffs to the Swing `StockerTableModel` on the EDT.
+- The platform shares one `StockerToolWindow` factory instance across all projects, so it must stay stateless: per-window views and bus connections hang off `toolWindow.disposable`.
+- `StockerSetting` is an application-level `PersistentStateComponent` (`stocker-config.xml`) holding watchlists, custom names, cost prices, holdings, color pattern, visible columns, language override, and refresh interval.
 
 ## Repository Layout
 
@@ -32,7 +41,7 @@
 
 - Preserve the existing mixed-language structure. Do not move Java table/view classes into Kotlin unless the task explicitly requires a broader refactor.
 - Prefer small, surgical fixes. This plugin has a lot of event-driven UI behavior; broad rewrites are risky.
-- When changing user-visible text, check whether it belongs in `messages/StockerBundle*.properties` instead of hardcoding it.
+- When changing user-visible text, check whether it belongs in `messages/StockerBundle*.properties` instead of hardcoding it, and keep `StockerBundle.properties` and `StockerBundle_zh_CN.properties` in sync.
 - When changing plugin wiring, actions, startup behavior, settings registration, or notification groups, verify `src/main/resources/META-INF/plugin.xml`.
 - When changing tool window, table, or popup behavior, review both sides of the flow:
   - UI event handling in `views` / `components`
@@ -47,6 +56,8 @@
   - `./gradlew test`
 - For broader plugin or packaging changes, consider:
   - `./gradlew build`
+- For plugin compatibility (API usage, platform version range):
+  - `./gradlew verifyPlugin`
 - If the change affects UI behavior, context menus, notifications, actions, or settings application, note whether the fix was only compile-verified or manually exercised in IntelliJ.
 
 ## Testing
@@ -60,16 +71,14 @@
 
 ## Release And Versioning
 
-- `pluginVersion` lives in `gradle.properties`.
-- `build.gradle.kts` uses `CHANGELOG.md` as the source for plugin change notes shown on release.
-- `StockerNotification.kt` contains the in-product release note content shown to users after upgrade.
 - When bumping the plugin version, you must update these files together in the same change:
-  - `gradle.properties`
-  - `CHANGELOG.md`
-  - `src/main/kotlin/com/vermouthx/stocker/notifications/StockerNotification.kt`
+  - `gradle.properties` → `pluginVersion` (the source of truth).
+  - `CHANGELOG.md` → add a new `## X.Y.Z` section matching the existing format: emoji-prefixed category headings (`### ✨ New Features`, `### 🐛 Bug Fixes`, `### 🔧 Maintenance`, …) with bilingual `English / 中文` entries. `build.gradle.kts` derives the Marketplace change notes from the latest entry via the `org.jetbrains.changelog` plugin, so no manual copy is needed.
+  - `src/main/kotlin/com/vermouthx/stocker/notifications/StockerNotification.kt` → update `buildReleaseNote()`, editing both the `zh_CN` and English HTML blocks. This is the in-IDE popup shown after upgrade; the version string itself comes from `StockerMeta`, so only the prose changes.
 - Publishing is **tag-driven** via `.github/workflows/build.yml`:
-  - Pushing a tag matching `v1.*` triggers the release job, which builds the plugin, creates a GitHub Release with the `.zip` artifact, and runs `./gradlew publishPlugin` to the JetBrains Marketplace (using the `JETBRAINS_TOKEN` repo secret).
-  - Typical flow after the version bump: verify (`./gradlew test build`), commit, then `git tag vX.Y.Z && git push origin master --tags`.
+  1. Verify: `./gradlew test build` (and `./gradlew verifyPlugin` for compatibility).
+  2. Commit (`🔖 Release version X.Y.Z: …`), then `git tag vX.Y.Z && git push origin master --tags`. The release job only runs for tags matching `v1.*`.
+  3. CI builds the plugin, creates a GitHub Release with the `.zip` artifact, and runs `./gradlew publishPlugin` to the JetBrains Marketplace (using the `JETBRAINS_TOKEN` repo secret).
   - Manual fallback: `./gradlew publishPlugin -Djetbrains.token=<token>`.
 
 ## Common Pitfalls
