@@ -14,7 +14,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
-import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.entities.StockerQuote
 import com.vermouthx.stocker.enums.StockerMarketType
@@ -47,6 +47,7 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     private val tabMap: MutableMap<StockerMarketType, JPanel> = mutableMapOf()
 
+    // Only markets whose list has finished loading; OK leaves the others untouched.
     private val currentSymbols: MutableMap<StockerMarketType, DefaultListModel<StockerQuote>> = mutableMapOf()
 
     init {
@@ -82,7 +83,6 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
 
     private fun loadMarketData(marketType: StockerMarketType, codes: List<String>) {
         val listModel = DefaultListModel<StockerQuote>()
-        currentSymbols[marketType] = listModel
 
         // Show loading state
         tabMap[marketType]?.let { pane ->
@@ -118,6 +118,9 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
                         )
                     listModel.addElement(quote)
                 }
+                // Register only once populated: pressing OK while the fetch is still in flight
+                // would otherwise overwrite this watchlist with an empty list.
+                currentSymbols[marketType] = listModel
                 tabMap[marketType]?.let { pane ->
                     renderTabPane(pane, listModel)
                 }
@@ -147,23 +150,21 @@ class StockerManagementDialog(val project: Project?) : DialogWrapper(project) {
         return arrayOf(
             object : OkAction() {
                 override fun actionPerformed(e: ActionEvent?) {
-                    val myApplication = StockerAppManager.myApplication(project)
-                    if (myApplication != null) {
-                        myApplication.shutdownThenClear()
-                        currentSymbols[StockerMarketType.AShare]?.let { symbols ->
-                            setting.aShareList = symbols.elements().asSequence().map { it.code }.toMutableList()
-                        }
-                        currentSymbols[StockerMarketType.HKStocks]?.let { symbols ->
-                            setting.hkStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
-                        }
-                        currentSymbols[StockerMarketType.USStocks]?.let { symbols ->
-                            setting.usStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
-                        }
-                        currentSymbols[StockerMarketType.Crypto]?.let { symbols ->
-                            setting.cryptoList = symbols.elements().asSequence().map { it.code }.toMutableList()
-                        }
-                        myApplication.schedule()
+                    val myApplication = StockerApp.instance
+                    myApplication.shutdownThenClear()
+                    currentSymbols[StockerMarketType.AShare]?.let { symbols ->
+                        setting.aShareList = symbols.elements().asSequence().map { it.code }.toMutableList()
                     }
+                    currentSymbols[StockerMarketType.HKStocks]?.let { symbols ->
+                        setting.hkStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
+                    }
+                    currentSymbols[StockerMarketType.USStocks]?.let { symbols ->
+                        setting.usStocksList = symbols.elements().asSequence().map { it.code }.toMutableList()
+                    }
+                    currentSymbols[StockerMarketType.Crypto]?.let { symbols ->
+                        setting.cryptoList = symbols.elements().asSequence().map { it.code }.toMutableList()
+                    }
+                    myApplication.schedule()
                     super.actionPerformed(e)
                 }
             }, cancelAction

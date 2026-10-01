@@ -15,7 +15,7 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
-import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.entities.StockerSuggestion
 import com.vermouthx.stocker.enums.StockerMarketType
@@ -276,7 +276,7 @@ class StockerSuggestionDialog(val project: Project?) : DialogWrapper(project) {
         }
         refreshButtonText()
         actionButton.addActionListener {
-            val myApplication = StockerAppManager.myApplication(project) ?: return@addActionListener
+            val myApplication = StockerApp.instance
             myApplication.shutdownThenClear()
             if (setting.containsCode(suggestion.code)) {
                 StockerActionUtil.removeStock(suggestion.market, suggestion)

@@ -195,6 +195,60 @@ class StockerQuoteParserTest {
     }
 
     @Test
+    fun `skips unknown Sina symbols without dropping the rest of the batch`() {
+        // Sina answers an unknown or delisted symbol with an empty payload.
+        val valid = record(
+            32, ",",
+            0 to "平安银行", 1 to "10.000", 2 to "10.000", 3 to "11.000",
+            4 to "11.500", 5 to "9.800", 30 to "2024-01-02", 31 to "15:00:00"
+        )
+        val response = buildString {
+            append("var hq_str_sh999999=\"\";\n")
+            append("var hq_str_sz000001=\"$valid\";\n")
+            append("not a quote line\n")
+        }
+
+        val quotes = StockerQuoteParser.parseQuoteResponse(
+            StockerQuoteProvider.SINA, StockerMarketType.AShare, response
+        )
+
+        assertEquals(listOf("SZ000001"), quotes.map { it.code })
+    }
+
+    @Test
+    fun `skips Tencent no-match records without dropping the rest of the batch`() {
+        val valid = record(
+            35, "~",
+            0 to "1", 1 to "贵州茅台", 2 to "600519", 3 to "1700.00", 4 to "1680.00", 5 to "1690.00",
+            30 to "20240102150000", 32 to "1.19", 33 to "1710.00", 34 to "1670.00"
+        )
+        val response = buildString {
+            append("v_pv_none_match=\"1\";\n")
+            append("v_sh600519=\"$valid\";\n")
+        }
+
+        val quotes = StockerQuoteParser.parseQuoteResponse(
+            StockerQuoteProvider.TENCENT, StockerMarketType.AShare, response
+        )
+
+        assertEquals(listOf("SH600519"), quotes.map { it.code })
+    }
+
+    @Test
+    fun `reports zero percent change when Sina previous close is zero`() {
+        // A listing that has not traded yet: every price, including the previous close, is 0.
+        val payload = record(32, ",", 0 to "新股", 30 to "2024-01-02", 31 to "09:00:00")
+        val response = "var hq_str_sh688999=\"$payload\";"
+
+        val quotes = StockerQuoteParser.parseQuoteResponse(
+            StockerQuoteProvider.SINA, StockerMarketType.AShare, response
+        )
+
+        assertEquals(1, quotes.size)
+        assertEquals(0.0, quotes[0].percentage)
+    }
+
+    @Test
     fun `returns empty list for blank response`() {
         val quotes = StockerQuoteParser.parseQuoteResponse(
             StockerQuoteProvider.SINA, StockerMarketType.AShare, ""

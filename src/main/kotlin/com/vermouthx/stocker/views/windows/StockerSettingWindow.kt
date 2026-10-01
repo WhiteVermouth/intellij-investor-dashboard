@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
-import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.enums.StockerQuoteColorPattern
 import com.vermouthx.stocker.enums.StockerQuoteProvider
@@ -361,10 +361,9 @@ class StockerSettingWindow : BoundConfigurable(StockerBundle.message("plugin.nam
     }
 
     private fun refreshAllWindows() {
-        StockerAppManager.getAllApplications().forEach { app ->
-            app.shutdownThenClear()
-            app.schedule()
-        }
+        val myApplication = StockerApp.instance
+        myApplication.shutdownThenClear()
+        myApplication.schedule()
     }
 
 }

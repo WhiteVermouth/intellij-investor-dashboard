@@ -3,7 +3,7 @@ package com.vermouthx.stocker.actions
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.StockerBundle
 
 class StockerRefreshAction : AnAction() {
@@ -17,8 +17,9 @@ class StockerRefreshAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        StockerAppManager.myApplication(e.project)?.shutdownThenClear()
-        StockerAppManager.myApplication(e.project)?.schedule()
+        val myApplication = StockerApp.instance
+        myApplication.shutdownThenClear()
+        myApplication.schedule()
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {

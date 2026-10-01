@@ -13,6 +13,22 @@ object StockerQuoteParser {
         return (this * 100.0).roundToInt() / 100.0
     }
 
+    // A zero base (e.g. a listing that has not traded yet) would yield NaN, which roundToInt rejects.
+    private fun percentChange(current: Double, base: Double): Double {
+        return if (base == 0.0) 0.0 else ((current - base) / base * 100).twoDigits()
+    }
+
+    /**
+     * Providers answer an unknown or delisted symbol with an empty or placeholder record in the
+     * middle of an otherwise valid batch. Parse each line on its own and drop the ones that do not
+     * fit, so one bad symbol cannot discard the quotes of every other symbol in the request.
+     */
+    private fun parseLines(responseText: String, parseLine: (String) -> StockerQuote): List<StockerQuote> {
+        return responseText.split("\n").filter { text -> text.isNotBlank() }.mapNotNull { text ->
+            runCatching { parseLine(text) }.getOrNull()
+        }
+    }
+
     fun parseQuoteResponse(
         provider: StockerQuoteProvider, marketType: StockerMarketType, responseText: String
     ): List<StockerQuote> {
@@ -24,11 +40,9 @@ object StockerQuoteParser {
 
     private fun parseSinaQuoteResponse(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
         val regex = Regex("var hq_str_(\\w+?)=\"(.*?)\";")
-        return responseText.split("\n").asSequence().filter { text -> text.isNotEmpty() }.map { text ->
-            val matchResult = regex.find(text)
-            val (_, code, quote) = matchResult!!.groupValues
-            "${code},${quote}"
-        }.map { text -> text.split(",") }.map { textArray ->
+        return parseLines(responseText) { text ->
+            val (_, symbol, payload) = regex.find(text)!!.groupValues
+            val textArray = "${symbol},${payload}".split(",")
             when (marketType) {
                 StockerMarketType.AShare -> {
                     val code = textArray[0].uppercase()
@@ -39,7 +53,7 @@ object StockerQuoteParser {
                     val high = textArray[5].toDouble()
                     val low = textArray[6].toDouble()
                     val change = (current - close).twoDigits()
-                    val percentage = ((current - close) / close * 100).twoDigits()
+                    val percentage = percentChange(current, close)
                     val updateAt = textArray[31] + " " + textArray[32]
                     StockerQuote(
                         code = code,
@@ -116,7 +130,7 @@ object StockerQuoteParser {
                     val high = textArray[7].toDouble()
                     val opening = textArray[6].toDouble()
                     val change = (current - opening).twoDigits()
-                    val percentage = ((current - opening) / opening * 100).twoDigits()
+                    val percentage = percentChange(current, opening)
                     val updateAt = "${textArray[12]} ${textArray[1]}"
                     StockerQuote(
                         code = code,
@@ -132,20 +146,21 @@ object StockerQuoteParser {
                     )
                 }
             }
-        }.toList()
+        }
     }
 
     private fun parseTencentQuoteResponse(marketType: StockerMarketType, responseText: String): List<StockerQuote> {
-        return responseText.split("\n").asSequence().filter { text -> text.isNotEmpty() }.map { text ->
-            val code = when (marketType) {
+        return parseLines(responseText) { text ->
+            val symbol = when (marketType) {
                 StockerMarketType.AShare -> text.subSequence(2, text.indexOfFirst { c -> c == '=' })
                 StockerMarketType.HKStocks, StockerMarketType.USStocks -> text.subSequence(4,
                     text.indexOfFirst { c -> c == '=' })
 
                 StockerMarketType.Crypto -> ""
             }
-            "$code~${text.subSequence(text.indexOfFirst { c -> c == '"' } + 1, text.indexOfLast { c -> c == '"' })}"
-        }.map { text -> text.split("~") }.map { textArray ->
+            val textArray =
+                "$symbol~${text.subSequence(text.indexOfFirst { c -> c == '"' } + 1, text.indexOfLast { c -> c == '"' })}"
+                    .split("~")
             val code = textArray[0].uppercase()
             val name = textArray[2]
             val opening = textArray[6].toDouble()
@@ -185,6 +200,6 @@ object StockerQuoteParser {
                 percentage = percentage,
                 updateAt = updateAt
             )
-        }.toList()
+        }
     }
 }

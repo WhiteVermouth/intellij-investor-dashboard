@@ -30,9 +30,12 @@ Toolchain: JDK 21, Gradle wrapper 9.5.0. Always use the wrapper (`./gradlew`).
 
 ## How the plugin works (data flow)
 
-- `StockerApp` runs one consolidated `ScheduledExecutorService` task per project
-  on the configured refresh interval; it fetches favorites + indices for all
-  markets and publishes results over the IntelliJ **message bus**.
+- `StockerApp` is an application-level service running one consolidated
+  `ScheduledExecutorService` task on the configured refresh interval while any
+  Stocker tool window is open; it fetches favorites + indices for all markets
+  and publishes results over the application **message bus** to every project's
+  tool window. `StockerToolWindow` is shared across projects by the platform, so
+  it must stay stateless (per-window state hangs off `toolWindow.disposable`).
 - `StockerQuoteHttpUtil` builds provider URLs (Sina / Tencent) →
   `StockerQuoteParser` parses the text response into `StockerQuote`.
 - Per-market tool-window tabs subscribe to update/delete/reload topics; the Java

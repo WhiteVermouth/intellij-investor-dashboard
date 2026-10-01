@@ -3,7 +3,7 @@ package com.vermouthx.stocker.actions
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.vermouthx.stocker.StockerAppManager
+import com.vermouthx.stocker.StockerApp
 import com.vermouthx.stocker.StockerBundle
 import com.vermouthx.stocker.settings.StockerSetting
 
@@ -17,8 +17,8 @@ class StockerResetAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val myApplication = StockerAppManager.myApplication(e.project)
-        myApplication?.shutdownThenClear()
+        val myApplication = StockerApp.instance
+        myApplication.shutdownThenClear()
 
         val setting = StockerSetting.instance
         setting.aShareList.clear()
@@ -26,7 +26,7 @@ class StockerResetAction : AnAction() {
         setting.usStocksList.clear()
         setting.cryptoList.clear()
 
-        myApplication?.schedule()
+        myApplication.schedule()
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {

@@ -5,6 +5,7 @@ import com.vermouthx.stocker.settings.StockerSetting;
 import com.vermouthx.stocker.utils.StockerTableModelUtil;
 import com.vermouthx.stocker.views.StockerTableView;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
@@ -38,12 +39,12 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
     }
 
     @Override
-    public void syncQuotes(List<StockerQuote> quotes, int size) {
-        DefaultTableModel tableModel = myTableView.getTableModel();
-        StockerSetting setting = StockerSetting.Companion.getInstance();
-        
-        quotes.forEach(quote -> {
-            synchronized (myTableView.getTableModel()) {
+    public void syncQuotes(List<StockerQuote> quotes) {
+        // Published from the refresh thread; Swing models may only be touched on the EDT.
+        SwingUtilities.invokeLater(() -> {
+            DefaultTableModel tableModel = myTableView.getTableModel();
+            StockerSetting setting = StockerSetting.Companion.getInstance();
+            quotes.forEach(quote -> {
                 String displayName = setting.getDisplayName(quote.getCode(), quote.getName());
                 int rowIndex = StockerTableModelUtil.existAt(tableModel, quote.getCode());
                 if (rowIndex != -1) {
@@ -108,7 +109,9 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                         tableModel.setValueAt(dailyProfitVal, rowIndex, 12);
                     }
                 } else {
-                    if (quotes.size() == size) {
+                    // Add rows for whatever was fetched, so one unavailable symbol doesn't keep the
+                    // rest off the table, but skip codes deleted since this refresh started.
+                    if (setting.containsCode(quote.getCode())) {
                         Double costPrice = setting.getCostPrice(quote.getCode());
                         Integer holdings = setting.getHoldings(quote.getCode());
                         tableModel.addRow(new Object[]{
@@ -130,7 +133,7 @@ public class StockerQuoteUpdateListener implements StockerQuoteUpdateNotifier {
                         myTableView.clearSortState();
                     }
                 }
-            }
+            });
         });
     }
 

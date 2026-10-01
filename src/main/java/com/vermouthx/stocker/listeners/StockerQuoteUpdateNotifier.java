@@ -12,7 +12,7 @@ public interface StockerQuoteUpdateNotifier {
     Topic<StockerQuoteUpdateNotifier> STOCK_US_QUOTE_UPDATE_TOPIC = Topic.create("StockUSQuoteUpdateTopic", StockerQuoteUpdateNotifier.class);
     Topic<StockerQuoteUpdateNotifier> CRYPTO_QUOTE_UPDATE_TOPIC = Topic.create("CryptoQuoteUpdateTopic", StockerQuoteUpdateNotifier.class);
 
-    void syncQuotes(List<StockerQuote> quotes, int size);
+    void syncQuotes(List<StockerQuote> quotes);
 
     void syncIndices(List<StockerQuote> indices);
 }

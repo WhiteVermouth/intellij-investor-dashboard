@@ -7,148 +7,85 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.messages.MessageBusConnection
+import com.intellij.util.messages.Topic
 import com.vermouthx.stocker.StockerApp
-import com.vermouthx.stocker.StockerAppManager
 import com.vermouthx.stocker.enums.StockerMarketType
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteListener
+import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier
 import com.vermouthx.stocker.listeners.StockerQuoteDeleteNotifier.*
 import com.vermouthx.stocker.listeners.StockerQuoteReloadListener
+import com.vermouthx.stocker.listeners.StockerQuoteReloadNotifier
 import com.vermouthx.stocker.listeners.StockerQuoteReloadNotifier.*
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateListener
+import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier
 import com.vermouthx.stocker.listeners.StockerQuoteUpdateNotifier.*
+import com.vermouthx.stocker.views.StockerTableView
 
+/**
+ * The platform shares one factory instance across all projects, so everything here is created
+ * per call and tied to the tool window's disposable instead of being kept in fields.
+ */
 class StockerToolWindow : ToolWindowFactory {
-
-    private val messageBus = ApplicationManager.getApplication().messageBus
-
-    private lateinit var allView: StockerSimpleToolWindow
-    private lateinit var tabViewMap: Map<StockerMarketType, StockerSimpleToolWindow>
-    private lateinit var myApplication: StockerApp
-    private val messageBusConnections = mutableListOf<MessageBusConnection>()
-
-    override fun init(toolWindow: ToolWindow) {
-        super.init(toolWindow)
-        allView = StockerSimpleToolWindow()
-        tabViewMap = mapOf(
-            StockerMarketType.AShare to StockerSimpleToolWindow(StockerMarketType.AShare),
-            StockerMarketType.HKStocks to StockerSimpleToolWindow(StockerMarketType.HKStocks),
-            StockerMarketType.USStocks to StockerSimpleToolWindow(StockerMarketType.USStocks),
-            StockerMarketType.Crypto to StockerSimpleToolWindow(StockerMarketType.Crypto)
-        )
-        myApplication = StockerApp()
-    }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val contentManager = toolWindow.contentManager
         val contentFactory = ContentFactory.getInstance()
-        
-        // Create a disposable for cleanup when tool window is closed
-        val disposable = Disposer.newDisposable("StockerToolWindow")
-        toolWindow.disposable.let { Disposer.register(it, disposable) }
-        
-        val allContent = contentFactory.createContent(allView.component, "ALL", false)
-        contentManager.addContent(allContent)
-        val aShareContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.AShare]?.component, StockerMarketType.AShare.title, false
-        )
-        contentManager.addContent(aShareContent)
-        val hkStocksContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.HKStocks]?.component, StockerMarketType.HKStocks.title, false
-        )
-        contentManager.addContent(hkStocksContent)
-        val usStocksContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.USStocks]?.component, StockerMarketType.USStocks.title, false
-        )
-        contentManager.addContent(usStocksContent)
-        val cryptoContent = contentFactory.createContent(
-            tabViewMap[StockerMarketType.Crypto]?.component,
-            StockerMarketType.Crypto.title,
-            false
-        )
-        contentManager.addContent(cryptoContent)
-        this.subscribeMessage()
-        
-        // Register cleanup when disposable is disposed
-        Disposer.register(disposable) {
-            cleanup()
+        val disposable = toolWindow.disposable
+
+        val allView = StockerSimpleToolWindow()
+        val tabViewMap = StockerMarketType.entries.associateWith { StockerSimpleToolWindow(it) }
+
+        contentManager.addContent(contentFactory.createContent(allView.component, "ALL", false))
+        tabViewMap.forEach { (market, view) ->
+            contentManager.addContent(contentFactory.createContent(view.component, market.title, false))
         }
-        
-        StockerAppManager.register(project, myApplication)
-        myApplication.schedule()
-    }
-    
-    private fun cleanup() {
-        // Dispose all table views
-        allView.tableView.dispose()
-        tabViewMap.values.forEach { it.tableView.dispose() }
-        
-        // Disconnect all message bus connections
-        messageBusConnections.forEach { it.disconnect() }
-        messageBusConnections.clear()
-    }
 
-    private fun subscribeMessage() {
-        // Create and store connections for proper disposal
-        messageBusConnections.add(messageBus.connect().apply {
-            subscribe(STOCK_ALL_QUOTE_UPDATE_TOPIC, StockerQuoteUpdateListener(allView.tableView))
-        })
-        messageBusConnections.add(messageBus.connect().apply {
-            subscribe(STOCK_ALL_QUOTE_DELETE_TOPIC, StockerQuoteDeleteListener(allView.tableView))
-        })
-        messageBusConnections.add(messageBus.connect().apply {
-            subscribe(STOCK_ALL_QUOTE_RELOAD_TOPIC, StockerQuoteReloadListener(allView.tableView))
-        })
-        
-        tabViewMap.forEach { (market, myTableView) ->
+        // Disconnected automatically when the tool window (or its project) is disposed.
+        val connection = ApplicationManager.getApplication().messageBus.connect(disposable)
+        connection.subscribeTable(
+            allView.tableView,
+            STOCK_ALL_QUOTE_UPDATE_TOPIC, STOCK_ALL_QUOTE_DELETE_TOPIC, STOCK_ALL_QUOTE_RELOAD_TOPIC
+        )
+        tabViewMap.forEach { (market, view) ->
             when (market) {
-                StockerMarketType.AShare -> {
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_CN_QUOTE_UPDATE_TOPIC, StockerQuoteUpdateListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_CN_QUOTE_DELETE_TOPIC, StockerQuoteDeleteListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_CN_QUOTE_RELOAD_TOPIC, StockerQuoteReloadListener(myTableView.tableView))
-                    })
-                }
+                StockerMarketType.AShare -> connection.subscribeTable(
+                    view.tableView,
+                    STOCK_CN_QUOTE_UPDATE_TOPIC, STOCK_CN_QUOTE_DELETE_TOPIC, STOCK_CN_QUOTE_RELOAD_TOPIC
+                )
 
-                StockerMarketType.HKStocks -> {
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_HK_QUOTE_UPDATE_TOPIC, StockerQuoteUpdateListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_HK_QUOTE_DELETE_TOPIC, StockerQuoteDeleteListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_HK_QUOTE_RELOAD_TOPIC, StockerQuoteReloadListener(myTableView.tableView))
-                    })
-                }
+                StockerMarketType.HKStocks -> connection.subscribeTable(
+                    view.tableView,
+                    STOCK_HK_QUOTE_UPDATE_TOPIC, STOCK_HK_QUOTE_DELETE_TOPIC, STOCK_HK_QUOTE_RELOAD_TOPIC
+                )
 
-                StockerMarketType.USStocks -> {
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_US_QUOTE_UPDATE_TOPIC, StockerQuoteUpdateListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_US_QUOTE_DELETE_TOPIC, StockerQuoteDeleteListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_US_QUOTE_RELOAD_TOPIC, StockerQuoteReloadListener(myTableView.tableView))
-                    })
-                }
+                StockerMarketType.USStocks -> connection.subscribeTable(
+                    view.tableView,
+                    STOCK_US_QUOTE_UPDATE_TOPIC, STOCK_US_QUOTE_DELETE_TOPIC, STOCK_US_QUOTE_RELOAD_TOPIC
+                )
 
-                StockerMarketType.Crypto -> {
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(CRYPTO_QUOTE_UPDATE_TOPIC, StockerQuoteUpdateListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(CRYPTO_QUOTE_DELETE_TOPIC, StockerQuoteDeleteListener(myTableView.tableView))
-                    })
-                    messageBusConnections.add(messageBus.connect().apply {
-                        subscribe(STOCK_CRYPTO_QUOTE_RELOAD_TOPIC, StockerQuoteReloadListener(myTableView.tableView))
-                    })
-                }
+                StockerMarketType.Crypto -> connection.subscribeTable(
+                    view.tableView,
+                    CRYPTO_QUOTE_UPDATE_TOPIC, CRYPTO_QUOTE_DELETE_TOPIC, STOCK_CRYPTO_QUOTE_RELOAD_TOPIC
+                )
             }
         }
+
+        Disposer.register(disposable) {
+            allView.tableView.dispose()
+            tabViewMap.values.forEach { it.tableView.dispose() }
+        }
+
+        StockerApp.instance.register(disposable)
+    }
+
+    private fun MessageBusConnection.subscribeTable(
+        tableView: StockerTableView,
+        updateTopic: Topic<StockerQuoteUpdateNotifier>,
+        deleteTopic: Topic<StockerQuoteDeleteNotifier>,
+        reloadTopic: Topic<StockerQuoteReloadNotifier>
+    ) {
+        subscribe(updateTopic, StockerQuoteUpdateListener(tableView))
+        subscribe(deleteTopic, StockerQuoteDeleteListener(tableView))
+        subscribe(reloadTopic, StockerQuoteReloadListener(tableView))
     }
 }
